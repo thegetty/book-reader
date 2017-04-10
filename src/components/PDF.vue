@@ -2,7 +2,12 @@
   <div id="pageContainer" :class="{ loading: isLoading }">
     <!-- <div id="pageContainerLeft" class="pdfViewer"></div>
     <div id="pageContainerRight" class="pdfViewer"></div> -->
-    <canvas ref="canvas" />
+    <div class="page" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }">
+      <canvas ref="canvas" :width="`${viewportWidth}px`" :height="`${viewportHeight}px`"/>
+      <div ref="textLayer" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }" class="textLayer"></div>
+      <div ref="imageLayer"></div>
+      <div ref="annotationLayer"></div>
+    </div>
   </div>
 </template>
 
@@ -11,6 +16,9 @@
 <script src="/static/libs/pdfjs-dist/web/pdf_viewer.js"></script>
 <script>
 const pdfjsLib = require('pdfjs-dist');
+// const pdfjsWebTextLayerBuilder = require('pdfjs-dist/lib/web/text_layer_builder.js');
+// console.log(pdfjsWebTextLayerBuilder);
+// const pdfjsWebAnnotationLayerBuilder = require('./annotation_layer_builder.js');
 // /* global PDFJS */
 
 // const pdfViewer = require('../../static/libs/pdfjs-dist/web/pdf_viewer.js');
@@ -41,7 +49,9 @@ export default {
       numPages: 0,
       scale: 1,
       rotate: undefined,
-      isLoading: true
+      isLoading: true,
+      viewportWidth: 0,
+      viewportHeight: 0
     }
   },
   updated () {
@@ -78,6 +88,8 @@ export default {
           this.pdf = pdfDocument;
 
           this.isLoading = false;
+
+          this.$emit('loaded');
           // return pdfDocument.getPage(1);
         })
         // .then((firstPage) => {
@@ -126,14 +138,50 @@ export default {
     },
     onPageLoad (page) {
       // const scale = this.getPageScale(page);
-      const { canvas } = this.$refs;
+      const { canvas, textLayer } = this.$refs;
       const canvasContext = canvas.getContext('2d');
       const { scale, rotate } = this;
       const viewport = page.getViewport(scale, rotate);
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+      const imageLayer = {
+        beginLayout () { },
+        endLayout () { },
+        appendImage (i) { console.log(i); }
+      };
 
-      page.render({ canvasContext, viewport });
+      this.viewportHeight = viewport.height;
+      this.viewportWidth = viewport.width;
+
+      page.render({ canvasContext, viewport, imageLayer })
+        .then(() => {
+          textLayer.innerHTML = '';
+          page.getTextContent({ normalizeWhitespace: true }).then(
+            (textContent) => {
+              console.log(textContent);
+              // textLayer.setTextContent(textContent);
+              // textLayer.render(TEXT_LAYER_RENDER_DELAY);
+              this.textDivs = [];
+              let textLayerFrag = document.createDocumentFragment();
+
+              if (this.textLayerRenderTask) {
+                this.textLayerRenderTask.cancel();
+                this.textLayerRenderTask = null;
+              }
+
+              this.textLayerRenderTask = pdfjsLib.renderTextLayer({
+                textContent: textContent,
+                container: textLayerFrag,
+                viewport: viewport,
+                textDivs: this.textDivs,
+                timeout: 300
+              });
+
+              this.textLayerRenderTask.promise.then(() => {
+                console.log(textLayerFrag);
+                textLayer.appendChild(textLayerFrag);
+              });
+            }
+          );
+        });
     },
     onPageError (page) {
       console.error(page);
@@ -148,5 +196,37 @@ export default {
 }
 canvas {
   /*background-color: #eee;*/
+}
+
+.page {
+  direction: ltr;
+  position: relative;
+  overflow: visible;
+  margin: 0 auto;
+}
+
+.textLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  line-height: 1.0;
+}
+</style>
+
+<style>
+.textLayer > div {
+    color: transparent;
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+    -webkit-transform-origin: 0% 0%;
+    -moz-transform-origin: 0% 0%;
+    -o-transform-origin: 0% 0%;
+    -ms-transform-origin: 0% 0%;
+    transform-origin: 0% 0%;
 }
 </style>

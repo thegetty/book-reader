@@ -1,7 +1,7 @@
 <template>
   <div id="page-wrap">
 
-    <PDF :src="this.manifest.pdf" :page="page"/>
+    <PDF :src="this.manifest.pdf" :page="page" @loaded="loaded" />
     <div id="prev" class="arrow" @click="page -= 1">‹</div>
     <div id="next" class="arrow" @click="page += 1">›</div>
     <header>
@@ -11,7 +11,7 @@
     </header>
     <div id="images">
       <ol>
-        <li v-for="image in manifest.images">
+        <li v-for="image in images">
           <a class="img_link" @click="page = (image.page - 1)">
             <img :src="image.thumbnail" />
           </a>
@@ -33,6 +33,7 @@ export default {
   data () {
     return {
       manifest: {},
+      images: [],
       page: 0
     }
   },
@@ -49,6 +50,10 @@ export default {
           console.log(manifest)
           this.manifest = manifest;
         })
+    },
+    loaded () {
+      // Wait for PDF to load
+      this.images = this.manifest.images;
     },
     next () {
       // TODO: don't go over total pages
