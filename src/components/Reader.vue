@@ -1,9 +1,8 @@
 <template>
   <div id="page-wrap">
-
-    <PDF :src="this.manifest.pdf" :page="page" @loaded="loaded" />
-    <div id="prev" class="arrow" @click="page -= 1">‹</div>
-    <div id="next" class="arrow" @click="page += 1">›</div>
+    <PDF ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="1000" />
+    <div id="prev" class="arrow" @click="this.prev">‹</div>
+    <div id="next" class="arrow" @click="this.next">›</div>
     <header>
       <h1>{{manifest.title}}: </h1>
       <h2>{{manifest.subtitle}}, </h2>
@@ -23,6 +22,7 @@
 
 <script>
 import PDF from '@/components/PDF'
+import Vue from 'vue'
 
 export default {
   name: 'reader',
@@ -38,7 +38,11 @@ export default {
     }
   },
   created () {
-    this.fetchManifest()
+    this.fetchManifest();
+    window.addEventListener('keyup', this.keyListener.bind(this), false);
+  },
+  beforeDestory () {
+    window.removeEventListener('keyup', this.keyListener);
   },
   methods: {
     fetchManifest () {
@@ -56,12 +60,19 @@ export default {
       this.images = this.manifest.images;
     },
     next () {
-      // TODO: don't go over total pages
-      this.page += 1;
+      const { pdf } = this.$refs;
+      pdf.next();
     },
     prev () {
-      if (this.page > 1) {
-        this.page -= 1;
+      const { pdf } = this.$refs;
+      pdf.prev();
+    },
+    keyListener (e) {
+      const { keyCode } = e;
+      if (keyCode === 37) {
+        this.prev();
+      } else if (keyCode === 39) {
+        this.next();
       }
     }
 
@@ -69,8 +80,8 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 header {
 
 }

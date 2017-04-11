@@ -1,20 +1,17 @@
 <template>
-  <div id="pageContainer" :class="{ loading: isLoading }">
-    <!-- <div id="pageContainerLeft" class="pdfViewer"></div>
-    <div id="pageContainerRight" class="pdfViewer"></div> -->
-    <div class="page" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }">
-      <canvas ref="canvas" :width="`${viewportWidth}px`" :height="`${viewportHeight}px`"/>
-      <div ref="textLayer" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }" class="textLayer"></div>
-      <div ref="imageLayer"></div>
-      <div ref="annotationLayer"></div>
+  <div class="pageContainer" :class="{ loading: isLoading }">
+    <div class="page" v-for="page in displayedPages">
+      <page :page="page" :width="spreads ? width / 2 : width" :height="height" />
     </div>
   </div>
 </template>
 
 <!-- <script src="libs/pdfjs-dist/build/pdf.js"></script> -->
 <!-- <script src="/static/libs/pdfjs-dist/build/pdf.worker.js"></script> -->
-<script src="/static/libs/pdfjs-dist/web/pdf_viewer.js"></script>
+<!-- <script src="/static/libs/pdfjs-dist/web/pdf_viewer.js"></script> -->
 <script>
+import Page from '@/components/Page'
+
 const pdfjsLib = require('pdfjs-dist');
 // const pdfjsWebTextLayerBuilder = require('pdfjs-dist/lib/web/text_layer_builder.js');
 // console.log(pdfjsWebTextLayerBuilder);
@@ -27,6 +24,9 @@ pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.js';
 
 export default {
   name: 'pdf',
+  components: {
+    'Page': Page
+  },
   props: {
     'src': {
       type: String
@@ -35,12 +35,15 @@ export default {
       type: Number
     },
     'height': {
-      default: 1,
       type: Number
     },
     'page': {
       default: 0,
       type: Number
+    },
+    'spreads': {
+      default: true,
+      type: Boolean
     }
   },
   data () {
@@ -51,7 +54,9 @@ export default {
       rotate: undefined,
       isLoading: true,
       viewportWidth: 0,
-      viewportHeight: 0
+      viewportHeight: 0,
+      displayedPage: 0,
+      displayedPages: []
     }
   },
   updated () {
@@ -59,19 +64,19 @@ export default {
   mounted () {
     if (this.src) {
       this.loadDocument(this.src)
-        .then(() => this.loadPage(this.page))
+        .then(() => this.display(this.page))
     }
   },
   watch: {
     src () {
       if (this.src) {
         this.loadDocument(this.src)
-          .then(() => this.loadPage(this.page))
+          .then(() => this.display(this.page))
       }
     },
     page (pg) {
       if (this.page) {
-        this.loadPage(this.page);
+        this.display(this.page);
       }
     }
   },
@@ -104,18 +109,33 @@ export default {
         //
         // })
     },
-    getPageScale (page = this.page) {
-      const { scale, width } = this;
+    display (page = this.page) {
+      if (this.spreads) {
+        this.displayedPages = []; // clear
 
-      // Be default, we'll render page at 100% * scale width.
-      let pageScale = 1;
-
-      // If width is defined, calculate the scale of the page so it could be of desired width.
-      if (width) {
-        pageScale = width / page.getViewport(scale).width;
+        if (page % 2 === 0) {
+          this.displayedPage = page;
+        } else {
+          this.displayedPage = page - 1;
+        }
+        console.log(page, page % 2, this.displayedPage);
+        this.loadPage(this.displayedPage); // left
+        this.loadPage(this.displayedPage + 1); // right
+      } else {
+        this.displayedPage = page;
+        this.loadPage(this.displayedPage);
       }
-
-      return scale * pageScale;
+    },
+    next () {
+      // TODO: don't go over total pages
+      this.displayedPage += this.spreads ? 2 : 1;
+      this.display(this.displayedPage);
+    },
+    prev () {
+      if (this.displayedPage > 1) {
+        this.displayedPage -= this.spreads ? 2 : 1;
+        this.display(this.displayedPage);
+      }
     },
     loadPage (pageIndex) {
       const { pdf } = this;
@@ -137,51 +157,7 @@ export default {
         .catch((page) => this.onPageError(page));
     },
     onPageLoad (page) {
-      // const scale = this.getPageScale(page);
-      const { canvas, textLayer } = this.$refs;
-      const canvasContext = canvas.getContext('2d');
-      const { scale, rotate } = this;
-      const viewport = page.getViewport(scale, rotate);
-      const imageLayer = {
-        beginLayout () { },
-        endLayout () { },
-        appendImage (i) { console.log(i); }
-      };
-
-      this.viewportHeight = viewport.height;
-      this.viewportWidth = viewport.width;
-
-      page.render({ canvasContext, viewport, imageLayer })
-        .then(() => {
-          textLayer.innerHTML = '';
-          page.getTextContent({ normalizeWhitespace: true }).then(
-            (textContent) => {
-              console.log(textContent);
-              // textLayer.setTextContent(textContent);
-              // textLayer.render(TEXT_LAYER_RENDER_DELAY);
-              this.textDivs = [];
-              let textLayerFrag = document.createDocumentFragment();
-
-              if (this.textLayerRenderTask) {
-                this.textLayerRenderTask.cancel();
-                this.textLayerRenderTask = null;
-              }
-
-              this.textLayerRenderTask = pdfjsLib.renderTextLayer({
-                textContent: textContent,
-                container: textLayerFrag,
-                viewport: viewport,
-                textDivs: this.textDivs,
-                timeout: 300
-              });
-
-              this.textLayerRenderTask.promise.then(() => {
-                console.log(textLayerFrag);
-                textLayer.appendChild(textLayerFrag);
-              });
-            }
-          );
-        });
+      this.displayedPages.push(page);
     },
     onPageError (page) {
       console.error(page);
@@ -194,39 +170,15 @@ export default {
 .loading {
   /*background: #eee url('../assets/loading-icon.gif') center no-repeat;*/
 }
-canvas {
-  /*background-color: #eee;*/
+.pageContainer {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
 .page {
-  direction: ltr;
-  position: relative;
-  overflow: visible;
-  margin: 0 auto;
-}
-
-.textLayer {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  opacity: 0.2;
-  line-height: 1.0;
-}
-</style>
-
-<style>
-.textLayer > div {
-    color: transparent;
-    position: absolute;
-    white-space: pre;
-    cursor: text;
-    -webkit-transform-origin: 0% 0%;
-    -moz-transform-origin: 0% 0%;
-    -o-transform-origin: 0% 0%;
-    -ms-transform-origin: 0% 0%;
-    transform-origin: 0% 0%;
+  flex: none;
 }
 </style>
