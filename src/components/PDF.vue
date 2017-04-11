@@ -9,10 +9,13 @@
 <!-- <script src="libs/pdfjs-dist/build/pdf.js"></script> -->
 <!-- <script src="/static/libs/pdfjs-dist/build/pdf.worker.js"></script> -->
 <!-- <script src="/static/libs/pdfjs-dist/web/pdf_viewer.js"></script> -->
+<!-- <script src="/static/libs/pdfjs-dist/web/compatibility.js"></script> -->
 <script>
 import Page from '@/components/Page'
 
 const pdfjsLib = require('pdfjs-dist');
+// require('pdfjs-dist/lib/shared/compatibility.js');
+
 // const pdfjsWebTextLayerBuilder = require('pdfjs-dist/lib/web/text_layer_builder.js');
 // console.log(pdfjsWebTextLayerBuilder);
 // const pdfjsWebAnnotationLayerBuilder = require('./annotation_layer_builder.js');

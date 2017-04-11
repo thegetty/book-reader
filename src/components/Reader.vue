@@ -22,7 +22,7 @@
 
 <script>
 import PDF from '@/components/PDF'
-import Vue from 'vue'
+import 'whatwg-fetch'
 
 export default {
   name: 'reader',
