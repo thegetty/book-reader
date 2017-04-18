@@ -1,7 +1,7 @@
 <template>
-  <div class="pageContainer" :class="{ loading: isLoading }">
+  <div class="pageContainer" :class="{ loading: isLoading }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
     <div class="page" v-for="page in displayedPages">
-      <page :page="page" :width="spreads ? width / 2 : width" :height="height" />
+      <page :page="page" :width="spreads ? width / 2 : width" :height="height" :onViewport="handleViewport"/>
     </div>
   </div>
 </template>
@@ -35,10 +35,12 @@ export default {
       type: String
     },
     'width': {
-      type: Number
+      type: Number,
+      default: undefined
     },
     'height': {
-      type: Number
+      type: Number,
+      default: undefined
     },
     'page': {
       default: 0,
@@ -164,6 +166,10 @@ export default {
     },
     onPageError (page) {
       console.error(page);
+    },
+    handleViewport (viewport) {
+      this.viewportWidth = viewport.width;
+      this.viewportHeight = viewport.height;
     }
   }
 }

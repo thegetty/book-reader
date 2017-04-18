@@ -1,6 +1,6 @@
 <template>
   <div id="page-wrap">
-    <PDF ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="1000" />
+    <PDF ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="1000"/>
     <div id="prev" class="arrow" @click="this.prev">‹</div>
     <div id="next" class="arrow" @click="this.next">›</div>
     <header>

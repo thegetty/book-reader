@@ -2,13 +2,14 @@
   <div class="pageWrapper" :class="{ loading: isLoading }" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }">
     <canvas ref="canvas" :width="`${viewportWidth}px`" :height="`${viewportHeight}px`"/>
     <textlayer :page="page" :viewport="viewport"></textlayer>
-    <div ref="imageLayer"></div>
+    <imagelayer :images="images" :viewport="viewport"></imagelayer>
     <div ref="annotationLayer"></div>
   </div>
 </template>
 
 <script>
 import TextLayer from '@/components/TextLayer'
+import ImageLayer from '@/components/ImageLayer'
 
 const pdfjsLib = require('pdfjs-dist');
 pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.js';
@@ -16,7 +17,8 @@ pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.js';
 export default {
   name: 'page',
   components: {
-    'textlayer': TextLayer
+    'textlayer': TextLayer,
+    'imagelayer': ImageLayer
   },
   props: {
     'scale': {
@@ -36,6 +38,10 @@ export default {
     'page': {
       default: undefined,
       type: Object
+    },
+    'onViewport': {
+      default: undefined,
+      type: Function
     }
   },
   data () {
@@ -46,7 +52,8 @@ export default {
       viewportHeight: 0,
       viewportScale: 1,
       viewport: undefined,
-      textContent: undefined
+      textContent: undefined,
+      images: []
     }
   },
   updated () {
@@ -85,16 +92,25 @@ export default {
       const { scale, rotate } = this;
       const scaled = scale !== 1 ? scale : this.getPageScale(page);
       const viewport = page.getViewport(scaled, rotate);
+      let images = this.images;
+      let imageCount = 0;
       const imageLayer = {
         beginLayout () { },
         endLayout () { },
-        appendImage (i) { console.log(i); }
+        appendImage (i) {
+          i.page = page.pageIndex;
+          i.index = imageCount;
+          images.push(i);
+          imageCount++;
+        }
       };
 
       this.viewport = viewport;
       this.viewportScale = scale;
       this.viewportHeight = viewport.height;
       this.viewportWidth = viewport.width;
+
+      this.onViewport && this.onViewport(viewport);
 
       page.render({ canvasContext, viewport, imageLayer });
     },
