@@ -1,5 +1,5 @@
 <template>
-  <div ref="textLayer" :style="{ width: `${width}px`, height: `${height}px` }" class="textLayer"></div>
+  <div ref="textLayer" :style="{ width: `${viewport ? viewport.width : 0}px`, height: `${viewport ? viewport.height : 0}px` }" class="textLayer"></div>
 </template>
 
 
@@ -10,15 +10,15 @@ const pdfjsLib = require('pdfjs-dist');
 export default {
   name: 'textlayer',
   props: {
-    'width': {
-      type: Number
-    },
-    'height': {
-      default: 1,
-      type: Number
-    },
     'page': {
-      default: undefined,
+      default: undefined
+    },
+    'viewport': {
+      default: undefined
+    },
+    'renderTimeout': {
+      default: 300,
+      type: Number
     }
   },
   data () {
@@ -29,26 +29,23 @@ export default {
   updated () {
   },
   mounted () {
-
+    if (this.page) {
+      this.getTextContent(this.page).then((textContent) => this.onContent(textContent));
+    }
   },
   watch: {
     page () {
       if (this.page) {
-        this.getTextContent(this.page).then((textContent) => this.onContent(textContent))
+        this.getTextContent(this.page).then((textContent) => this.onContent(textContent));
       }
     }
   },
   methods: {
     getTextContent (page) {
       return page.getTextContent({ normalizeWhitespace: true });
-    }
-    onContent (page) {
-      // const scale = this.getPageScale(page);
+    },
+    onContent (textContent) {
       const { textLayer } = this.$refs;
-
-      console.log(textContent);
-      // textLayer.setTextContent(textContent);
-      // textLayer.render(TEXT_LAYER_RENDER_DELAY);
       this.textDivs = [];
       let textLayerFrag = document.createDocumentFragment();
 
@@ -60,16 +57,14 @@ export default {
       this.textLayerRenderTask = pdfjsLib.renderTextLayer({
         textContent: textContent,
         container: textLayerFrag,
-        viewport: viewport,
+        viewport: this.viewport,
         textDivs: this.textDivs,
-        timeout: 300
+        timeout: this.renderTimeout
       });
 
       this.textLayerRenderTask.promise.then(() => {
-        console.log(textLayerFrag);
         textLayer.appendChild(textLayerFrag);
       });
-
     },
     onPageError (page) {
       console.error(page);

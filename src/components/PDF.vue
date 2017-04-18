@@ -121,7 +121,7 @@ export default {
         } else {
           this.displayedPage = page - 1;
         }
-        console.log(page, page % 2, this.displayedPage);
+
         this.loadPage(this.displayedPage); // left
         this.loadPage(this.displayedPage + 1); // right
       } else {
