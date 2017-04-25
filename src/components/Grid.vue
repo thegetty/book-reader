@@ -1,45 +1,12 @@
 <template>
   <div>
-    <form id="search">
-      Search <input name="query" v-model="filterKey">
-    </form>
-    <table>
-      <thead>
-        <tr>
-          <th v-for="key in columns"
-            @click="sortBy(key)"
-            :class="{ active: sortKey == key }">
-            {{ key | titlecase }}
-            <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
-            </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="entry in filteredData">
-          <td>
-            <a class="img_link" @click="$emit('onClick', entry)">
-              <img v-lazy="entry['thumbnail']" />
-            </a>
-          </td>
-          <td>
-            <a @click="$emit('onClick', entry)">
-              {{ entry['page'] }}
-            </a>
-          </td>
-          <td>
-            <a :href="entry['artwork_uri']" target="_blank" >
-              {{ entry['artwork_title'] }}
-            </a>
-          </td>
-          <td>
-            <a :href="entry['collection_uri']" target="_blank" >
-              {{ entry['collection'] }}
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <ol>
+      <li v-for="image in filteredData">
+        <a class="img_link" @click="$emit('onClick', image)">
+          <img v-lazy="image.thumbnail" />
+        </a>
+      </li>
+    </ol>
   </div>
 </template>
 
@@ -61,7 +28,7 @@ export default {
   },
   data () {
     var sortOrders = {}
-    this.columns = ['thumbnail', 'page', 'artwork_title', 'collection'];
+    this.columns = ['thumbnail'];
     this.columns.forEach(function (key) {
       sortOrders[key] = 1
     })
@@ -96,20 +63,6 @@ export default {
       return data
     }
   },
-  filters: {
-    capitalize: function (str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    },
-    titlecase: function (_str) {
-      var str;
-      str = _str.replace(/_/g, ' ');
-      str = str.replace(/([^\W_]+[^\s-]*) */g, (txt) => {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      });
-
-      return str;
-    }
-  },
   methods: {
     sortBy: function (key) {
       this.sortKey = key
@@ -121,39 +74,14 @@ export default {
 
 <style scoped>
 
-table {
-  border: 2px solid #cecece;
-  border-radius: 3px;
-  background-color: #fff;
-  width: 80vw;
-  margin: 24px auto;
+ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-th {
-  background-color: #cecece;
-  color: #000;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-td {
-  background-color: #f9f9f9;
-}
-
-th, td {
-  /*min-width: 220px;*/
-  padding: 10px 20px;
-}
-
-th.active {
-  color: #fff;
-}
-
-th.active .arrow {
-  opacity: 1;
+li {
+  display: inline-block;
+  margin: 0 10px;
 }
 
 .arrow {

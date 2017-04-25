@@ -10,12 +10,14 @@
     </header>
     <div id="images">
       <grid :data="images" @onClick="this.onImageSelected" />
+      <tablegrid :data="images" @onClick="this.onImageSelected" />
     </div>
   </div>
 </template>
 
 <script>
 import PDF from '@/components/PDF'
+import Table from '@/components/Table'
 import Grid from '@/components/Grid'
 import 'whatwg-fetch'
 
@@ -23,7 +25,8 @@ export default {
   name: 'reader',
   components: {
     'PDF': PDF,
-    'grid': Grid
+    'grid': Grid,
+    'tablegrid': Table
   },
   props: ['manifest-url'],
   data () {
@@ -89,16 +92,6 @@ h1, h2, h3 {
   font-weight: normal;
   display: inline;
   font-size: 16px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
 }
 
 a {
