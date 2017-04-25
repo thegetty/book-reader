@@ -18,6 +18,7 @@
     "eslint-config-airbnb": "^14.1.0",
     "pdfjs-dist": "^1.7.406",
     "vue": "^2.2.2",
+    "vue-lazyload": "^1.0.3",
     "vue-router": "^2.2.0",
     "whatwg-fetch": "^2.0.3"
   },

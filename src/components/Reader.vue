@@ -9,25 +9,21 @@
       <h3>{{manifest.author_as_it_appears}}</h3>
     </header>
     <div id="images">
-      <ol>
-        <li v-for="image in images">
-          <a class="img_link" @click="page = (image.page - 1)">
-            <img :src="image.thumbnail" />
-          </a>
-        </li>
-      </ol>
+      <grid :data="images" @onClick="this.onImageSelected" />
     </div>
   </div>
 </template>
 
 <script>
 import PDF from '@/components/PDF'
+import Grid from '@/components/Grid'
 import 'whatwg-fetch'
 
 export default {
   name: 'reader',
   components: {
-    'PDF': PDF
+    'PDF': PDF,
+    'grid': Grid
   },
   props: ['manifest-url'],
   data () {
@@ -74,6 +70,9 @@ export default {
       } else if (keyCode === 39) {
         this.next();
       }
+    },
+    onImageSelected (image) {
+      this.page = (image.page - 1);
     }
 
   }
@@ -135,23 +134,6 @@ a {
 
 .arrow:active {
   color: #000;
-}
-
-.img_link {
-  cursor: pointer;
-}
-
-.img_link:hover {
-  opacity: 0.8;
-}
-
-.img_link:active {
-  opacity: 0.5;
-}
-
-.img_link img {
-  max-width: 100px;
-  max-height: 100px;
 }
 
 header {
