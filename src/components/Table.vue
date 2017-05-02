@@ -115,6 +115,9 @@ export default {
       this.sortKey = key
       this.sortOrders[key] = this.sortOrders[key] * -1
     }
+  },
+  updated () {
+    console.log('updated');
   }
 }
 </script>
@@ -192,6 +195,10 @@ th.active .arrow {
 .img_link img {
   max-width: 100px;
   max-height: 100px;
+}
+
+#search {
+  text-align: center;
 }
 
 </style>

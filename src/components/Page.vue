@@ -2,7 +2,7 @@
   <div class="pageWrapper" :class="{ loading: isLoading }" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }">
     <canvas ref="canvas" :width="`${viewportWidth}px`" :height="`${viewportHeight}px`"/>
     <textlayer :page="page" :viewport="viewport"></textlayer>
-    <imagelayer :images="images" :viewport="viewport"></imagelayer>
+    <imagelayer :images="images" :viewport="viewport" :onImageClicked="onImageClicked"></imagelayer>
     <div ref="annotationLayer"></div>
   </div>
 </template>
@@ -40,6 +40,10 @@ export default {
       type: Object
     },
     'onViewport': {
+      default: undefined,
+      type: Function
+    },
+    'onImageClicked': {
       default: undefined,
       type: Function
     }

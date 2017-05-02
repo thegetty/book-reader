@@ -25,6 +25,10 @@ export default {
     'viewport': {
       default: undefined,
       type: Object
+    },
+    'onImageClicked': {
+      default: undefined,
+      type: Function
     }
   },
   data () {
@@ -49,6 +53,10 @@ export default {
   methods: {
     handleClick (image) {
       console.log('CLICK', image.objId);
+      if (this.onImageClicked) {
+        this.onImageClicked(image);
+      }
+      this.$emit('imageClicked', image);
     }
   }
 }

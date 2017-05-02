@@ -1,7 +1,7 @@
 <template>
   <div class="pageContainer" :class="{ loading: isLoading }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
     <div class="page" v-for="page in displayedPages">
-      <page :page="page" :width="spreads ? width / 2 : width" :height="height" :onViewport="handleViewport"/>
+      <page :page="page" :width="spreads ? width / 2 : width" :height="height" :onViewport="handleViewport" :onImageClicked="onImageClicked"/>
     </div>
   </div>
 </template>
@@ -49,6 +49,10 @@ export default {
     'spreads': {
       default: true,
       type: Boolean
+    },
+    'onImageClicked': {
+      default: undefined,
+      type: Function
     }
   },
   data () {
@@ -80,8 +84,13 @@ export default {
       }
     },
     page (pg) {
-      if (this.page) {
+      if (typeof this.page !== 'undefined') {
         this.display(this.page);
+      }
+    },
+    spreads (spreads) {
+      if (typeof this.displayedPage !== 'undefined') {
+        this.display(this.displayedPage);
       }
     }
   },
@@ -115,9 +124,9 @@ export default {
         // })
     },
     display (page = this.page) {
-      if (this.spreads) {
-        this.displayedPages = []; // clear
+      this.displayedPages = []; // clear
 
+      if (this.spreads) {
         if (page % 2 === 0) {
           this.displayedPage = page;
         } else {
