@@ -141,9 +141,12 @@ export default {
       }
     },
     next () {
-      // TODO: don't go over total pages
       this.displayedPage += this.spreads ? 2 : 1;
-      this.display(this.displayedPage);
+      if (this.displayedPage < this.numPages) {
+        this.display(this.displayedPage);
+      } else {
+        this.displayedPage = this.numPages - (this.spreads ? 2 : 1);
+      }
     },
     prev () {
       if (this.displayedPage > 1) {

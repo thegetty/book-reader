@@ -52,7 +52,6 @@ export default {
   },
   methods: {
     handleClick (image) {
-      console.log('CLICK', image.objId);
       if (this.onImageClicked) {
         this.onImageClicked(image);
       }
@@ -75,5 +74,6 @@ export default {
 .imageLayerItem {
   position: absolute;
   pointer-events: all;
+  cursor: pointer;
 }
 </style>

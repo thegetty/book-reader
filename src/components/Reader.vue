@@ -11,11 +11,9 @@
         <li id="title-nav">{{manifest.title}}: {{manifest.subtitle}}, {{manifest.author_as_it_appears}}</li>
         <li id="book-nav">
           Book:
-          <a id="artwork-nav-single" @click="spreads = false; showGrid = false; showTable = false;">Single</a>
+          <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;">Single</a>
            |
-          <a id="artwork-nav-spread" @click="spreads = true; showGrid = false; showTable = false;">Spread</a>
-           |
-          <a id="artwork-nav-scroll">Scroll</a>
+          <a id="artwork-nav-spread" @click="setSpreads(true); showGrid = false; showTable = false;">Spread</a>
         </li>
         <li id="artwork-nav">
           Artwork:
@@ -26,16 +24,29 @@
       </ul>
     </header>
     <section id="main">
-      <PDF id="pdf" ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="1000" :spreads="spreads"/>
+      <PDF id="pdf" ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="this.width" :spreads="spreads" :onImageClicked="this.onImageClicked"/>
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
       <div id="images" v-show="showGrid || showTable">
         <grid id="grid" v-if="showGrid" :data="images" @onClick="this.onImageSelected" />
         <tablegrid id="table" v-if="showTable" :data="images" @onClick="this.onImageSelected" />
       </div>
-      <div id="detail" v-if="currentDetail">
-        <img :src="currentDetail.url">
-      </div>
+      <section id="detail" v-if="currentDetail">
+        <div class="image_detail">
+          <img :src="currentDetail.asset">
+        </div>
+        <div class="image_info">
+          <h1>{{currentDetail.artwork_title}}</h1>
+          <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
+
+          <h2>{{currentDetail.artist_name}}</h2>
+          <h4><a :href="currentDetail.artist_uri">{{currentDetail.artist_uri}}</a></h4>
+
+          <h3>{{currentDetail.collection}}</h3>
+          <h4><a :href="currentDetail.collection_uri">{{currentDetail.collection_uri}}</a></h4>
+        </div>
+        <a class="detail_close" @click="currentDetail = undefined">Close</a>
+      </section>
     </section>
   </div>
 </template>
@@ -58,11 +69,13 @@ export default {
     return {
       manifest: {},
       images: [],
+      imagesById: {},
       page: 0,
       spreads: true,
       showTable: false,
       showGrid: false,
-      currentDetail: undefined
+      currentDetail: undefined,
+      width: this.getWidth()
     }
   },
   created () {
@@ -86,6 +99,10 @@ export default {
     loaded () {
       // Wait for PDF to load
       this.images = this.manifest.images;
+
+      this.images.forEach((image) => {
+        this.imagesById[`img_p${image.page - 1}_${image.location}`] = image;
+      });
     },
     next () {
       const { pdf } = this.$refs;
@@ -107,6 +124,26 @@ export default {
       this.page = (image.page - 1);
       this.showGrid = false;
       this.showTable = false;
+      this.currentDetail = image;
+    },
+    onImageClicked (image) {
+      this.currentDetail = this.imagesById[image.objId];
+    },
+    getWidth () {
+      let width = window.innerWidth;
+      let scaler = 0.8;
+      return width * scaler;
+    },
+    setSpreads (spreads) {
+      if (this.spreads !== spreads) {
+        this.spreads = spreads;
+
+        if (spreads) {
+          this.width = this.width * 2;
+        } else {
+          this.width = this.width / 2;
+        }
+      }
     }
 
   }
@@ -206,7 +243,62 @@ header {
   margin: 0 6px;
 }
 
+#nav li a {
+  cursor: pointer;
+}
+
 #title-nav {
   flex-grow: 100;
+}
+
+#detail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100vw - 80px);
+  min-height: calc(100vh - 132px);
+  margin: 0 auto;
+  padding: 40px;
+  background: #333333;
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  overflow: auto;
+}
+
+.image_detail img {
+  float: left;
+  max-width: 50vw;
+  max-height: calc(100vh - 132px);
+  margin-right: 40px;
+}
+
+.image_info {
+  color: #eee;
+}
+
+.image_info h1 {
+  font-size: 34px;
+  font-weight: bold;
+}
+
+.image_info h2 {
+  font-size: 24px;
+}
+
+.image_info h3 {
+  font-size: 24px;
+}
+
+.image_info h4 {
+  margin: 0 0 40px 0;
+}
+
+.detail_close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 20px;
+  cursor: pointer;
 }
 </style>
