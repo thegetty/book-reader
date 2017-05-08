@@ -76,16 +76,19 @@ export default {
   },
   methods: {
     getPageScale (page = this.page) {
-      const { scale, width } = this;
+      const { scale, width, height } = this;
 
       // Be default, we'll render page at 100% * scale width.
       let pageScale = 1;
 
       // If width is defined, calculate the scale of the page so it could be of desired width.
-      if (width) {
+      if (width < height) {
         pageScale = width / page.getViewport(scale).width;
+      } else {
+        pageScale = height / page.getViewport(scale).height;
       }
-      // console.log('pageScale', pageScale);
+
+      // console.log('pageScale', pageScale, width, height);
 
       return scale * pageScale;
     },

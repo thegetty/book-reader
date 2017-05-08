@@ -3,50 +3,50 @@
     <header id="menu">
       <ul id="nav">
         <li id="toc-nav">
-          <a>ToC</a>
+          <a><icon name="list-ul" title="Table of Contents"></icon></a>
         </li>
         <li id="search-nav">
-          <a>Search</a>
+          <a><icon name="search" title="Search"></icon></a>
         </li>
         <li id="title-nav">{{manifest.title}}: {{manifest.subtitle}}, {{manifest.author_as_it_appears}}</li>
         <li id="book-nav">
           Book:
-          <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;">Single</a>
+          <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;"><icon name="file-o" title="Single" style="transform: rotate(180deg) scaleX(-1); height: .95em"></icon></a>
            |
-          <a id="artwork-nav-spread" @click="setSpreads(true); showGrid = false; showTable = false;">Spread</a>
+          <a id="artwork-nav-spread" @click="setSpreads(true); showGrid = false; showTable = false;"><icon name="columns" title="Spread"></icon></a>
         </li>
         <li id="artwork-nav">
           Artwork:
-          <a id="artwork-nav-table" @click="showTable = !showTable; showGrid = false">Table</a>
+          <a id="artwork-nav-table" @click="showTable = !showTable; showGrid = false"><icon name="table" title="Table"></icon></a>
            |
-          <a id="artwork-nav-grid" @click="showGrid = !showGrid; showTable = false">Grid</a>
+          <a id="artwork-nav-grid" @click="showGrid = !showGrid; showTable = false"><icon name="th" title="Grid"></icon></a>
         </li>
       </ul>
     </header>
     <section id="main">
-      <PDF id="pdf" ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="this.width" :spreads="spreads" :onImageClicked="this.onImageClicked"/>
+      <PDF id="pdf" ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="this.width" :height="this.height" :spreads="spreads" :onImageClicked="this.onImageClicked"/>
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
       <div id="images" v-show="showGrid || showTable">
         <grid id="grid" v-if="showGrid" :data="images" @onClick="this.onImageSelected" />
-        <tablegrid id="table" v-if="showTable" :data="images" @onClick="this.onImageSelected" />
+        <tablegrid id="table" v-if="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
       </div>
-      <section id="detail" v-if="currentDetail">
-        <div class="image_detail">
-          <img :src="currentDetail.asset">
-        </div>
-        <div class="image_info">
-          <h1>{{currentDetail.artwork_title}}</h1>
-          <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
+    </section>
+    <section id="detail" v-if="currentDetail">
+      <div class="image_detail">
+        <img :src="currentDetail.asset">
+      </div>
+      <div class="image_info" v-if="currentDetail.artwork_title">
+        <h1>{{currentDetail.artwork_title}}</h1>
+        <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
 
-          <h2>{{currentDetail.artist_name}}</h2>
-          <h4><a :href="currentDetail.artist_uri">{{currentDetail.artist_uri}}</a></h4>
+        <h2>{{currentDetail.artist_name}}</h2>
+        <h4><a :href="currentDetail.artist_uri">{{currentDetail.artist_uri}}</a></h4>
 
-          <h3>{{currentDetail.collection}}</h3>
-          <h4><a :href="currentDetail.collection_uri">{{currentDetail.collection_uri}}</a></h4>
-        </div>
-        <a class="detail_close" @click="currentDetail = undefined">Close</a>
-      </section>
+        <h3>{{currentDetail.collection}}</h3>
+        <h4><a :href="currentDetail.collection_uri">{{currentDetail.collection_uri}}</a></h4>
+      </div>
+      <a class="detail_close" @click="currentDetail = undefined">Close</a>
     </section>
   </div>
 </template>
@@ -57,15 +57,27 @@ import Table from '@/components/Table'
 import Grid from '@/components/Grid'
 import 'whatwg-fetch'
 
+// Icons
+import 'vue-awesome/icons/list-ul'
+import 'vue-awesome/icons/search'
+import 'vue-awesome/icons/columns'
+import 'vue-awesome/icons/file-o'
+import 'vue-awesome/icons/table'
+import 'vue-awesome/icons/th'
+import Icon from 'vue-awesome/components/Icon'
+
 export default {
   name: 'reader',
   components: {
     'PDF': PDF,
     'grid': Grid,
-    'tablegrid': Table
+    'tablegrid': Table,
+    'icon': Icon
   },
   props: ['manifest-url'],
   data () {
+    let bounds = this.getBounds();
+
     return {
       manifest: {},
       images: [],
@@ -75,7 +87,8 @@ export default {
       showTable: false,
       showGrid: false,
       currentDetail: undefined,
-      width: this.getWidth()
+      width: bounds.width,
+      height: bounds.height
     }
   },
   created () {
@@ -121,28 +134,37 @@ export default {
       }
     },
     onImageSelected (image) {
-      this.page = (image.page - 1);
+      // this.page = (image.page - 1);
       this.showGrid = false;
       this.showTable = false;
       this.currentDetail = image;
     },
+    onPageSelected (page) {
+      this.page = (page - 1);
+      this.showGrid = false;
+      this.showTable = false;
+    },
     onImageClicked (image) {
       this.currentDetail = this.imagesById[image.objId];
     },
-    getWidth () {
+    getBounds () {
       let width = window.innerWidth;
+      let height = window.innerHeight;
       let scaler = 0.8;
-      return width * scaler;
+      return {
+        width: width * scaler,
+        height: height * scaler
+      };
     },
     setSpreads (spreads) {
       if (this.spreads !== spreads) {
         this.spreads = spreads;
 
-        if (spreads) {
-          this.width = this.width * 2;
-        } else {
-          this.width = this.width / 2;
-        }
+        // if (spreads) {
+        //   this.width = this.width * 2;
+        // } else {
+        //   this.width = this.width / 2;
+        // }
       }
     }
 
@@ -193,21 +215,36 @@ a {
   color: #000;
 }
 
-header {
+#page-wrap {
+  background: #D3D3D3;
+}
+
+#page-wrap > header {
   padding: 15px;
+  -webkit-transition: opacity 1s;
+  transition: opacity 0.8s;
+  opacity: 0.3;
+  height: 24px;
+  overflow: hidden;
+}
+
+#page-wrap > header:hover {
+  opacity: 1;
 }
 
 #main {
   position: relative;
   width: calc(100vw - 80px);
-  min-height: calc(100vh - 132px);
-  margin: 0 auto;
-  padding: 40px;
+  min-height: calc(100vh - 54px);
+  margin: 0;
+  padding: 0 40px;
   background: #D3D3D3;
   box-sizing: content-box;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   overflow: auto;
+  display: flex;
+  justify-content: center;
 }
 
 #pdf {
@@ -241,10 +278,21 @@ header {
 
 #nav li {
   margin: 0 6px;
+  color: #696969;
 }
 
 #nav li a {
   cursor: pointer;
+  color: #696969;
+  display: inline-block;
+}
+
+#nav li a:active {
+  color: #151515;
+}
+
+#nav li a:active .fa-icon {
+  margin-bottom: -4px;
 }
 
 #title-nav {
@@ -253,28 +301,30 @@ header {
 
 #detail {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: calc(100vw - 80px);
-  min-height: calc(100vh - 132px);
-  margin: 0 auto;
+  top: 60px;
+  left: 20px;
+  width: calc(100vw - 120px);
+  height: calc(100vh - 160px);
   padding: 40px;
   background: #333333;
   box-sizing: content-box;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   overflow: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .image_detail img {
-  float: left;
+
   max-width: 50vw;
-  max-height: calc(100vh - 132px);
-  margin-right: 40px;
+  max-height: calc(100vh - 152px);
 }
 
 .image_info {
   color: #eee;
+  margin-left: 40px;
+  min-width: 40vw;
 }
 
 .image_info h1 {
@@ -298,7 +348,14 @@ header {
   position: absolute;
   top: 0;
   right: 0;
-  padding: 20px;
+  padding: 10px 10px 0 0;
   cursor: pointer;
 }
+
+.fa-icon {
+  width: auto;
+  height: 1em;
+  margin-bottom: -3px;
+}
+
 </style>

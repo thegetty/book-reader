@@ -18,12 +18,12 @@
       <tbody>
         <tr v-for="entry in filteredData">
           <td>
-            <a class="img_link" @click="$emit('onClick', entry)">
+            <a class="img_link" @click="$emit('onImageClick', entry)">
               <img v-lazy="entry['thumbnail']" />
             </a>
           </td>
           <td>
-            <a href="#" @click="$emit('onClick', entry)">
+            <a href="#" @click="$emit('onPageClick', entry.page)">
               {{ entry['page'] }}
             </a>
           </td>
