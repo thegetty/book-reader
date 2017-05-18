@@ -96,9 +96,9 @@ export default {
       // const scale = this.getPageScale(page);
       const { canvas } = this.$refs;
       const canvasContext = canvas.getContext('2d');
-      const { scale, rotate } = this;
+      const { scale } = this;
       const scaled = scale !== 1 ? scale : this.getPageScale(page);
-      const viewport = page.getViewport(scaled, rotate);
+      const viewport = page.getViewport(scaled);
       let images = this.images;
       let imageCount = 0;
       const imageLayer = {
