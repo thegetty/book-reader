@@ -24,12 +24,17 @@
           </td>
           <td>
             <a href="#" @click="$emit('onPageClick', entry.page)">
-              {{ entry['page'] }}
+              {{ entry['page_label'] || entry['page'] }}
             </a>
           </td>
           <td>
             <a :href="entry['artwork_uri']" target="_blank" >
               {{ entry['artwork_title'] }}
+            </a>
+          </td>
+          <td>
+            <a :href="entry['artist_uri']" target="_blank" >
+              {{ entry['artist_name'] }}
             </a>
           </td>
           <td>
@@ -61,7 +66,7 @@ export default {
   },
   data () {
     var sortOrders = {}
-    this.columns = ['thumbnail', 'page', 'artwork_title', 'collection'];
+    this.columns = ['thumbnail', 'page', 'artwork_title', 'artist', 'collection'];
     this.columns.forEach(function (key) {
       sortOrders[key] = 1
     })
