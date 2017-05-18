@@ -24,7 +24,16 @@
       </ul>
     </header>
     <section id="main">
-      <PDF id="pdf" ref="pdf" :src="this.manifest.pdf" :page="page" @loaded="loaded" :width="this.width" :height="this.height" :spreads="spreads" :onImageClicked="this.onImageClicked"/>
+      <PDF id="pdf" ref="pdf"
+          :src="this.manifest.pdf"
+          :page="page"
+          @loaded="loaded"
+          :width="this.width"
+          :height="this.height"
+          :spreads="spreads"
+          :onImageClicked="this.onImageClicked"
+          :onOutlineReady="this.onOutlineReady"
+        />
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
       <div id="images" v-show="showGrid || showTable">
@@ -49,6 +58,9 @@
       <a class="detail_view" @click="onPageSelected(currentDetail.page); currentDetail = undefined">View in Book</a>
       <a class="detail_close" @click="currentDetail = undefined">Close</a>
     </section>
+    <section id="outline" v-if="outline">
+      <outline :data="outline" @onClick="this.goto"/>
+    </section>
   </div>
 </template>
 
@@ -56,6 +68,7 @@
 import PDF from '@/components/PDF'
 import Table from '@/components/Table'
 import Grid from '@/components/Grid'
+import Outline from '@/components/Outline'
 import 'whatwg-fetch'
 
 // Icons
@@ -73,7 +86,8 @@ export default {
     'PDF': PDF,
     'grid': Grid,
     'tablegrid': Table,
-    'icon': Icon
+    'icon': Icon,
+    'outline': Outline
   },
   props: ['manifest-url'],
   data () {
@@ -89,7 +103,8 @@ export default {
       showGrid: false,
       currentDetail: undefined,
       width: bounds.width,
-      height: bounds.height
+      height: bounds.height,
+      outline: undefined
     }
   },
   created () {
@@ -134,6 +149,13 @@ export default {
         this.next();
       }
     },
+    goto (dest) {
+      const { pdf } = this.$refs;
+      return pdf.getPageIndex(dest[0]).then((pg) => {
+        console.log('pg', pg);
+        this.page = pg;
+      });
+    },
     onImageSelected (image) {
       // this.page = (image.page - 1);
       this.currentDetail = image;
@@ -158,15 +180,12 @@ export default {
     setSpreads (spreads) {
       if (this.spreads !== spreads) {
         this.spreads = spreads;
-
-        // if (spreads) {
-        //   this.width = this.width * 2;
-        // } else {
-        //   this.width = this.width / 2;
-        // }
       }
+    },
+    onOutlineReady (outline) {
+      this.outline = outline;
+      console.log(outline);
     }
-
   }
 }
 </script>

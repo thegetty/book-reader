@@ -53,6 +53,10 @@ export default {
     'onImageClicked': {
       default: undefined,
       type: Function
+    },
+    'onOutlineReady': {
+      default: undefined,
+      type: Function
     }
   },
   data () {
@@ -65,7 +69,8 @@ export default {
       viewportWidth: 0,
       viewportHeight: 0,
       displayedPage: 0,
-      displayedPages: []
+      displayedPages: [],
+      outline: undefined
     }
   },
   updated () {
@@ -99,6 +104,8 @@ export default {
       console.log('src', src);
       return pdfjsLib.getDocument(src)
         .then((pdfDocument) => {
+          this.pdfDocument = pdfDocument;
+
           // Document loaded, retrieving the page.
           var pagesCount = pdfDocument.numPages;
           // var noCover = settings.cover === false;
@@ -109,6 +116,11 @@ export default {
           this.isLoading = false;
 
           this.$emit('loaded');
+
+          this.outline = pdfDocument.getOutline().then((outline) => {
+            return this.processOutline(outline);
+          });
+
           // return pdfDocument.getPage(1);
         })
         // .then((firstPage) => {
@@ -182,6 +194,14 @@ export default {
     handleViewport (viewport) {
       this.viewportWidth = viewport.width;
       this.viewportHeight = viewport.height;
+    },
+    processOutline (outline) {
+      this.onOutlineReady && this.onOutlineReady(outline);
+      return outline;
+    },
+    getPageIndex (dest) {
+      console.log(dest);
+      return this.pdfDocument.getPageIndex(dest);
     }
   }
 }
