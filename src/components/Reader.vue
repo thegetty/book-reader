@@ -46,6 +46,7 @@
         <h3>{{currentDetail.collection}}</h3>
         <h4><a :href="currentDetail.collection_uri">{{currentDetail.collection_uri}}</a></h4>
       </div>
+      <a class="detail_view" @click="onPageSelected(currentDetail.page); currentDetail = undefined">View in Book</a>
       <a class="detail_close" @click="currentDetail = undefined">Close</a>
     </section>
   </div>
@@ -135,8 +136,6 @@ export default {
     },
     onImageSelected (image) {
       // this.page = (image.page - 1);
-      this.showGrid = false;
-      this.showTable = false;
       this.currentDetail = image;
     },
     onPageSelected (page) {
@@ -348,6 +347,14 @@ a {
   position: absolute;
   top: 0;
   right: 0;
+  padding: 10px 10px 0 0;
+  cursor: pointer;
+}
+
+.detail_view {
+  position: absolute;
+  top: 0;
+  right: 50px;
   padding: 10px 10px 0 0;
   cursor: pointer;
 }
