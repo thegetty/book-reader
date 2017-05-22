@@ -67,6 +67,9 @@ export default {
     sortBy: function (key) {
       this.sortKey = key
       this.sortOrders[key] = this.sortOrders[key] * -1
+    },
+    triggerLoad: function () {
+      Vue.nextTick(this.$Lazyload.lazyLoadHandler)
     }
   }
 }

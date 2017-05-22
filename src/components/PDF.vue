@@ -200,7 +200,6 @@ export default {
       return outline;
     },
     getPageIndex (dest) {
-      console.log(dest);
       return this.pdfDocument.getPageIndex(dest);
     }
   }
@@ -217,6 +216,7 @@ export default {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
+  align-items: center;
 }
 
 .page {

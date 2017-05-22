@@ -36,15 +36,22 @@ export default {
 <style scoped>
 
 ul {
-
+  border-top: 1px solid #ccc;
+  padding: 40px;
 }
 
 li {
-
+  margin: 12px;
 }
 
 li a {
   cursor: pointer;
+  color: #eee;
+}
+
+li a:active {
+  color: #fff;
+  text-decoration: underline;
 }
 
 </style>

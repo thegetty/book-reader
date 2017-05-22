@@ -3,7 +3,7 @@
     <header id="menu">
       <ul id="nav">
         <li id="toc-nav">
-          <a><icon name="list-ul" title="Table of Contents"></icon></a>
+          <a @click="outlineOpen = !outlineOpen"><icon name="list-ul" title="Outline"></icon></a>
         </li>
         <li id="search-nav">
           <a><icon name="search" title="Search"></icon></a>
@@ -17,9 +17,9 @@
         </li>
         <li id="artwork-nav">
           Artwork:
-          <a id="artwork-nav-table" @click="showTable = !showTable; showGrid = false"><icon name="table" title="Table"></icon></a>
+          <a id="artwork-nav-table" @click="toggleTable"><icon name="table" title="Table"></icon></a>
            |
-          <a id="artwork-nav-grid" @click="showGrid = !showGrid; showTable = false"><icon name="th" title="Grid"></icon></a>
+          <a id="artwork-nav-grid" @click="toggleGrid"><icon name="th" title="Grid"></icon></a>
         </li>
       </ul>
     </header>
@@ -37,8 +37,8 @@
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
       <div id="images" v-show="showGrid || showTable">
-        <grid id="grid" v-if="showGrid" :data="images" @onClick="this.onImageSelected" />
-        <tablegrid id="table" v-if="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+        <grid id="grid" ref="grid" v-show="showGrid" :data="images" @onClick="this.onImageSelected" />
+        <tablegrid id="table" ref="table" v-show="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
       </div>
     </section>
     <section id="detail" v-if="currentDetail">
@@ -58,8 +58,10 @@
       <a class="detail_view" @click="onPageSelected(currentDetail.page); currentDetail = undefined">View in Book</a>
       <a class="detail_close" @click="currentDetail = undefined">Close</a>
     </section>
-    <section id="outline" v-if="outline">
+    <section id="outline" v-show="outlineOpen">
+      <h2>Outline</h2>
       <outline :data="outline" @onClick="this.goto"/>
+      <a class="detail_close" @click="outlineOpen = false">Close</a>
     </section>
   </div>
 </template>
@@ -104,7 +106,8 @@ export default {
       currentDetail: undefined,
       width: bounds.width,
       height: bounds.height,
-      outline: undefined
+      outline: undefined,
+      outlineOpen: false
     }
   },
   created () {
@@ -113,6 +116,16 @@ export default {
   },
   beforeDestory () {
     window.removeEventListener('keyup', this.keyListener);
+  },
+  watch: {
+    showTable () {
+      const { table } = this.$refs;
+      table.triggerLoad();
+    },
+    showGrid () {
+      const { grid } = this.$refs;
+      grid.triggerLoad();
+    }
   },
   methods: {
     fetchManifest () {
@@ -151,6 +164,7 @@ export default {
     },
     goto (dest) {
       const { pdf } = this.$refs;
+      this.outlineOpen = false;
       return pdf.getPageIndex(dest[0]).then((pg) => {
         console.log('pg', pg);
         this.page = pg;
@@ -184,7 +198,14 @@ export default {
     },
     onOutlineReady (outline) {
       this.outline = outline;
-      console.log(outline);
+    },
+    toggleTable () {
+      this.showTable = !this.showTable;
+      this.showGrid = false;
+    },
+    toggleGrid () {
+      this.showGrid = !this.showGrid;
+      this.showTable = false;
     }
   }
 }
@@ -382,6 +403,33 @@ a {
   width: auto;
   height: 1em;
   margin-bottom: -3px;
+}
+
+#outline {
+  position: absolute;
+  top: 60px;
+  left: 20px;
+  width: calc(100vw - 120px);
+  height: calc(100vh - 160px);
+  padding: 40px;
+  background: #333333;
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  overflow: auto;
+}
+
+#outline h2 {
+  display: block;
+  color: #fff;
+}
+
+#outline ul {
+  list-style: none;
+}
+
+#outline a.outline_link {
+  color: #eee;
 }
 
 </style>

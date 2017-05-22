@@ -52,7 +52,12 @@
 import VueLazyload from 'vue-lazyload'
 import Vue from 'vue'
 
-Vue.use(VueLazyload);
+Vue.use(VueLazyload, {
+  preLoad: 1.3,
+  // error: 'dist/error.png',
+  // loading: 'dist/loading.gif',
+  attempt: 1
+})
 
 export default {
   name: 'table',
@@ -119,10 +124,13 @@ export default {
     sortBy: function (key) {
       this.sortKey = key
       this.sortOrders[key] = this.sortOrders[key] * -1
+    },
+    triggerLoad: function () {
+      Vue.nextTick(this.$Lazyload.lazyLoadHandler);
     }
   },
   updated () {
-    console.log('updated');
+
   }
 }
 </script>
