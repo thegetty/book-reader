@@ -70,6 +70,7 @@ export default {
       viewportHeight: 0,
       displayedPage: 0,
       displayedPages: [],
+      displayedPagesNumbers: [],
       outline: undefined
     }
   },
@@ -97,6 +98,9 @@ export default {
       if (typeof this.displayedPage !== 'undefined') {
         this.display(this.displayedPage);
       }
+    },
+    displayedPage () {
+      this.$emit('pageChanged', this.displayedPagesNumbers);
     }
   },
   methods: {
@@ -147,9 +151,13 @@ export default {
 
         this.loadPage(this.displayedPage); // left
         this.loadPage(this.displayedPage + 1); // right
+
+        this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
       } else {
         this.displayedPage = page;
         this.loadPage(this.displayedPage);
+
+        this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
       }
     },
     next () {

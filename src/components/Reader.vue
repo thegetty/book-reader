@@ -33,6 +33,7 @@
           :spreads="spreads"
           :onImageClicked="this.onImageClicked"
           :onOutlineReady="this.onOutlineReady"
+          @pageChanged="this.onPageChanged"
         />
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
@@ -60,7 +61,7 @@
     </section>
     <section id="outline" v-show="outlineOpen">
       <h2>Outline</h2>
-      <outline :data="outline" @onClick="this.goto"/>
+      <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto"/>
       <a class="detail_close" @click="outlineOpen = false">Close</a>
     </section>
   </div>
@@ -100,6 +101,7 @@ export default {
       images: [],
       imagesById: {},
       page: 0,
+      displayedPage: 0,
       spreads: true,
       showTable: false,
       showGrid: false,
@@ -166,7 +168,6 @@ export default {
       const { pdf } = this.$refs;
       this.outlineOpen = false;
       return pdf.getPageIndex(dest[0]).then((pg) => {
-        console.log('pg', pg);
         this.page = pg;
       });
     },
@@ -198,6 +199,9 @@ export default {
     },
     onOutlineReady (outline) {
       this.outline = outline;
+    },
+    onPageChanged (pages) {
+      this.displayedPage = pages[pages.length - 1];
     },
     toggleTable () {
       this.showTable = !this.showTable;

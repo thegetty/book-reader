@@ -1,7 +1,7 @@
 <template>
   <ul>
-    <li v-for="item in data">
-      <a class="outline_link" @click="handleLink(item)">
+    <li v-for="item in pageList">
+      <a class="outline_link" :class="{ active: item === activeItem }" @click="handleLink(item)">
         {{ item.title || '' }}
         <outline v-if="item.items.length" :data="item.items" @onClick="handleLink"/>
       </a>
@@ -19,15 +19,54 @@ export default {
   props: {
     'data': {
       type: Array
+    },
+    'page': {
+      type: Number,
+      default: undefined
+    },
+    'pdf': {
+      type: Object,
+      default: undefined
     }
   },
   data () {
-    return {};
+    return {
+      pageList: [],
+      activeItem: undefined
+    };
+  },
+  mounted () {
   },
   methods: {
-    handleLink: function (item) {
-      console.log(item.dest);
+    handleLink (item) {
       this.$emit('onClick', item.dest);
+    },
+    checkActive () {
+      for (let item of this.pageList) {
+        if (item.page > this.page) {
+          break;
+        } else {
+          this.activeItem = item;
+        }
+      }
+    }
+  },
+  watch: {
+    data () {
+      this.data.forEach((item, i) => {
+        let li = Object.assign({}, item);
+        this.pageList.push(li);
+        this.pdf.getPageIndex(item.dest[0]).then((pg) => {
+          li.page = pg;
+
+          if (i === this.data.length - 1) {
+            this.checkActive();
+          }
+        });
+      });
+    },
+    page () {
+      this.checkActive();
     }
   }
 }
@@ -49,7 +88,7 @@ li a {
   color: #eee;
 }
 
-li a:active {
+li a:active, li a.active {
   color: #fff;
   text-decoration: underline;
 }
