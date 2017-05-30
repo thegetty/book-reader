@@ -23,7 +23,7 @@ const pdfjsLib = require('pdfjs-dist');
 
 // const pdfViewer = require('../../static/libs/pdfjs-dist/web/pdf_viewer.js');
 // console.log(pdfViewer);
-pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.js';
+pdfjsLib.PDFJS.workerSrc = 'static/libs/pdfjs-dist/build/pdf.worker.js';
 
 export default {
   name: 'pdf',

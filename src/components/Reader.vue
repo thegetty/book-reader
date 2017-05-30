@@ -49,15 +49,48 @@
       <div class="image_info" v-if="currentDetail.artwork_title">
         <h1>{{currentDetail.artwork_title}}</h1>
         <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
+        <aside v-if="this.imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
+          <h5>Also in this book</h5>
+          <ul class="related_images">
+            <li v-for="relatedImage in this.imagesByArtwork[encodeURI(currentDetail.artwork_title)]" v-if="currentDetail != relatedImage">
+              <a class="related_img_link" @click="currentDetail = relatedImage">
+                <img :src="relatedImage.thumbnail" />
+              </a>
+            </li>
+          </ul>
+        </aside>
 
         <h2>{{currentDetail.artist_name}}</h2>
         <h4><a :href="currentDetail.artist_uri">{{currentDetail.artist_uri}}</a></h4>
+        <aside v-if="this.imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
+          <h5>Also in this book</h5>
+          <ul class="related_images">
+            <li v-for="relatedImage in this.imagesByArtist[encodeURI(currentDetail.artist_name)]" v-if="currentDetail != relatedImage">
+              <a class="related_img_link" @click="currentDetail = relatedImage">
+                <img :src="relatedImage.thumbnail" />
+              </a>
+            </li>
+          </ul>
+        </aside>
 
         <h3>{{currentDetail.collection}}</h3>
         <h4><a :href="currentDetail.collection_uri">{{currentDetail.collection_uri}}</a></h4>
+        <aside v-if="this.imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
+          <h5>Also in this book</h5>
+          <ul class="related_images">
+            <li v-for="relatedImage in this.imagesByCollection[encodeURI(currentDetail.collection)]" v-if="currentDetail != relatedImage">
+              <a class="related_img_link" @click="currentDetail = relatedImage">
+                <img :src="relatedImage.thumbnail" />
+              </a>
+            </li>
+          </ul>
+        </aside>
+
       </div>
-      <a class="detail_view" @click="onPageSelected(currentDetail.page); currentDetail = undefined">View in Book</a>
+      <a class="detail_view" @click="onPageSelected(currentDetail.page);">View in Book</a>
       <a class="detail_close" @click="currentDetail = undefined">Close</a>
+      <div id="prevDetail" class="detail_arrow" @click="this.prevDetail">‹</div>
+      <div id="nextDetail" class="detail_arrow" @click="this.nextDetail">›</div>
     </section>
     <section id="outline" v-show="outlineOpen">
       <h2>Outline</h2>
@@ -100,6 +133,9 @@ export default {
       manifest: {},
       images: [],
       imagesById: {},
+      imagesByArtwork: {},
+      imagesByArtist: {},
+      imagesByCollection: {},
       page: 0,
       displayedPage: 0,
       spreads: true,
@@ -136,7 +172,6 @@ export default {
           return response.json()
         })
         .then((manifest) => {
-          console.log(manifest)
           this.manifest = manifest;
         })
     },
@@ -146,6 +181,30 @@ export default {
 
       this.images.forEach((image) => {
         this.imagesById[`img_p${image.page - 1}_${image.location}`] = image;
+
+        if (image.artwork_title) {
+          let artworkUri = encodeURI(image.artwork_title);
+          if (!this.imagesByArtwork[artworkUri]) {
+            this.imagesByArtwork[artworkUri] = [];
+          }
+          this.imagesByArtwork[artworkUri].push(image);
+        }
+
+        if (image.artist_name) {
+          let artistUri = encodeURI(image.artist_name);
+          if (!this.imagesByArtist[artistUri]) {
+            this.imagesByArtist[artistUri] = [];
+          }
+          this.imagesByArtist[artistUri].push(image);
+        }
+
+        if (image.collection) {
+          let collectionUri = encodeURI(image.collection);
+          if (!this.imagesByCollection[collectionUri]) {
+            this.imagesByCollection[collectionUri] = [];
+          }
+          this.imagesByCollection[collectionUri].push(image);
+        }
       });
     },
     next () {
@@ -179,6 +238,7 @@ export default {
       this.page = (page - 1);
       this.showGrid = false;
       this.showTable = false;
+      this.currentDetail = undefined;
     },
     onImageClicked (image) {
       this.currentDetail = this.imagesById[image.objId];
@@ -210,6 +270,18 @@ export default {
     toggleGrid () {
       this.showGrid = !this.showGrid;
       this.showTable = false;
+    },
+    nextDetail () {
+      const index = this.images.indexOf(this.currentDetail);
+      if (index + 1 < this.images.length) {
+        this.currentDetail = this.images[index + 1];
+      }
+    },
+    prevDetail () {
+      const index = this.images.indexOf(this.currentDetail);
+      if (index - 1 >= 0) {
+        this.currentDetail = this.images[index - 1];
+      }
     }
   }
 }
@@ -434,6 +506,42 @@ a {
 
 #outline a.outline_link {
   color: #eee;
+}
+
+.related_images {
+  list-style: none;
+  padding: 0;
+}
+
+.related_images li {
+  display: inline;
+  margin-right: 12px;
+}
+
+.related_images li a {
+  cursor: pointer;
+}
+
+.detail_arrow {
+  position: absolute;
+  top: 50%;
+  margin-top: -32px;
+  font-size: 64px;
+  color: #E2E2E2;
+  font-family: arial, sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+#prevDetail {
+  left: 8px;
+}
+
+#nextDetail {
+  right: 8px;
 }
 
 </style>
