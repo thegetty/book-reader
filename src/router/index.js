@@ -12,12 +12,12 @@ export default new Router({
       component: Main
     },
     {
-      path: '/book/:book/edition/:edition',
+      path: '/books/:book/editions/:edition',
       name: 'Manifest',
       component: Main
     },
     {
-      path: '/book/:book/edition/:edition/image/:image',
+      path: '/books/:book/editions/:edition/images/:image',
       name: 'ImageLink',
       component: Main
     }

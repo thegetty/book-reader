@@ -44,10 +44,13 @@
     </section>
     <section id="detail" v-if="currentDetail">
       <div class="image_detail">
-        <img :src="currentDetail.asset">
+        <img :src="currentDetail.asset" v-if="!currentDetail.copyright" />
+        <img :src="currentDetail.downsampled" v-if="currentDetail.copyright" />
+        <p><a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a></p>
       </div>
       <div class="image_info" v-if="currentDetail.artwork_title">
         <h1>{{currentDetail.artwork_title}}</h1>
+
         <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
         <aside v-if="this.imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
           <h5>Also in this book</h5>
@@ -65,20 +68,8 @@
         <aside v-if="this.imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
           <h5>Also in this book</h5>
           <ul class="related_images">
-            <li v-for="relatedImage in this.imagesByArtist[encodeURI(currentDetail.artist_name)]" v-if="currentDetail != relatedImage">
-              <a class="related_img_link" @click="currentDetail = relatedImage">
-                <img :src="relatedImage.thumbnail" />
-              </a>
-            </li>
-          </ul>
-        </aside>
-
-        <h3>{{currentDetail.collection}}</h3>
-        <h4><a :href="currentDetail.collection_uri">{{currentDetail.collection_uri}}</a></h4>
-        <aside v-if="this.imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
-          <h5>Also in this book</h5>
-          <ul class="related_images">
-            <li v-for="relatedImage in this.imagesByCollection[encodeURI(currentDetail.collection)]" v-if="currentDetail != relatedImage">
+            <li v-for="relatedImage in this.imagesByArtist[encodeURI(currentDetail.artist_name)]"
+                v-if="currentDetail != relatedImage && (imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].indexOf(relatedImage) === -1)">
               <a class="related_img_link" @click="currentDetail = relatedImage">
                 <img :src="relatedImage.thumbnail" />
               </a>
