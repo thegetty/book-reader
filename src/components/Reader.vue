@@ -6,7 +6,8 @@
           <a @click="outlineOpen = !outlineOpen"><icon name="list-ul" title="Outline"></icon></a>
         </li>
         <li id="search-nav">
-          <a><icon name="search" title="Search"></icon></a>
+          <input id="search" name="query" v-model="query" type="search" results="5">
+          <!-- <icon name="search" title="Search"></icon> -->
         </li>
         <li id="title-nav">{{manifest.title}}: {{manifest.subtitle}}, {{manifest.author_as_it_appears}}</li>
         <li id="book-nav">
@@ -34,6 +35,7 @@
           :onImageClicked="this.onImageClicked"
           :onOutlineReady="this.onOutlineReady"
           @pageChanged="this.onPageChanged"
+          :query="query"
         />
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
@@ -127,16 +129,17 @@ export default {
       imagesByArtwork: {},
       imagesByArtist: {},
       imagesByCollection: {},
-      page: 0,
+      page: 10,
       displayedPage: 0,
       spreads: true,
       showTable: false,
       showGrid: false,
       currentDetail: undefined,
       width: bounds.width,
-      height: bounds.height,
+      height: (bounds.height > 600) ? bounds.height : 600,
       outline: undefined,
-      outlineOpen: false
+      outlineOpen: false,
+      query: ''
     }
   },
   created () {
@@ -166,7 +169,8 @@ export default {
           this.manifest = manifest;
         })
     },
-    loaded () {
+    loaded (pdfDocument) {
+      this.pdfDocument = pdfDocument;
       // Wait for PDF to load
       this.images = this.manifest.images;
 

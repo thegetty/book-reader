@@ -1,8 +1,18 @@
 <template>
   <div class="pageContainer" :class="{ loading: isLoading }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
     <div class="page" v-for="page in displayedPages">
-      <page :page="page" :width="spreads ? width / 2 : width" :height="height" :onViewport="handleViewport" :onImageClicked="onImageClicked"/>
+      <page
+        :ref="'page_'+page.pageIndex"
+        :page="page"
+        :width="spreads ? width / 2 : width"
+        :height="height"
+        :onViewport="handleViewport"
+        :onImageClicked="onImageClicked"
+        :pageMatchesLength="{pageMatchesLength}"
+        :pageMatches="{pageMatches}"
+      />
     </div>
+    <search :pdfDocument="pdfDocument" :query="query" @matched="this.onMatched"/>
   </div>
 </template>
 
@@ -12,6 +22,7 @@
 <!-- <script src="/static/libs/pdfjs-dist/web/compatibility.js"></script> -->
 <script>
 import Page from '@/components/Page'
+import Search from '@/components/Search'
 
 const pdfjsLib = require('pdfjs-dist');
 // require('pdfjs-dist/lib/shared/compatibility.js');
@@ -25,10 +36,13 @@ const pdfjsLib = require('pdfjs-dist');
 // console.log(pdfViewer);
 pdfjsLib.PDFJS.workerSrc = 'static/libs/pdfjs-dist/build/pdf.worker.js';
 
+// import { PDFFindController } from './search_manager'
+
 export default {
   name: 'pdf',
   components: {
-    'Page': Page
+    'Page': Page,
+    'Search': Search
   },
   props: {
     'src': {
@@ -57,11 +71,15 @@ export default {
     'onOutlineReady': {
       default: undefined,
       type: Function
+    },
+    'query': {
+      default: undefined,
+      type: String
     }
   },
   data () {
     return {
-      pdf: undefined,
+      pdfDocument: undefined,
       numPages: 0,
       scale: 1,
       rotate: undefined,
@@ -71,7 +89,9 @@ export default {
       displayedPage: 0,
       displayedPages: [],
       displayedPagesNumbers: [],
-      outline: undefined
+      outline: undefined,
+      pageMatchesLength: [],
+      pageMatches: []
     }
   },
   updated () {
@@ -101,6 +121,11 @@ export default {
     },
     displayedPage () {
       this.$emit('pageChanged', this.displayedPagesNumbers);
+    },
+    query () {
+      if (this.query) {
+        // this.findController.executeCommand('find', {query: this.query});
+      }
     }
   },
   methods: {
@@ -108,23 +133,30 @@ export default {
       console.log('src', src);
       return pdfjsLib.getDocument(src)
         .then((pdfDocument) => {
-          this.pdfDocument = pdfDocument;
-
           // Document loaded, retrieving the page.
           var pagesCount = pdfDocument.numPages;
           // var noCover = settings.cover === false;
           this.numPages = pagesCount;
 
-          this.pdf = pdfDocument;
+          this.pdfDocument = pdfDocument;
 
-          this.isLoading = false;
-
-          this.$emit('loaded');
+          this.$emit('loaded', pdfDocument);
 
           this.outline = pdfDocument.getOutline().then((outline) => {
             return this.processOutline(outline);
           });
 
+          /*
+          this.findController = new PDFFindController({
+            pdfDocument: pdfDocument,
+            onUpdateMatches: ({pageMatchesLength, pageMatches}) => {
+              this.pageMatchesLength = pageMatchesLength;
+              this.pageMatches = pageMatches;
+            }
+          });
+
+          this.findController.resolveFirstPage();
+          */
           // return pdfDocument.getPage(1);
         })
         // .then((firstPage) => {
@@ -149,8 +181,8 @@ export default {
           this.displayedPage = page - 1;
         }
 
-        this.loadPage(this.displayedPage); // left
-        this.loadPage(this.displayedPage + 1); // right
+        this.loadPage(this.displayedPage) // left
+        this.loadPage(this.displayedPage + 1)  // right
 
         this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
       } else {
@@ -175,9 +207,9 @@ export default {
       }
     },
     loadPage (pageIndex) {
-      const { pdf } = this;
+      const { pdfDocument } = this;
 
-      if (!pdf) {
+      if (!pdfDocument) {
         throw new Error('Unexpected call to getPage() before the document has been loaded.');
       }
 
@@ -185,11 +217,11 @@ export default {
 
       if (!pageIndex || pageNumber < 1) {
         pageNumber = 1;
-      } else if (pageNumber >= pdf.numPages) {
-        pageNumber = pdf.numPages;
+      } else if (pageNumber >= pdfDocument.numPages) {
+        pageNumber = pdfDocument.numPages;
       }
 
-      return pdf.getPage(pageNumber)
+      return pdfDocument.getPage(pageNumber)
         .then((page) => this.onPageLoad(page))
         .catch((page) => this.onPageError(page));
     },
@@ -209,6 +241,10 @@ export default {
     },
     getPageIndex (dest) {
       return this.pdfDocument.getPageIndex(dest);
+    },
+    onMatched (pageMatches, pageMatchesLength, count) {
+      this.pageMatches = pageMatches;
+      this.pageMatchesLength = pageMatchesLength;
     }
   }
 }

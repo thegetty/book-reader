@@ -26,6 +26,12 @@ module.exports = {
 
     'semi': 0,
 
-    'no-unused-vars': 'warn'
+    'no-unused-vars': 'warn',
+
+    'comma-dangle': 0,
+
+    'space-before-function-paren': 0,
+
+    'operator-linebreak': 0
   }
 }

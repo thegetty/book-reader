@@ -1,7 +1,7 @@
 <template>
   <div class="pageWrapper" :class="{ loading: isLoading }" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }">
     <canvas ref="canvas" :width="`${viewportWidth}px`" :height="`${viewportHeight}px`"/>
-    <textlayer :page="page" :viewport="viewport"></textlayer>
+    <textlayer :page="page" :viewport="viewport" ref="textLayer"></textlayer>
     <imagelayer :images="images" :viewport="viewport" :onImageClicked="onImageClicked"></imagelayer>
     <div ref="annotationLayer"></div>
   </div>
@@ -46,6 +46,14 @@ export default {
     'onImageClicked': {
       default: undefined,
       type: Function
+    },
+    'pageMatchesLength': {
+      default: undefined,
+      type: Object
+    },
+    'pageMatches': {
+      default: undefined,
+      type: Object
     }
   },
   data () {
@@ -57,7 +65,8 @@ export default {
       viewportScale: 1,
       viewport: undefined,
       textContent: undefined,
-      images: []
+      images: [],
+      pageIndex: undefined
     }
   },
   updated () {
@@ -71,6 +80,17 @@ export default {
     page () {
       if (this.page) {
         this.displayPage(this.page);
+      }
+    },
+    pageMatches () {
+      // For some reason changes to the array isn't picked up, so sent as an object.
+      const {pageMatches} = this.pageMatches;
+      const {pageMatchesLength} = this.pageMatchesLength;
+
+      if (this.pageIndex in pageMatches) {
+        this.$refs.textLayer.updateTextLayerMatches(pageMatchesLength[this.pageIndex], pageMatches[this.pageIndex]);
+      } else {
+        this.$refs.textLayer.clearTextLayerMatches();
       }
     }
   },
@@ -112,6 +132,7 @@ export default {
         }
       };
 
+      this.pageIndex = page.pageIndex;
       this.viewport = viewport;
       this.viewportScale = scale;
       this.viewportHeight = viewport.height;
@@ -123,6 +144,9 @@ export default {
     },
     onPageError (page) {
       console.error(page);
+    },
+    updateTextLayerMatches (pageMatchesLength, pageMatches) {
+      this.$refs.textLayer.updateTextLayerMatches(pageMatchesLength, pageMatches);
     }
   }
 }
