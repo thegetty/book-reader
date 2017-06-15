@@ -4,12 +4,14 @@
 <script>
 import { createPromiseCapability } from 'pdfjs-dist';
 
+/*
 const FindState = {
   FOUND: 0,
   NOT_FOUND: 1,
   WRAPPED: 2,
   PENDING: 3,
 };
+*/
 
 // const FIND_SCROLL_OFFSET_TOP = -50;
 // const FIND_SCROLL_OFFSET_LEFT = -400;
@@ -60,7 +62,8 @@ export default {
       pendingFindMatches: {},
       active: false,
       pagesToSearch: null,
-      extractTextPromises: []
+      extractTextPromises: [],
+      matched: []
     }
   },
   updated () {
@@ -88,11 +91,12 @@ export default {
   },
   methods: {
     reset () {
+      this.matched = [];
       this.pageMatches = [];
       this.pageMatchesLength = null;
       this.matchCount = 0;
 
-      this.$emit('matched', this.pageMatches, this.pageMatchesLength, this.matchCount);
+      this.$emit('matched', this.matched, this.pageMatchesLength, this.matchCount);
       this.$emit('found', this.pageMatches, this.pageMatchesLength, this.matchCount);
     },
 
@@ -262,12 +266,18 @@ export default {
       // Update the match count.
       if (this.pageMatches[pageIndex].length > 0) {
         this.matchCount += this.pageMatches[pageIndex].length;
+        // console.log(this.pageMatchesLength[pageIndex]);
+        this.pageMatches[pageIndex].forEach((match) => {
+          this.matched.push({
+            matchIdx: match,
+            pageIdx: pageIndex
+          });
+          this.$emit('matched', this.matched, this.pageMatches[pageIndex], this.pageMatchesLength[pageIndex], this.matchCount);
+        });
       }
 
-      this.$emit('matched', this.pageMatches, this.pageMatchesLength, this.matchCount);
-
       if (this.pageMatches.length === this.pagesCount) {
-        this.$emit('found', this.pageMatches, this.pageMatchesLength, this.matchCount);
+        this.$emit('found', this.matched, this.pageMatches, this.pageMatchesLength, this.matchCount);
       }
     },
 

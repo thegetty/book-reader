@@ -83,14 +83,16 @@ export default {
       }
     },
     pageMatches () {
-      // For some reason changes to the array isn't picked up, so sent as an object.
-      const {pageMatches} = this.pageMatches;
-      const {pageMatchesLength} = this.pageMatchesLength;
+      if (this.pageMatches && this.pageMatchesLength) {
+        // For some reason changes to the array isn't picked up, so sent as an object.
+        const {pageMatches} = this.pageMatches;
+        const {pageMatchesLength} = this.pageMatchesLength;
 
-      if (this.pageIndex in pageMatches) {
-        this.$refs.textLayer.updateTextLayerMatches(pageMatchesLength[this.pageIndex], pageMatches[this.pageIndex]);
-      } else {
-        this.$refs.textLayer.clearTextLayerMatches();
+        if (this.pageIndex in pageMatches) {
+          this.$refs.textLayer.updateTextLayerMatches(pageMatchesLength[this.pageIndex], pageMatches[this.pageIndex]);
+        } else {
+          this.$refs.textLayer.clearTextLayerMatches();
+        }
       }
     }
   },

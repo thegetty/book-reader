@@ -12,7 +12,7 @@
         :pageMatches="{pageMatches}"
       />
     </div>
-    <search :pdfDocument="pdfDocument" :query="query" @matched="this.onMatched"/>
+    <search :pdfDocument="pdfDocument" :query="query" @matched="this.onMatched" @found="this.onFound"/>
   </div>
 </template>
 
@@ -91,7 +91,8 @@ export default {
       displayedPagesNumbers: [],
       outline: undefined,
       pageMatchesLength: [],
-      pageMatches: []
+      pageMatches: [],
+      matched: []
     }
   },
   updated () {
@@ -242,9 +243,31 @@ export default {
     getPageIndex (dest) {
       return this.pdfDocument.getPageIndex(dest);
     },
-    onMatched (pageMatches, pageMatchesLength, count) {
+    onMatched (matched, pageMatches, pageMatchesLength, count) {
+      // per page
+    },
+    onFound (matched, pageMatches, pageMatchesLength, count) {
       this.pageMatches = pageMatches;
       this.pageMatchesLength = pageMatchesLength;
+      this.matched = matched;
+
+      if (this.matched && this.matched.length && this.displayedPagesNumbers && !(this.matched[0].pageIdx in this.displayedPagesNumbers)) {
+        this.currentMatchIndex = 0;
+        this.display(this.matched[0].pageIdx);
+      }
+    },
+    nextMatch () {
+      if (this.matched && this.currentMatchIndex < this.matched.length) {
+        this.currentMatchIndex += 1;
+        let currentMatch = this.matched[this.currentMatchIndex];
+
+        if (currentMatch.pageIdx in this.displayedPagesNumbers) {
+          this.display(currentMatch.pageIdx);
+        }
+      }
+    },
+    prevMatch () {
+
     }
   }
 }

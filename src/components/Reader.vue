@@ -129,7 +129,7 @@ export default {
       imagesByArtwork: {},
       imagesByArtist: {},
       imagesByCollection: {},
-      page: 10,
+      page: 0,
       displayedPage: 0,
       spreads: true,
       showTable: false,
