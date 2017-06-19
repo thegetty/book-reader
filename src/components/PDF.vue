@@ -1,5 +1,5 @@
 <template>
-  <div :ref="'container'" class="pageContainer" :class="{ loading: isLoading, centered: (zoom < 1) }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
+  <div :ref="'container'" class="pageContainer" :class="{ loading: isLoading, centered: (!spreads || zoom <= 1) }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
     <div class="page" v-for="page in displayedPages" :key="page.pageIndex">
       <page
         :ref="'page_'+page.pageIndex"
@@ -17,10 +17,6 @@
   </div>
 </template>
 
-<!-- <script src="libs/pdfjs-dist/build/pdf.js"></script> -->
-<!-- <script src="/static/libs/pdfjs-dist/build/pdf.worker.js"></script> -->
-<!-- <script src="/static/libs/pdfjs-dist/web/pdf_viewer.js"></script> -->
-<!-- <script src="/static/libs/pdfjs-dist/web/compatibility.js"></script> -->
 <script>
 import Page from '@/components/Page'
 import Search from '@/components/Search'
@@ -28,19 +24,7 @@ import Search from '@/components/Search'
 const pdfjsLib = require('pdfjs-dist');
 // require('pdfjs-dist/lib/shared/compatibility.js');
 
-// const pdfjsWebTextLayerBuilder = require('pdfjs-dist/lib/web/text_layer_builder.js');
-// console.log(pdfjsWebTextLayerBuilder);
-// const pdfjsWebAnnotationLayerBuilder = require('./annotation_layer_builder.js');
-// /* global PDFJS */
-
-// const pdfViewer = require('../../static/libs/pdfjs-dist/web/pdf_viewer.js');
-// console.log(pdfViewer);
 pdfjsLib.PDFJS.workerSrc = 'static/libs/pdfjs-dist/build/pdf.worker.js';
-
-// import { PDFFindController } from './search_manager'
-
-// const FIND_SCROLL_OFFSET_TOP = -50;
-// const FIND_SCROLL_OFFSET_LEFT = -400;
 
 export default {
   name: 'pdf',
@@ -170,26 +154,38 @@ export default {
     display (page = this.page) {
       this.displayedPages = []; // clear
 
+      if (page < 0) {
+        return;
+      }
+
       if (this.spreads) {
-        if (page % 2 === 0) {
+        if (page % 2 !== 0 || page === 0) {
           this.displayedPage = page;
         } else {
           this.displayedPage = page - 1;
         }
 
-        this.loadPage(this.displayedPage) // left
-        this.loadPage(this.displayedPage + 1)  // right
-
-        this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
+        if (this.displayedPage > 0) {
+          this.loadPage(this.displayedPage) // left
+          this.loadPage(this.displayedPage + 1)  // right
+          this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
+        } else {
+          this.loadPage(this.displayedPage) // cover
+          this.displayedPagesNumbers = [this.displayedPage];
+        }
       } else {
         this.displayedPage = page;
         this.loadPage(this.displayedPage);
 
-        this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
+        this.displayedPagesNumbers = [this.displayedPage];
       }
     },
     next () {
-      this.displayedPage += this.spreads ? 2 : 1;
+      if (this.displayedPage === 0) {
+        this.displayedPage += 1;
+      } else {
+        this.displayedPage += this.spreads ? 2 : 1;
+      }
       if (this.displayedPage < this.numPages) {
         this.display(this.displayedPage);
       } else {
@@ -197,8 +193,12 @@ export default {
       }
     },
     prev () {
-      if (this.displayedPage > 1) {
-        this.displayedPage -= this.spreads ? 2 : 1;
+      if (this.displayedPage > 0) {
+        if (this.displayedPage === 1) {
+          this.displayedPage -= 1;
+        } else {
+          this.displayedPage -= this.spreads ? 2 : 1;
+        }
         this.display(this.displayedPage);
       }
     },

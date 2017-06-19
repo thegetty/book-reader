@@ -36,8 +36,25 @@ export default {
     };
   },
   mounted () {
+    if (this.data) {
+      this.processData();
+    }
   },
   methods: {
+    processData () {
+      this.pageList = [];
+      this.data.forEach((item, i) => {
+        let li = Object.assign({}, item);
+        this.pageList.push(li);
+        this.pdf.getPageIndex(item.dest[0]).then((pg) => {
+          li.page = pg;
+
+          if (i === this.data.length - 1) {
+            this.checkActive();
+          }
+        });
+      });
+    },
     handleLink (item) {
       this.$emit('onClick', item.dest);
     },
@@ -53,17 +70,7 @@ export default {
   },
   watch: {
     data () {
-      this.data.forEach((item, i) => {
-        let li = Object.assign({}, item);
-        this.pageList.push(li);
-        this.pdf.getPageIndex(item.dest[0]).then((pg) => {
-          li.page = pg;
-
-          if (i === this.data.length - 1) {
-            this.checkActive();
-          }
-        });
-      });
+      this.processData();
     },
     page () {
       this.checkActive();

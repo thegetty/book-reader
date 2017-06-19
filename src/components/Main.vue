@@ -13,7 +13,7 @@ export default {
   data () {
     console.log(this.$route.params.book, this.$route.params.edition);
     return {
-      url: `https://s3.amazonaws.com/pubs-fchasen/books/${this.$route.params.book || 371}/editions/${this.$route.params.edition || 500}/manifest.json`
+      url: `https://s3.amazonaws.com/pubs-fchasen/books/${this.$route.params.book || 711}/editions/${this.$route.params.edition || 884}/manifest.json`
     }
   }
 }

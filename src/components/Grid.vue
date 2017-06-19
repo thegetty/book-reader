@@ -4,6 +4,7 @@
       <li v-for="image in filteredData">
         <a class="img_link" @click="$emit('onClick', image)">
           <img v-lazy="image.thumbnail" />
+          <span>{{ image.page_label || image.page }}</span>
         </a>
       </li>
     </ol>
@@ -110,6 +111,8 @@ li {
 
 .img_link {
   cursor: pointer;
+  display: inline-block;
+  margin: 8px;
 }
 
 .img_link:hover {
@@ -123,6 +126,12 @@ li {
 .img_link img {
   max-width: 100px;
   max-height: 100px;
+  display: block;
+}
+
+.img_link span {
+  display: block;
+  text-align: center;
 }
 
 </style>

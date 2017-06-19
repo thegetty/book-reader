@@ -3,7 +3,7 @@
     <header id="menu">
       <ul id="nav">
         <li id="toc-nav">
-          <a @click="outlineOpen = !outlineOpen"><icon name="list-ul" title="Outline"></icon></a>
+          <a @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;"><icon name="list-ul" title="Outline"></icon></a>
         </li>
         <li id="search-nav">
           <input id="search" name="query" v-model="query" type="search" results="5">
@@ -147,7 +147,7 @@ export default {
       showGrid: false,
       currentDetail: undefined,
       width: bounds.width,
-      height: (bounds.height > 600) ? bounds.height : 600,
+      height: bounds.height,
       outline: undefined,
       outlineOpen: false,
       query: '',
@@ -159,8 +159,10 @@ export default {
   created () {
     this.fetchManifest();
     window.addEventListener('keyup', this.keyListener.bind(this), false);
+    window.addEventListener('resize', this.handleResize.bind(this), false);
   },
   beforeDestory () {
+    window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keyup', this.keyListener);
   },
   watch: {
@@ -233,6 +235,11 @@ export default {
         this.next();
       }
     },
+    handleResize () {
+      let bounds = this.getBounds();
+      this.width = bounds.width;
+      this.height = bounds.height;
+    },
     goto (dest) {
       const { pdf } = this.$refs;
       this.outlineOpen = false;
@@ -263,10 +270,10 @@ export default {
     getBounds () {
       let width = window.innerWidth;
       let height = window.innerHeight;
-      let scaler = 0.8;
+      let header = 134;
       return {
-        width: width * scaler,
-        height: height * scaler
+        width: width - header,
+        height: height - header
       };
     },
     setSpreads (spreads) {

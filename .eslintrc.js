@@ -32,6 +32,8 @@ module.exports = {
 
     'space-before-function-paren': 0,
 
-    'operator-linebreak': 0
+    'operator-linebreak': 0,
+
+    'quotes': 'warn'
   }
 }
