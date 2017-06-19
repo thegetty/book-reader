@@ -48,6 +48,14 @@ export default {
     'query': {
       default: '',
       type: String
+    },
+    'phraseSearch': {
+      default: true,
+      type: Boolean
+    },
+    'minQueryLength': {
+      default: 3,
+      type: Number
     }
   },
   data () {
@@ -84,8 +92,12 @@ export default {
       if (this.query === '') {
         this.reset();
       }
+
+      clearTimeout(this.findTimeout);
       this.findTimeout = setTimeout(() => {
-        this.find(this.query);
+        if (this.query.length > this.minQueryLength) {
+          this.find(this.query);
+        }
       }, FIND_TIMEOUT);
     }
   },
@@ -109,6 +121,7 @@ export default {
       this.prevQuery = query;
 
       // Reset
+      this.matched = [];
       this.pageMatches = [];
       this.pageMatchesLength = null;
       this.matchCount = 0;
@@ -264,20 +277,20 @@ export default {
       // this.updateMatches();
 
       // Update the match count.
-      if (this.pageMatches[pageIndex].length > 0) {
+      if (pageIndex in this.pageMatches && this.pageMatches[pageIndex].length > 0) {
         this.matchCount += this.pageMatches[pageIndex].length;
-        // console.log(this.pageMatchesLength[pageIndex]);
+
         this.pageMatches[pageIndex].forEach((match) => {
           this.matched.push({
             matchIdx: match,
             pageIdx: pageIndex
           });
-          this.$emit('matched', this.matched, this.pageMatches[pageIndex], this.pageMatchesLength[pageIndex], this.matchCount);
+          this.$emit('matched', this.query, this.matched, this.pageMatches[pageIndex], this.pageMatchesLength ? this.pageMatchesLength[pageIndex] : null, this.matchCount);
         });
       }
 
       if (this.pageMatches.length === this.pagesCount) {
-        this.$emit('found', this.matched, this.pageMatches, this.pageMatchesLength, this.matchCount);
+        this.$emit('found', this.query, this.matched, this.pageMatches, this.pageMatchesLength, this.matchCount);
       }
     },
 

@@ -28,15 +28,20 @@ export default {
       selected: {
         pageIdx: -1,
         matchIdx: -1
-      }
+      },
+      query: ''
     }
   },
   updated () {
+
   },
   mounted () {
     if (this.page) {
       this.getTextContent(this.page).then((textContent) => this.onContent(textContent));
     }
+  },
+  destroyed () {
+
   },
   watch: {
     page () {
@@ -82,10 +87,10 @@ export default {
     onPageError (page) {
       console.error(page);
     },
-    updateTextLayerMatches(pageMatchesLength, pageMatches) {
+    updateTextLayerMatches(query, pageMatches, pageMatchesLength) {
       this.pageMatches = pageMatches;
       this.pageMatchesLength = pageMatchesLength;
-
+      this.query = query;
       if (this.textContent) {
         this.clearMatches();
         this.matches = this.convertMatches(this.pageMatches, this.pageMatchesLength);
@@ -95,11 +100,14 @@ export default {
     clearTextLayerMatches() {
       this.pageMatches = [];
       this.pageMatchesLength = [];
-
+      this.query = '';
       this.clearMatches();
+      this.selected = {pageIdx: -1, matchIdx: -1};
     },
     selectedMatch(pageIdx, matchIdx) {
+      this.clearMatches();
       this.selected = {pageIdx, matchIdx};
+      this.renderMatches(this.matches);
     },
     renderMatches(matches) {
       // Early exit if there is nothing to render.
@@ -153,14 +161,8 @@ export default {
         var match = matches[i];
         var begin = match.begin;
         var end = match.end;
-        var isSelected = (isSelectedPage && i === selectedMatchIdx);
+        var isSelected = (isSelectedPage && match.matchIdx === selectedMatchIdx);
         var highlightSuffix = (isSelected ? ' selected' : '');
-
-        if (this.findController) {
-          this.findController.updateMatchPosition(pageIdx, i, textDivs,
-                                                  begin.divIdx);
-        }
-
         // Match inside new div.
         if (!prevEnd || begin.divIdx !== prevEnd.divIdx) {
           // If there was a previous div, then add the text at the end.
@@ -196,7 +198,7 @@ export default {
       var iIndex = 0;
       var bidiTexts = this.textContent.items;
       var end = bidiTexts.length - 1;
-      var queryLen = 0;// (this.findController === null ? 0 : this.findController.state.query.length);
+      var queryLen = this.query ? this.query.length : 0;
       var ret = [];
       if (!matches) {
         return ret;
@@ -216,9 +218,10 @@ export default {
         }
 
         var match = {
+          matchIdx: matchIdx,
           begin: {
             divIdx: i,
-            offset: matchIdx - iIndex,
+            offset: matchIdx - iIndex
           },
         };
 

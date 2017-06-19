@@ -7,6 +7,9 @@
         </li>
         <li id="search-nav">
           <input id="search" name="query" v-model="query" type="search" results="5">
+          <a id="prevMatch" @click="prevMatch" v-if="matchCount">‹</a>
+          <span id="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
+          <a id="nextMatch" @click="nextMatch" v-if="matchCount">›</a>
           <!-- <icon name="search" title="Search"></icon> -->
         </li>
         <li id="title-nav">{{manifest.title}}: {{manifest.subtitle}}, {{manifest.author_as_it_appears}}</li>
@@ -35,6 +38,8 @@
           :onImageClicked="this.onImageClicked"
           :onOutlineReady="this.onOutlineReady"
           @pageChanged="this.onPageChanged"
+          @found="this.onFound"
+          @match="this.onMatch"
           :query="query"
         />
       <div id="prev" class="arrow" @click="this.prev">‹</div>
@@ -139,7 +144,9 @@ export default {
       height: (bounds.height > 600) ? bounds.height : 600,
       outline: undefined,
       outlineOpen: false,
-      query: ''
+      query: '',
+      matchCount: undefined,
+      currentMatchIndex: undefined
     }
   },
   created () {
@@ -238,6 +245,12 @@ export default {
     onImageClicked (image) {
       this.currentDetail = this.imagesById[image.objId];
     },
+    onFound (count) {
+      this.matchCount = count;
+    },
+    onMatch (index) {
+      this.currentMatchIndex = index + 1;
+    },
     getBounds () {
       let width = window.innerWidth;
       let height = window.innerHeight;
@@ -257,6 +270,7 @@ export default {
     },
     onPageChanged (pages) {
       this.displayedPage = pages[pages.length - 1];
+      this.page = -1; // reset
     },
     toggleTable () {
       this.showTable = !this.showTable;
@@ -277,6 +291,14 @@ export default {
       if (index - 1 >= 0) {
         this.currentDetail = this.images[index - 1];
       }
+    },
+    nextMatch () {
+      const { pdf } = this.$refs;
+      pdf.nextMatch();
+    },
+    prevMatch () {
+      const { pdf } = this.$refs;
+      pdf.prevMatch();
     }
   }
 }

@@ -1,15 +1,13 @@
 <template>
   <div class="pageContainer" :class="{ loading: isLoading }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
-    <div class="page" v-for="page in displayedPages">
-      <page
+    <div class="page" v-for="page in displayedPages" :key="page.pageIndex">
+      <page v-once
         :ref="'page_'+page.pageIndex"
         :page="page"
         :width="spreads ? width / 2 : width"
         :height="height"
         :onViewport="handleViewport"
         :onImageClicked="onImageClicked"
-        :pageMatchesLength="{pageMatchesLength}"
-        :pageMatches="{pageMatches}"
       />
     </div>
     <search :pdfDocument="pdfDocument" :query="query" @matched="this.onMatched" @found="this.onFound"/>
@@ -92,7 +90,8 @@ export default {
       outline: undefined,
       pageMatchesLength: [],
       pageMatches: [],
-      matched: []
+      matched: [],
+      selectedMatch: {}
     }
   },
   updated () {
@@ -111,7 +110,7 @@ export default {
       }
     },
     page (pg) {
-      if (typeof this.page !== 'undefined') {
+      if (typeof this.page !== 'undefined' && this.page > -1) {
         this.display(this.page);
       }
     },
@@ -124,8 +123,9 @@ export default {
       this.$emit('pageChanged', this.displayedPagesNumbers);
     },
     query () {
-      if (this.query) {
+      if (this.query === '') {
         // this.findController.executeCommand('find', {query: this.query});
+        this.clearMatches();
       }
     }
   },
@@ -227,7 +227,17 @@ export default {
         .catch((page) => this.onPageError(page));
     },
     onPageLoad (page) {
+      if (!this.displayedPagesNumbers.includes(page.pageIndex)) {
+        return;
+      }
+
       this.displayedPages.push(page);
+
+      this.$nextTick(() => {
+        let pg = this.$refs[`page_${page.pageIndex}`][0];
+        pg.updatedSelectedMatch(this.selectedMatch);
+        pg.updateTextLayerMatches(this.query, this.pageMatches, this.pageMatchesLength);
+      });
     },
     onPageError (page) {
       console.error(page);
@@ -246,28 +256,72 @@ export default {
     onMatched (matched, pageMatches, pageMatchesLength, count) {
       // per page
     },
-    onFound (matched, pageMatches, pageMatchesLength, count) {
+    onFound (query, matched, pageMatches, pageMatchesLength, count) {
       this.pageMatches = pageMatches;
       this.pageMatchesLength = pageMatchesLength;
       this.matched = matched;
-
-      if (this.matched && this.matched.length && this.displayedPagesNumbers && !(this.matched[0].pageIdx in this.displayedPagesNumbers)) {
+      this.$emit('found', count);
+      if (this.matched && this.matched.length) {
         this.currentMatchIndex = 0;
-        this.display(this.matched[0].pageIdx);
-      }
-    },
-    nextMatch () {
-      if (this.matched && this.currentMatchIndex < this.matched.length) {
-        this.currentMatchIndex += 1;
-        let currentMatch = this.matched[this.currentMatchIndex];
+        this.selectedMatch = this.matched[this.currentMatchIndex];
+        this.$emit('match', this.currentMatchIndex);
 
-        if (currentMatch.pageIdx in this.displayedPagesNumbers) {
-          this.display(currentMatch.pageIdx);
+        if (!this.displayedPagesNumbers.includes(this.selectedMatch.pageIdx)) {
+          this.display(this.selectedMatch.pageIdx);
+        } else {
+          let pg = this.$refs[`page_${this.selectedMatch.pageIdx}`][0];
+          pg.updatedSelectedMatch(this.selectedMatch);
+          pg.updateTextLayerMatches(this.query, this.pageMatches, this.pageMatchesLength);
         }
       }
     },
-    prevMatch () {
+    clearMatches () {
+      this.displayedPagesNumbers.forEach((pageIndex) => {
+        let pg = this.$refs[`page_${pageIndex}`][0];
+        pg.updateTextLayerMatches('', [], null);
+      });
+    },
+    nextMatch () {
+      if (!this.matched || this.matched.length === 0) {
+        return;
+      }
 
+      if (this.currentMatchIndex < this.matched.length - 1) {
+        this.currentMatchIndex += 1;
+      } else {
+        this.currentMatchIndex = 0;
+      }
+
+      this.selectedMatch = this.matched[this.currentMatchIndex];
+      this.$emit('match', this.currentMatchIndex);
+
+      if (!this.displayedPagesNumbers.includes(this.selectedMatch.pageIdx)) {
+        this.display(this.selectedMatch.pageIdx);
+      } else {
+        let pg = this.$refs[`page_${this.selectedMatch.pageIdx}`][0];
+        pg.updatedSelectedMatch(this.selectedMatch);
+      }
+    },
+    prevMatch () {
+      if (!this.matched || this.matched.length === 0) {
+        return;
+      }
+
+      if (this.currentMatchIndex > 0) {
+        this.currentMatchIndex -= 1;
+      } else {
+        this.currentMatchIndex = this.matched.length - 1;
+      }
+
+      this.selectedMatch = this.matched[this.currentMatchIndex];
+      this.$emit('match', this.currentMatchIndex);
+
+      if (!this.displayedPagesNumbers.includes(this.selectedMatch.pageIdx)) {
+        this.display(this.selectedMatch.pageIdx);
+      } else {
+        let pg = this.$refs[`page_${this.selectedMatch.pageIdx}`][0];
+        pg.updatedSelectedMatch(this.selectedMatch);
+      }
     }
   }
 }

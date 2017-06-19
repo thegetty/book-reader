@@ -47,14 +47,22 @@ export default {
       default: undefined,
       type: Function
     },
-    'pageMatchesLength': {
-      default: undefined,
-      type: Object
-    },
-    'pageMatches': {
-      default: undefined,
-      type: Object
-    }
+    // 'pageMatchesLength': {
+    //   default: undefined,
+    //   type: Object
+    // },
+    // 'pageMatches': {
+    //   default: undefined,
+    //   type: Object
+    // },
+    // 'selectedMatch': {
+    //   default: undefined,
+    //   type: Object
+    // },
+    // 'query': {
+    //   default: undefined,
+    //   type: String
+    // }
   },
   data () {
     return {
@@ -75,6 +83,22 @@ export default {
     if (this.page) {
       this.displayPage(this.page);
     }
+
+    // if (this.pageMatches && this.pageMatchesLength) {
+    //   // For some reason changes to the array isn't picked up, so sent as an object.
+    //   const {pageMatches} = this.pageMatches;
+    //   const {pageMatchesLength} = this.pageMatchesLength;
+    //
+    //   if (this.pageIndex in pageMatches) {
+    //     this.$refs.textLayer.updateTextLayerMatches(this.query, pageMatchesLength ? pageMatchesLength[this.pageIndex] : null, pageMatches[this.pageIndex]);
+    //   } else {
+    //     this.$refs.textLayer.clearTextLayerMatches();
+    //   }
+    // }
+    //
+    // if (this.pageIndex === this.selectedMatch.pageIdx) {
+    //   this.$refs.textLayer.selectedMatch(this.selectedMatch.pageIdx, this.selectedMatch.matchIdx);
+    // }
   },
   watch: {
     page () {
@@ -83,18 +107,23 @@ export default {
       }
     },
     pageMatches () {
-      if (this.pageMatches && this.pageMatchesLength) {
-        // For some reason changes to the array isn't picked up, so sent as an object.
-        const {pageMatches} = this.pageMatches;
-        const {pageMatchesLength} = this.pageMatchesLength;
-
-        if (this.pageIndex in pageMatches) {
-          this.$refs.textLayer.updateTextLayerMatches(pageMatchesLength[this.pageIndex], pageMatches[this.pageIndex]);
-        } else {
-          this.$refs.textLayer.clearTextLayerMatches();
-        }
-      }
+      // if (this.pageMatches && this.pageMatchesLength) {
+      //   // For some reason changes to the array isn't picked up, so sent as an object.
+      //   const {pageMatches} = this.pageMatches;
+      //   const {pageMatchesLength} = this.pageMatchesLength;
+      //
+      //   if (this.pageIndex in pageMatches) {
+      //     this.$refs.textLayer.updateTextLayerMatches(this.query, pageMatchesLength ? pageMatchesLength[this.pageIndex] : null, pageMatches[this.pageIndex]);
+      //   } else {
+      //     this.$refs.textLayer.clearTextLayerMatches();
+      //   }
+      // }
     }
+    // selectedMatch () {
+    //   if (this.pageIndex === this.selectedMatch.pageIdx) {
+    //     this.$refs.textLayer.selectedMatch(this.selectedMatch.pageIdx, this.selectedMatch.matchIdx);
+    //   }
+    // }
   },
   methods: {
     getPageScale (page = this.page) {
@@ -141,14 +170,27 @@ export default {
       this.viewportWidth = viewport.width;
 
       this.onViewport && this.onViewport(viewport);
-
       page.render({ canvasContext, viewport, imageLayer });
     },
     onPageError (page) {
       console.error(page);
     },
-    updateTextLayerMatches (pageMatchesLength, pageMatches) {
-      this.$refs.textLayer.updateTextLayerMatches(pageMatchesLength, pageMatches);
+    updateTextLayerMatches (query, pageMatches, pageMatchesLength) {
+      this.query = query;
+      this.pageMatchesLength = pageMatchesLength;
+      this.pageMatches = pageMatches;
+
+      if (pageMatches && pageMatches.length > this.pageIndex) {
+        this.$refs.textLayer.updateTextLayerMatches(query, pageMatches[this.pageIndex], pageMatchesLength ? pageMatchesLength[this.pageIndex] : null);
+      } else {
+        this.$refs.textLayer.clearTextLayerMatches();
+      }
+    },
+    updatedSelectedMatch (selectedMatch) {
+      this.selectedMatch = selectedMatch;
+      if (this.pageIndex === selectedMatch.pageIdx) {
+        this.$refs.textLayer.selectedMatch(selectedMatch.pageIdx, selectedMatch.matchIdx);
+      }
     }
   }
 }
