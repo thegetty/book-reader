@@ -1,13 +1,16 @@
 <template>
-  <div class="pageContainer" :class="{ loading: isLoading }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
+  <div :ref="'container'" class="pageContainer" :class="{ loading: isLoading, centered: (zoom < 1) }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
     <div class="page" v-for="page in displayedPages" :key="page.pageIndex">
-      <page v-once
+      <page
         :ref="'page_'+page.pageIndex"
         :page="page"
         :width="spreads ? width / 2 : width"
         :height="height"
+        :scale="zoom"
         :onViewport="handleViewport"
         :onImageClicked="onImageClicked"
+        :onSelected="onSelected"
+        @displayed="afterDisplayed"
       />
     </div>
     <search :pdfDocument="pdfDocument" :query="query" @matched="this.onMatched" @found="this.onFound"/>
@@ -35,6 +38,9 @@ const pdfjsLib = require('pdfjs-dist');
 pdfjsLib.PDFJS.workerSrc = 'static/libs/pdfjs-dist/build/pdf.worker.js';
 
 // import { PDFFindController } from './search_manager'
+
+// const FIND_SCROLL_OFFSET_TOP = -50;
+// const FIND_SCROLL_OFFSET_LEFT = -400;
 
 export default {
   name: 'pdf',
@@ -73,6 +79,10 @@ export default {
     'query': {
       default: undefined,
       type: String
+    },
+    'zoom': {
+      default: 1,
+      type: Number
     }
   },
   data () {
@@ -100,6 +110,7 @@ export default {
     if (this.src) {
       this.loadDocument(this.src)
         .then(() => this.display(this.page))
+        .catch((err) => console.error(err));
     }
   },
   watch: {
@@ -107,6 +118,7 @@ export default {
       if (this.src) {
         this.loadDocument(this.src)
           .then(() => this.display(this.page))
+          .catch((err) => console.error(err));
       }
     },
     page (pg) {
@@ -127,6 +139,12 @@ export default {
         // this.findController.executeCommand('find', {query: this.query});
         this.clearMatches();
       }
+    },
+    zoom () {
+      let container = this.$refs.container;
+      let bounds = container.getBoundingClientRect();
+      this.scrollLeftDelta = (container.scrollLeft - ((container.scrollWidth - bounds.width) / 2));
+      this.scrollTopDelta = (container.scrollTop - ((container.scrollHeight - bounds.height) / 2));
     }
   },
   methods: {
@@ -146,31 +164,8 @@ export default {
           this.outline = pdfDocument.getOutline().then((outline) => {
             return this.processOutline(outline);
           });
-
-          /*
-          this.findController = new PDFFindController({
-            pdfDocument: pdfDocument,
-            onUpdateMatches: ({pageMatchesLength, pageMatches}) => {
-              this.pageMatchesLength = pageMatchesLength;
-              this.pageMatches = pageMatches;
-            }
-          });
-
-          this.findController.resolveFirstPage();
-          */
-          // return pdfDocument.getPage(1);
         })
-        // .then((firstPage) => {
-        // // var viewport = firstPage.getViewport(SCALE);
-        //   var CSS_UNITS = 96.0 / 72.0;
-        //
-        //   var widthScale = (window.innerWidth / 2) / firstPage.getViewport(CSS_UNITS).width;
-        //   var heightScale = (window.innerHeight) / firstPage.getViewport(CSS_UNITS).height;
-        //   var scale = (widthScale > heightScale ? heightScale : widthScale);
-        //
-        //   var viewport = firstPage.getViewport(scale);
-        //
-        // })
+        .catch((err) => console.error(err));
     },
     display (page = this.page) {
       this.displayedPages = []; // clear
@@ -239,6 +234,12 @@ export default {
         pg.updateTextLayerMatches(this.query, this.pageMatches, this.pageMatchesLength);
       });
     },
+    afterDisplayed () {
+      let container = this.$refs.container;
+      let bounds = container.getBoundingClientRect();
+      container.scrollLeft = (container.scrollWidth - bounds.width) / 2 + this.scrollLeftDelta;
+      container.scrollTop = (container.scrollHeight - bounds.height) / 2 + this.scrollTopDelta;
+    },
     onPageError (page) {
       console.error(page);
     },
@@ -274,6 +275,12 @@ export default {
           pg.updateTextLayerMatches(this.query, this.pageMatches, this.pageMatchesLength);
         }
       }
+    },
+    onSelected (selected) {
+      let container = this.$refs.container;
+      let bounds = container.getBoundingClientRect();
+      container.scrollLeft = bounds.left + selected.left;
+      container.scrollTop = bounds.top + selected.top;
     },
     clearMatches () {
       this.displayedPagesNumbers.forEach((pageIndex) => {
@@ -331,11 +338,16 @@ export default {
 .loading {
   /*background: #eee url('../assets/loading-icon.gif') center no-repeat;*/
 }
+
 .pageContainer {
   margin: 0 auto;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  overflow: auto;
+}
+
+.pageContainer.centered {
   justify-content: center;
   align-items: center;
 }

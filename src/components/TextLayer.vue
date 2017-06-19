@@ -37,7 +37,9 @@ export default {
   },
   mounted () {
     if (this.page) {
-      this.getTextContent(this.page).then((textContent) => this.onContent(textContent));
+      this.getTextContent(this.page)
+        .then((textContent) => this.onContent(textContent))
+        .catch((err) => console.error(err));
     }
   },
   destroyed () {
@@ -46,7 +48,14 @@ export default {
   watch: {
     page () {
       if (this.page) {
-        this.getTextContent(this.page).then((textContent) => this.onContent(textContent));
+        this.getTextContent(this.page)
+          .then((textContent) => this.onContent(textContent))
+          .catch((err) => console.error(err));
+      }
+    },
+    viewport () {
+      if (this.textContent) {
+        this.onContent(this.textContent);
       }
     }
   },
@@ -56,6 +65,8 @@ export default {
     },
     onContent (textContent) {
       const { textLayer } = this.$refs;
+
+      this.clearTextLayer();
 
       this.textContent = textContent;
 
@@ -82,10 +93,17 @@ export default {
           this.matches = this.convertMatches(this.pageMatches, this.pageMatchesLength);
           this.renderMatches(this.matches);
         }
-      });
+      })
+      .catch((err) => console.error(err));
     },
     onPageError (page) {
       console.error(page);
+    },
+    clearTextLayer () {
+      const { textLayer } = this.$refs;
+      while (textLayer.firstChild) {
+        textLayer.removeChild(textLayer.firstChild);
+      }
     },
     updateTextLayerMatches(query, pageMatches, pageMatchesLength) {
       this.pageMatches = pageMatches;
@@ -103,8 +121,10 @@ export default {
       this.query = '';
       this.clearMatches();
       this.selected = {pageIdx: -1, matchIdx: -1};
+      this._sentSelected = false;
     },
     selectedMatch(pageIdx, matchIdx) {
+      this._sentSelected = false;
       this.clearMatches();
       this.selected = {pageIdx, matchIdx};
       this.renderMatches(this.matches);
@@ -163,6 +183,12 @@ export default {
         var end = match.end;
         var isSelected = (isSelectedPage && match.matchIdx === selectedMatchIdx);
         var highlightSuffix = (isSelected ? ' selected' : '');
+
+        if (isSelected && !this._sentSelected) {
+          this.$emit('selected', textDivs[begin.divIdx].getBoundingClientRect());
+          this._sentSelected = true;
+        }
+
         // Match inside new div.
         if (!prevEnd || begin.divIdx !== prevEnd.divIdx) {
           // If there was a previous div, then add the text at the end.

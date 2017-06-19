@@ -4,17 +4,6 @@
 <script>
 import { createPromiseCapability } from 'pdfjs-dist';
 
-/*
-const FindState = {
-  FOUND: 0,
-  NOT_FOUND: 1,
-  WRAPPED: 2,
-  PENDING: 3,
-};
-*/
-
-// const FIND_SCROLL_OFFSET_TOP = -50;
-// const FIND_SCROLL_OFFSET_LEFT = -400;
 const FIND_TIMEOUT = 250; // ms
 
 const CHARACTERS_TO_NORMALIZE = {
@@ -299,7 +288,8 @@ export default {
         return page.getTextContent({
           normalizeWhitespace: true,
         });
-      });
+      })
+      .catch((err) => console.error(err));
     },
 
     extractText () {
@@ -329,107 +319,7 @@ export default {
           });
         });
       }
-    },
-    /*
-    nextMatch () {
-      let previous = this.state.findPrevious;
-      let currentPageIndex = this.pdfDocument.currentPageNumber - 1;
-      let numPages = this.pagesCount;
-
-      this.active = true;
-
-      if (this.dirtyMatch) {
-        // Need to recalculate the matches, reset everything.
-        this.dirtyMatch = false;
-        this.selected.pageIdx = this.selected.matchIdx = -1;
-        this.offset.pageIdx = currentPageIndex;
-        this.offset.matchIdx = null;
-        this.hadMatch = false;
-        this.resumePageIdx = null;
-        this.pageMatches = [];
-        this.matchCount = 0;
-        this.pageMatchesLength = null;
-
-        for (let i = 0; i < numPages; i++) {
-          // Wipe out any previously highlighted matches.
-          // this.updatePage(i);
-
-          // Start finding the matches as soon as the text is extracted.
-          if (!(i in this.pendingFindMatches)) {
-            this.pendingFindMatches[i] = true;
-            this.extractTextPromises[i].then((pageIdx) => {
-              delete this.pendingFindMatches[pageIdx];
-              this.calcFindMatch(pageIdx);
-            });
-          }
-        }
-      }
-
-      // If there's no query there's no point in searching.
-      if (this.query === '') {
-        this.updateUIState(FindState.FOUND);
-        return;
-      }
-
-      // If we're waiting on a page, we return since we can't do anything else.
-      if (this.resumePageIdx) {
-        return;
-      }
-
-      let offset = this.offset;
-      // Keep track of how many pages we should maximally iterate through.
-      this.pagesToSearch = numPages;
-      // If there's already a `matchIdx` that means we are iterating through a
-      // page's matches.
-      if (offset.matchIdx !== null) {
-        let numPageMatches = this.pageMatches[offset.pageIdx].length;
-        if ((!previous && offset.matchIdx + 1 < numPageMatches) ||
-            (previous && offset.matchIdx > 0)) {
-          // The simple case; we just have advance the matchIdx to select
-          // the next match on the page.
-          this.hadMatch = true;
-          offset.matchIdx = (previous ? offset.matchIdx - 1 : offset.matchIdx + 1);
-          this.updateMatch(true);
-          return;
-        }
-        // We went beyond the current page's matches, so we advance to
-        // the next page.
-        this.advanceOffsetPage(previous);
-      }
-      // Start searching through the page.
-      this.nextPageMatch();
-    },
-    */
-    /*
-    matchesReady(matches) {
-      let offset = this.offset;
-      let numMatches = matches.length;
-      let previous = this.state.findPrevious;
-
-      if (numMatches) {
-        // There were matches for the page, so initialize `matchIdx`.
-        this.hadMatch = true;
-        offset.matchIdx = (previous ? numMatches - 1 : 0);
-        this.updateMatch(true);
-        return true;
-      }
-      // No matches, so attempt to search the next page.
-      this.advanceOffsetPage(previous);
-      if (offset.wrapped) {
-        offset.matchIdx = null;
-        if (this.pagesToSearch < 0) {
-          // No point in wrapping again, there were no matches.
-          this.updateMatch(false);
-          // While matches were not found, searching for a page
-          // with matches should nevertheless halt.
-          return true;
-        }
-      }
-      // Matches were not found (and searching is not done).
-      return false;
     }
-    */
-
   }
 }
 </script>

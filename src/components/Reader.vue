@@ -13,6 +13,11 @@
           <!-- <icon name="search" title="Search"></icon> -->
         </li>
         <li id="title-nav">{{manifest.title}}: {{manifest.subtitle}}, {{manifest.author_as_it_appears}}</li>
+        <li id="zoom-nav">
+          <a id="zoomOut" @click="zoomOut">-</a>
+          <span id="zoomLevel" v-if="zoomLevel">{{Math.round(zoomLevel * 100)}}%</span>
+          <a id="zoomIn" @click="zoomIn">+</a>
+        </li>
         <li id="book-nav">
           Book:
           <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;"><icon name="file-o" title="Single" style="transform: rotate(180deg) scaleX(-1); height: .95em"></icon></a>
@@ -41,6 +46,7 @@
           @found="this.onFound"
           @match="this.onMatch"
           :query="query"
+          :zoom="zoomLevel"
         />
       <div id="prev" class="arrow" @click="this.prev">‹</div>
       <div id="next" class="arrow" @click="this.next">›</div>
@@ -146,7 +152,8 @@ export default {
       outlineOpen: false,
       query: '',
       matchCount: undefined,
-      currentMatchIndex: undefined
+      currentMatchIndex: undefined,
+      zoomLevel: 1.0
     }
   },
   created () {
@@ -175,6 +182,7 @@ export default {
         .then((manifest) => {
           this.manifest = manifest;
         })
+        .catch((err) => console.error(err));
     },
     loaded (pdfDocument) {
       this.pdfDocument = pdfDocument;
@@ -230,7 +238,8 @@ export default {
       this.outlineOpen = false;
       return pdf.getPageIndex(dest[0]).then((pg) => {
         this.page = pg;
-      });
+      })
+      .catch((err) => console.error(err));
     },
     onImageSelected (image) {
       // this.page = (image.page - 1);
@@ -299,6 +308,15 @@ export default {
     prevMatch () {
       const { pdf } = this.$refs;
       pdf.prevMatch();
+    },
+    zoomIn () {
+      // Handle https://en.wikipedia.org/wiki/IEEE_floating_point
+      this.zoomLevel = Math.round(this.zoomLevel * 10 + 2) / 10;
+    },
+    zoomOut () {
+      if (this.zoomLevel > 0.20) {
+        this.zoomLevel = Math.round(this.zoomLevel * 10 - 2) / 10;
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <div class="pageWrapper" :class="{ loading: isLoading }" :style="{ width: `${viewportWidth}px`, height: `${viewportHeight}px` }">
     <canvas ref="canvas" :width="`${viewportWidth}px`" :height="`${viewportHeight}px`"/>
-    <textlayer :page="page" :viewport="viewport" ref="textLayer"></textlayer>
-    <imagelayer :images="images" :viewport="viewport" :onImageClicked="onImageClicked"></imagelayer>
+    <textlayer :page="page" :viewport="viewport" :scale="scale" @selected="onSelected" ref="textLayer"></textlayer>
+    <imagelayer :images="images" :viewport="viewport" :scale="scale" :onImageClicked="onImageClicked"></imagelayer>
     <div ref="annotationLayer"></div>
   </div>
 </template>
@@ -47,6 +47,10 @@ export default {
       default: undefined,
       type: Function
     },
+    'onSelected': {
+      default: undefined,
+      type: Function
+    }
     // 'pageMatchesLength': {
     //   default: undefined,
     //   type: Object
@@ -103,6 +107,30 @@ export default {
   watch: {
     page () {
       if (this.page) {
+        this.displayPage(this.page);
+      }
+    },
+    scale () {
+      if (this.displaying) {
+        return;
+      }
+      if (typeof this.scale !== 'undefined') {
+        this.displayPage(this.page);
+      }
+    },
+    width () {
+      if (this.displaying) {
+        return;
+      }
+      if (typeof this.scale !== 'undefined') {
+        this.displayPage(this.page);
+      }
+    },
+    height () {
+      if (this.displaying) {
+        return;
+      }
+      if (typeof this.scale !== 'undefined') {
         this.displayPage(this.page);
       }
     },
@@ -170,7 +198,14 @@ export default {
       this.viewportWidth = viewport.width;
 
       this.onViewport && this.onViewport(viewport);
-      page.render({ canvasContext, viewport, imageLayer });
+
+      this.displaying = true;
+      page.render({ canvasContext, viewport, imageLayer })
+        .then(() => {
+          this.$emit('displayed', this);
+          this.displaying = false;
+        })
+        .catch((err) => console.error(err));
     },
     onPageError (page) {
       console.error(page);
