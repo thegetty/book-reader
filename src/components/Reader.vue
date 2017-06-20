@@ -55,7 +55,7 @@
         <tablegrid id="table" ref="table" v-show="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
       </div>
     </section>
-    <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @detailClosed="this.onDetailClosed"/>
+    <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/>
     <section id="outline" v-show="outlineOpen">
       <h2>Outline</h2>
       <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto"/>
@@ -121,7 +121,9 @@ export default {
       query: '',
       matchCount: undefined,
       currentMatchIndex: undefined,
-      zoomLevel: 1.0
+      zoomLevel: 1.0,
+      shownDetail: undefined,
+      displayedDetail: undefined
     }
   },
   created () {
@@ -152,7 +154,21 @@ export default {
       if (this.loaded) {
         this.currentDetail = this.imageUrl;
       }
-    }
+    },
+    displayedDetail () {
+      if (this.displayedDetail) {
+        this.$router.push({ name: 'ImageLink', params: { image: this.displayedDetail } });
+      } else {
+        this.$router.push({ name: 'Manifest' });
+      }
+    },
+    displayedPage () {
+      if (this.displayedPage) {
+        this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
+      } else {
+        this.$router.push({ name: 'Manifest' });
+      }
+    },
   },
   methods: {
     fetchManifest () {
@@ -224,6 +240,9 @@ export default {
     },
     onDetailClosed () {
       this.currentDetail = undefined;
+    },
+    onDetailDisplayed (detail) {
+      this.displayedDetail = detail;
     },
     onFound (count) {
       this.matchCount = count;

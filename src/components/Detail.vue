@@ -91,9 +91,19 @@ export default {
       } else {
         this.currentDetail = undefined;
       }
+    },
+    currentDetail () {
+      let imageRef;
+      if (this.currentDetail) {
+        imageRef = this.imageRef(this.currentDetail);
+      }
+      this.$emit('displayed', imageRef);
     }
   },
   methods: {
+    imageRef (image) {
+      return `img_p${image.page - 1}_${image.location}`;
+    },
     reset () {
       this.images = [];
       this.imagesById = {};
@@ -108,7 +118,8 @@ export default {
       this.images = this.manifest.images;
 
       this.images.forEach((image) => {
-        this.imagesById[`img_p${image.page - 1}_${image.location}`] = image;
+        let ref = this.imageRef(image);
+        this.imagesById[ref] = image;
 
         if (image.artwork_title) {
           let artworkUri = encodeURI(image.artwork_title);
@@ -153,7 +164,7 @@ export default {
     },
     onDetailClosed () {
       this.currentDetail = undefined;
-      this.$emit('detailClosed');
+      this.$emit('closed');
     },
     artistLookup (e) {
       let uri = this.currentDetail.artist_uri;
