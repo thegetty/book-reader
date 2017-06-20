@@ -55,47 +55,7 @@
         <tablegrid id="table" ref="table" v-show="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
       </div>
     </section>
-    <section id="detail" v-if="currentDetail">
-      <div class="image_detail">
-        <img :src="currentDetail.asset" v-if="!currentDetail.copyright" />
-        <img :src="currentDetail.downsampled" v-if="currentDetail.copyright" />
-        <p><a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a></p>
-      </div>
-      <div class="image_info" v-if="currentDetail.artwork_title">
-        <h1>{{currentDetail.artwork_title}}</h1>
-
-        <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
-        <aside v-if="this.imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
-          <h5>Also in this book</h5>
-          <ul class="related_images">
-            <li v-for="relatedImage in this.imagesByArtwork[encodeURI(currentDetail.artwork_title)]" v-if="currentDetail != relatedImage">
-              <a class="related_img_link" @click="currentDetail = relatedImage">
-                <img :src="relatedImage.thumbnail" />
-              </a>
-            </li>
-          </ul>
-        </aside>
-
-        <h2>{{currentDetail.artist_name}}</h2>
-        <h4><a :href="currentDetail.artist_uri">{{currentDetail.artist_uri}}</a></h4>
-        <aside v-if="this.imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
-          <h5>Also in this book</h5>
-          <ul class="related_images">
-            <li v-for="relatedImage in this.imagesByArtist[encodeURI(currentDetail.artist_name)]"
-                v-if="currentDetail != relatedImage && (imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].indexOf(relatedImage) === -1)">
-              <a class="related_img_link" @click="currentDetail = relatedImage">
-                <img :src="relatedImage.thumbnail" />
-              </a>
-            </li>
-          </ul>
-        </aside>
-
-      </div>
-      <a class="detail_view" @click="onPageSelected(currentDetail.page);">View in Book</a>
-      <a class="detail_close" @click="currentDetail = undefined">Close</a>
-      <div id="prevDetail" class="detail_arrow" @click="this.prevDetail">‹</div>
-      <div id="nextDetail" class="detail_arrow" @click="this.nextDetail">›</div>
-    </section>
+    <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @detailClosed="this.onDetailClosed"/>
     <section id="outline" v-show="outlineOpen">
       <h2>Outline</h2>
       <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto"/>
@@ -109,6 +69,7 @@ import PDF from '@/components/PDF'
 import Table from '@/components/Table'
 import Grid from '@/components/Grid'
 import Outline from '@/components/Outline'
+import Detail from '@/components/Detail'
 import 'whatwg-fetch'
 
 // Icons
@@ -127,19 +88,26 @@ export default {
     'grid': Grid,
     'tablegrid': Table,
     'icon': Icon,
-    'outline': Outline
+    'outline': Outline,
+    'detail': Detail
   },
-  props: ['manifest-url'],
+  props: {
+    'manifest-url': {
+      type: String
+    },
+    'page-url': {
+      type: String
+    },
+    'image-url': {
+      type: String
+    }
+  },
   data () {
     let bounds = this.getBounds();
 
     return {
       manifest: {},
       images: [],
-      imagesById: {},
-      imagesByArtwork: {},
-      imagesByArtist: {},
-      imagesByCollection: {},
       page: 0,
       displayedPage: 0,
       spreads: true,
@@ -160,6 +128,7 @@ export default {
     this.fetchManifest();
     window.addEventListener('keyup', this.keyListener.bind(this), false);
     window.addEventListener('resize', this.handleResize.bind(this), false);
+    this.currentDetail = undefined;
   },
   beforeDestory () {
     window.removeEventListener('resize', this.handleResize);
@@ -173,6 +142,16 @@ export default {
     showGrid () {
       const { grid } = this.$refs;
       grid.triggerLoad();
+    },
+    pageUrl () {
+      if (this.loaded) {
+        this.page = parseInt(this.pageUrl);
+      }
+    },
+    imageUrl () {
+      if (this.loaded) {
+        this.currentDetail = this.imageUrl;
+      }
     }
   },
   methods: {
@@ -187,37 +166,19 @@ export default {
         .catch((err) => console.error(err));
     },
     loaded (pdfDocument) {
+      this.loaded = true;
+
       this.pdfDocument = pdfDocument;
       // Wait for PDF to load
       this.images = this.manifest.images;
 
-      this.images.forEach((image) => {
-        this.imagesById[`img_p${image.page - 1}_${image.location}`] = image;
+      if (this.imageUrl) {
+        this.currentDetail = this.imageUrl;
+      }
 
-        if (image.artwork_title) {
-          let artworkUri = encodeURI(image.artwork_title);
-          if (!this.imagesByArtwork[artworkUri]) {
-            this.imagesByArtwork[artworkUri] = [];
-          }
-          this.imagesByArtwork[artworkUri].push(image);
-        }
-
-        if (image.artist_name) {
-          let artistUri = encodeURI(image.artist_name);
-          if (!this.imagesByArtist[artistUri]) {
-            this.imagesByArtist[artistUri] = [];
-          }
-          this.imagesByArtist[artistUri].push(image);
-        }
-
-        if (image.collection) {
-          let collectionUri = encodeURI(image.collection);
-          if (!this.imagesByCollection[collectionUri]) {
-            this.imagesByCollection[collectionUri] = [];
-          }
-          this.imagesByCollection[collectionUri].push(image);
-        }
-      });
+      if (this.pageUrl) {
+        this.page = parseInt(this.pageUrl);
+      }
     },
     next () {
       const { pdf } = this.$refs;
@@ -250,7 +211,7 @@ export default {
     },
     onImageSelected (image) {
       // this.page = (image.page - 1);
-      this.currentDetail = image;
+      this.currentDetail = image.objId;
     },
     onPageSelected (page) {
       this.page = (page - 1);
@@ -259,7 +220,10 @@ export default {
       this.currentDetail = undefined;
     },
     onImageClicked (image) {
-      this.currentDetail = this.imagesById[image.objId];
+      this.currentDetail = image.objId;
+    },
+    onDetailClosed () {
+      this.currentDetail = undefined;
     },
     onFound (count) {
       this.matchCount = count;
@@ -295,18 +259,6 @@ export default {
     toggleGrid () {
       this.showGrid = !this.showGrid;
       this.showTable = false;
-    },
-    nextDetail () {
-      const index = this.images.indexOf(this.currentDetail);
-      if (index + 1 < this.images.length) {
-        this.currentDetail = this.images[index + 1];
-      }
-    },
-    prevDetail () {
-      const index = this.images.indexOf(this.currentDetail);
-      if (index - 1 >= 0) {
-        this.currentDetail = this.images[index - 1];
-      }
     },
     nextMatch () {
       const { pdf } = this.$refs;
@@ -456,67 +408,6 @@ a {
   flex-grow: 100;
 }
 
-#detail {
-  position: absolute;
-  top: 60px;
-  left: 20px;
-  width: calc(100vw - 120px);
-  height: calc(100vh - 160px);
-  padding: 40px;
-  background: #333333;
-  box-sizing: content-box;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  overflow: auto;
-  display: flex;
-  justify-content: center;
-}
-
-.image_detail img {
-
-  max-width: 50vw;
-  max-height: calc(100vh - 152px);
-}
-
-.image_info {
-  color: #eee;
-  margin-left: 40px;
-  min-width: 40vw;
-}
-
-.image_info h1 {
-  font-size: 34px;
-  font-weight: bold;
-}
-
-.image_info h2 {
-  font-size: 24px;
-}
-
-.image_info h3 {
-  font-size: 24px;
-}
-
-.image_info h4 {
-  margin: 0 0 40px 0;
-}
-
-.detail_close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 10px 10px 0 0;
-  cursor: pointer;
-}
-
-.detail_view {
-  position: absolute;
-  top: 0;
-  right: 50px;
-  padding: 10px 10px 0 0;
-  cursor: pointer;
-}
-
 .fa-icon {
   width: auto;
   height: 1em;
@@ -548,42 +439,6 @@ a {
 
 #outline a.outline_link {
   color: #eee;
-}
-
-.related_images {
-  list-style: none;
-  padding: 0;
-}
-
-.related_images li {
-  display: inline;
-  margin-right: 12px;
-}
-
-.related_images li a {
-  cursor: pointer;
-}
-
-.detail_arrow {
-  position: absolute;
-  top: 50%;
-  margin-top: -32px;
-  font-size: 64px;
-  color: #E2E2E2;
-  font-family: arial, sans-serif;
-  font-weight: bold;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-
-#prevDetail {
-  left: 8px;
-}
-
-#nextDetail {
-  right: 8px;
 }
 
 </style>

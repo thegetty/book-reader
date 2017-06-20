@@ -17,6 +17,11 @@ export default new Router({
       component: Main
     },
     {
+      path: '/books/:book/editions/:edition/pages/:page',
+      name: 'PageLink',
+      component: Main
+    },
+    {
       path: '/books/:book/editions/:edition/images/:image',
       name: 'ImageLink',
       component: Main
