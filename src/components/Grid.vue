@@ -1,20 +1,35 @@
 <template>
-  <div>
-    <ol>
+  <div class="container card_container">
+    <!-- <ol>
       <li v-for="image in filteredData">
         <a class="img_link" @click="$emit('onClick', image)">
           <img v-lazy="image.thumbnail" />
-          <span>{{ image.page_label || image.page }}</span>
+          <span>{{ image.artwork_title }}</span>
         </a>
       </li>
-    </ol>
+    </ol> -->
+      <div class="card card_wrapper" v-for="image in filteredData">
+        <div class="card-image">
+          <figure class="image">
+            <a class="img_link" @click="$emit('onClick', image)">
+              <img class="downsampled" v-lazy="image.downsampled || image.asset" />
+            </a>
+          </figure>
+        </div>
+        <div class="card-footer">
+          <div class="card-footer-item">
+            <span>{{ image.artwork_title }}</span>
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
 <script>
 import VueLazyload from 'vue-lazyload'
 import Vue from 'vue'
-
+import Buefy from 'buefy';
+import 'buefy/lib/buefy.css';
 Vue.use(VueLazyload);
 
 export default {
@@ -76,43 +91,9 @@ export default {
 }
 </script>
 
-<style scoped>
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-.arrow {
-  display: inline-block;
-  vertical-align: middle;
-  width: 0;
-  height: 0;
-  margin-left: 5px;
-  opacity: 0.66;
-}
-
-.arrow.asc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 4px solid #fff;
-}
-
-.arrow.dsc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #fff;
-}
-
+<style>
 .img_link {
   cursor: pointer;
-  display: inline-block;
-  margin: 8px;
 }
 
 .img_link:hover {
@@ -123,15 +104,32 @@ li {
   opacity: 0.5;
 }
 
-.img_link img {
-  max-width: 100px;
-  max-height: 100px;
+.image .img_link img {
+  object-fit: cover;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+
+.card-image figure {
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
   display: block;
 }
 
-.img_link span {
-  display: block;
-  text-align: center;
+.card {
+  width: 200px;
 }
 
+.card_container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.card_wrapper {
+  margin: 12px;
+}
 </style>

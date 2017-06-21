@@ -1,5 +1,5 @@
 <template>
-  <section id="detail" v-if="currentDetail">
+  <section class="box" v-if="currentDetail">
     <div class="image_detail">
       <img :src="currentDetail.asset" v-if="!currentDetail.copyright" />
       <img :src="currentDetail.downsampled" v-if="currentDetail.copyright" />
@@ -76,7 +76,13 @@ export default {
       this.loaded();
     }
     if (this.image) {
-      this.currentDetail = this.imagesById[this.image.objId];
+      let imageRef;
+      if (typeof this.image === 'string') {
+        imageRef = this.image;
+      } else {
+        imageRef = this.imageRef(this.image);
+      }
+      this.currentDetail = this.imagesById[imageRef];
     } else {
       this.currentDetail = undefined;
     }
@@ -86,8 +92,14 @@ export default {
       this.loaded();
     },
     image () {
+      let imageRef;
       if (this.image) {
-        this.currentDetail = this.imagesById[this.image];
+        if (typeof this.image === 'string') {
+          imageRef = this.image;
+        } else {
+          imageRef = this.imageRef(this.image);
+        }
+        this.currentDetail = this.imagesById[imageRef];
       } else {
         this.currentDetail = undefined;
       }
@@ -187,21 +199,7 @@ export default {
 </script>
 
 <style scoped>
-#detail {
-  position: absolute;
-  top: 60px;
-  left: 20px;
-  width: calc(100vw - 120px);
-  height: calc(100vh - 160px);
-  padding: 40px;
-  background: #333333;
-  box-sizing: content-box;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  overflow: auto;
-  display: flex;
-  justify-content: center;
-}
+
 
 .related_images {
   list-style: none;

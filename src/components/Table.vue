@@ -1,56 +1,70 @@
 <template>
   <div>
-    <form id="search">
-      Search <input name="query" v-model="filterKey">
-    </form>
-    <table>
-      <thead>
-        <tr>
-          <th v-for="key in columns"
-            @click="sortBy(key)"
-            :class="{ active: sortKey == key }">
-            {{ key | titlecase }}
-            <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
+    <nav class="nav section_nav">
+      <div class="nav-right">
+        <div class="nav-item">
+          <p class="control has-icons-right">
+            <input class="input has-icons-right" name="query" v-model="filterKey">
+            <span class="icon is-small is-right">
+              <icon name="search" title="Search"></icon>
             </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="entry in filteredData">
-          <td>
-            <a class="img_link" @click="$emit('onImageClick', entry)">
-              <img v-lazy="entry['thumbnail']" />
-            </a>
-          </td>
-          <td>
-            <a href="#" @click="$emit('onPageClick', entry.page)">
-              {{ entry['page_label'] || entry['page'] }}
-            </a>
-          </td>
-          <td>
-            <a :href="entry['artwork_uri']" target="_blank" >
-              {{ entry['artwork_title'] }}
-            </a>
-          </td>
-          <td>
-            <a :href="entry['artist_uri']" target="_blank" >
-              {{ entry['artist_name'] }}
-            </a>
-          </td>
-          <td>
-            <a :href="entry['collection_uri']" target="_blank" >
-              {{ entry['collection'] }}
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </p>
+        </div>
+      </div>
+    </nav>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+
+    <b-table
+      :data="filteredData"
+      :bordered="true"
+      :striped="true"
+      :mobile-cards="true"
+      :paginated="false"
+      :per-page="10"
+      :pagination-simple="true"
+      >
+        <template scope="tb">
+            <b-table-column field="thumbnail" label="" >
+              <a class="img_link" @click="$emit('onImageClick', tb.row)">
+                <img v-lazy="tb.row['thumbnail']" />
+              </a>
+            </b-table-column>
+
+            <b-table-column field="page" label="Page" sortable>
+              <a href="#" @click="$emit('onPageClick', tb.row.page)">
+                {{ tb.row['page_label'] || tb.row['page'] }}
+              </a>
+            </b-table-column>
+
+            <b-table-column field="artwork" label="Artwork" sortable>
+              <a :href="tb.row['artwork_uri']" target="_blank" >
+                {{ tb.row['artwork_title'] }}
+              </a>
+            </b-table-column>
+
+            <b-table-column field="artist" label="Artist" sortable>
+              <a :href="tb.row['artist_uri']" target="_blank" >
+                {{ tb.row['artist_name'] }}
+              </a>
+            </b-table-column>
+
+            <b-table-column field="collection" label="Collection" sortable>
+              <a :href="tb.row['collection_uri']" target="_blank" >
+                {{ tb.row['collection'] }}
+              </a>
+            </b-table-column>
+        </template>
+    </b-table>
   </div>
 </template>
 
 <script>
 import VueLazyload from 'vue-lazyload'
 import Vue from 'vue'
+import 'vue-awesome/icons/search'
+
+import Icon from 'vue-awesome/components/Icon'
 
 Vue.use(VueLazyload, {
   preLoad: 1.3,
@@ -62,7 +76,7 @@ Vue.use(VueLazyload, {
 export default {
   name: 'table',
   components: {
-
+    'icon': Icon
   },
   props: {
     'data': {
@@ -138,11 +152,11 @@ export default {
 <style scoped>
 
 table {
-  border: 2px solid #cecece;
+  /*border: 2px solid #cecece;
   border-radius: 3px;
   background-color: #fff;
   width: 80vw;
-  margin: 24px auto;
+  margin: 24px auto;*/
 }
 
 th {
@@ -157,11 +171,13 @@ th {
 
 td {
   background-color: #f9f9f9;
+  min-width: 140px;
 }
 
 th, td {
   /*min-width: 220px;*/
-  padding: 10px 20px;
+  padding: 10px 40px;
+  border: 2px solid #cecece;
 }
 
 th.active {

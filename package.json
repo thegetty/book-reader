@@ -15,6 +15,7 @@
     "deploy": "touch dist/.nojekyll && node_modules/gh-pages/bin/gh-pages -d dist --dotfiles"
   },
   "dependencies": {
+    "buefy": "^0.4.2",
     "eslint-config-airbnb": "^14.1.0",
     "pdfjs-dist": "^1.7.406",
     "vue": "^2.2.2",

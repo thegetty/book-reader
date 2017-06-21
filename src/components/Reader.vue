@@ -1,38 +1,162 @@
 <template>
-  <div id="page-wrap">
-    <header id="menu">
-      <ul id="nav">
-        <li id="toc-nav">
-          <a @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;"><icon name="list-ul" title="Outline"></icon></a>
-        </li>
-        <li id="search-nav">
-          <input id="search" name="query" v-model="query" type="search" results="5">
-          <a id="prevMatch" @click="prevMatch" v-if="matchCount">‹</a>
-          <span id="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
-          <a id="nextMatch" @click="nextMatch" v-if="matchCount">›</a>
-          <!-- <icon name="search" title="Search"></icon> -->
-        </li>
-        <li id="title-nav">{{manifest.title}}: {{manifest.subtitle}}, {{manifest.author_as_it_appears}}</li>
-        <li id="zoom-nav">
+  <div>
+
+    <nav class="nav fixed">
+      <div class="nav-left">
+
+        <a class="nav-item" href="http://www.getty.edu/" target="_blank" title="The Getty">
+          <img src="../assets/getty_logo.png" alt="Getty Logo" class="logo">
+        </a>
+
+
+
+      </div>
+
+      <div class="nav-center">
+
+        <div class="nav-item">
+          <span id="title-nav">{{ title }}</span>
+        </div>
+
+      </div>
+      <!-- <div class="nav-right">
+        <div class="nav-item">
           <a id="zoomOut" @click="zoomOut">-</a>
           <span id="zoomLevel" v-if="zoomLevel">{{Math.round(zoomLevel * 100)}}%</span>
           <a id="zoomIn" @click="zoomIn">+</a>
-        </li>
-        <li id="book-nav">
+        </div>
+        <div class="nav-item">
           Book:
-          <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;"><icon name="file-o" title="Single" style="transform: rotate(180deg) scaleX(-1); height: .95em"></icon></a>
+          <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;">
+            <span class="icon is-small">
+              <icon name="file-o" title="Single" style="transform: rotate(180deg) scaleX(-1); height: .95em"></icon>
+            </span>
+          </a>
            |
-          <a id="artwork-nav-spread" @click="setSpreads(true); showGrid = false; showTable = false;"><icon name="columns" title="Spread"></icon></a>
-        </li>
-        <li id="artwork-nav">
+          <a id="artwork-nav-spread" @click="setSpreads(true); showGrid = false; showTable = false;">
+            <span class="icon is-small">
+              <icon name="columns" title="Spread"></icon>
+            </span>
+          </a>
+        </div>
+        <div class="nav-item">
           Artwork:
-          <a id="artwork-nav-table" @click="toggleTable"><icon name="table" title="Table"></icon></a>
+          <a id="artwork-nav-table" @click="toggleTable">
+            <span class="icon is-small">
+              <icon name="table" title="Table"></icon>
+            </span>
+          </a>
            |
-          <a id="artwork-nav-grid" @click="toggleGrid"><icon name="th" title="Grid"></icon></a>
-        </li>
-      </ul>
-    </header>
-    <section id="main">
+          <a id="artwork-nav-grid" @click="toggleGrid">
+            <span class="icon is-small">
+              <icon name="th" title="Grid"></icon>
+            </span>
+          </a>
+        </div>
+      </div> -->
+
+
+    </nav>
+    <b-tabs class="main" position="is-right" v-model="activeTab">
+      <b-tab-item label="Pages">
+        <nav class="nav section_nav">
+          <div class="nav-left">
+
+            <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+              <span class="icon is-small">
+                <icon name="list-ul" title="Outline"></icon>
+              </span>
+            </a>
+
+            <div class="zoom nav-item field has-addons">
+              <p class="control">
+                <a id="zoomOut" @click="zoomOut">
+                  <span class="button is-light is-small">
+                    <icon name="minus" title="Zoom Out"></icon>
+                  </span>
+                </a>
+              </p>
+              <p class="control">
+                <input class="input is-light is-small" type="text" :value="Math.round(zoomLevel * 100)+'%'">
+              </p>
+              <p class="control">
+                <a id="zoomIn" @click="zoomIn">
+                  <span class="button is-light is-small">
+                    <icon name="plus" title="Zoom In"></icon>
+                  </span>
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="nav-center">
+            <div id="prev" class="nav-item arrow" @click="this.prev">
+              <span class="icon is-small">
+                <icon name="chevron-left" title="Prev" v-show="activeTab === 0"></icon>
+              </span>
+            </div>
+            <div class="nav-item">
+              <span id="title-nav" v-if="current">
+                 {{ current }}
+              </span>
+            </div>
+            <div id="next" class="nav-item arrow" @click="this.next">
+              <span class="icon is-small">
+                <icon name="chevron-right" title="Next" v-show="activeTab === 0"></icon>
+              </span>
+            </div>
+          </div>
+          <div class="nav-right">
+                <div class="nav-item">
+
+                  <a id="prevMatch" @click="prevMatch" v-if="matchCount">
+                    <span class="icon is-small">
+                      <icon name="chevron-left" title="Prev Match"></icon>
+                    </span>
+                  </a>
+                  <p class="control" v-if="matchCount">
+                    <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
+                  </p>
+                  <a id="nextMatch" @click="nextMatch" v-if="matchCount">
+                    <span class="icon is-small">
+                      <icon name="chevron-right" title="Next Match"></icon>
+                    </span>
+                  </a>
+
+                  <p class="control has-icons-right">
+                    <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search">
+                    <span class="icon is-small is-right">
+                      <icon name="search" title="Search"></icon>
+                    </span>
+                  </p>
+                  <!-- <icon name="search" title="Search"></icon> -->
+                </div>
+          </div>
+        </nav>
+        <PDF id="pdf" ref="pdf"
+            :src="this.manifest.pdf"
+            :page="page"
+            @loaded="loaded"
+            :width="this.width"
+            :height="this.height"
+            :spreads="spreads"
+            :onImageClicked="this.onImageClicked"
+            :onOutlineReady="this.onOutlineReady"
+            @pageChanged="this.onPageChanged"
+            @found="this.onFound"
+            @match="this.onMatch"
+            :query="query"
+            :zoom="zoomLevel"
+          />
+      </b-tab-item>
+      <b-tab-item label="Artworks">
+        <grid id="grid" ref="grid" :data="images" @onClick="this.onImageSelected" />
+      </b-tab-item>
+      <b-tab-item label="Index">
+        <tablegrid id="table" ref="table" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+      </b-tab-item>
+    </b-tabs>
+    <!-- <section>
       <PDF id="pdf" ref="pdf"
           :src="this.manifest.pdf"
           :page="page"
@@ -48,23 +172,34 @@
           :query="query"
           :zoom="zoomLevel"
         />
-      <div id="prev" class="arrow" @click="this.prev">‹</div>
-      <div id="next" class="arrow" @click="this.next">›</div>
-      <div id="images" v-show="showGrid || showTable">
-        <grid id="grid" ref="grid" v-show="showGrid" :data="images" @onClick="this.onImageSelected" />
-        <tablegrid id="table" ref="table" v-show="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
-      </div>
     </section>
-    <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/>
+    <section>
+      <grid id="grid" ref="grid" v-show="showGrid" :data="images" @onClick="this.onImageSelected" />
+    </section>
+    <section>
+      <tablegrid id="table" ref="table" v-show="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+    </section> -->
+    <!-- <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/> -->
     <section id="outline" v-show="outlineOpen">
       <h2>Outline</h2>
-      <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto"/>
+      <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
       <a class="detail_close" @click="outlineOpen = false">Close</a>
     </section>
+
+    <div class="modal" :class="{'is-active': isModalActive}">
+      <div class="modal-background" @click="isModalActive = false"></div>
+      <div class="modal-content">
+        <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/>
+      </div>
+      <button class="modal-close" @click="isModalActive = false"></button>
+    </div>
+
   </div>
+
 </template>
 
 <script>
+import Vue from 'vue'
 import PDF from '@/components/PDF'
 import Table from '@/components/Table'
 import Grid from '@/components/Grid'
@@ -79,8 +214,20 @@ import 'vue-awesome/icons/columns'
 import 'vue-awesome/icons/file-o'
 import 'vue-awesome/icons/table'
 import 'vue-awesome/icons/th'
-import Icon from 'vue-awesome/components/Icon'
+import 'vue-awesome/icons/chevron-right'
+import 'vue-awesome/icons/chevron-left'
+import 'vue-awesome/icons/close'
+import 'vue-awesome/icons/caret-right'
+import 'vue-awesome/icons/plus'
+import 'vue-awesome/icons/minus'
 
+import Icon from 'vue-awesome/components/Icon'
+import Buefy from 'buefy';
+import 'buefy/lib/buefy.css';
+
+Vue.use(Buefy, {
+  defaultIconPack: 'fa'
+})
 export default {
   name: 'reader',
   components: {
@@ -123,7 +270,12 @@ export default {
       currentMatchIndex: undefined,
       zoomLevel: 1.0,
       shownDetail: undefined,
-      displayedDetail: undefined
+      displayedDetail: undefined,
+      activeTab: 0,
+      title: '',
+      shortTitle: '',
+      current: '',
+      isModalActive: false
     }
   },
   created () {
@@ -178,6 +330,14 @@ export default {
         })
         .then((manifest) => {
           this.manifest = manifest;
+
+          this.shortTitle = manifest.title;
+          this.title = manifest.title;
+          if (manifest.subtitle) {
+            this.title += ': ' + manifest.subtitle;
+          }
+
+          this.title += ' – ' + manifest.author_as_it_appears;
         })
         .catch((err) => console.error(err));
     },
@@ -227,7 +387,8 @@ export default {
     },
     onImageSelected (image) {
       // this.page = (image.page - 1);
-      this.currentDetail = image.objId;
+      this.currentDetail = image;
+      this.isModalActive = true;
     },
     onPageSelected (page) {
       this.page = (page - 1);
@@ -250,12 +411,15 @@ export default {
     onMatch (index) {
       this.currentMatchIndex = index + 1;
     },
+    onCurrentTitle (title) {
+      this.current = title;
+    },
     getBounds () {
       let width = window.innerWidth;
       let height = window.innerHeight;
-      let header = 134;
+      let header = 105;
       return {
-        width: width - header,
+        width: width - 40,
         height: height - header
       };
     },
@@ -300,9 +464,42 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 
-h1, h2, h3 {
+.nav.fixed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70%;
+  background-color: transparent;
+}
+
+.nav.section_nav {
+  background-color: whitesmoke;
+}
+
+.main {
+  margin-bottom: 0;
+  padding: 12px 0 0 0;
+}
+
+.main nav.tabs {
+  margin-bottom: 0;
+}
+
+.tab-item {
+  background-color: #757575;
+}
+
+.icon.is-small svg {
+  height: 1em;
+}
+
+.zoom {
+  width: 132px;
+}
+
+/*h1, h2, h3 {
   font-weight: normal;
   display: inline;
   font-size: 16px;
@@ -332,7 +529,6 @@ a {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
-  /*display: none;*/
 }
 
 .arrow:hover {
@@ -432,6 +628,10 @@ a {
   height: 1em;
   margin-bottom: -3px;
 }
+*/
+#detail {
+  z-index: 50;
+}
 
 #outline {
   position: absolute;
@@ -444,6 +644,7 @@ a {
   box-sizing: content-box;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
+  z-index: 50;
   overflow: auto;
 }
 
@@ -460,4 +661,8 @@ a {
   color: #eee;
 }
 
+.navbar-breadcrumb {
+  margin: 0 0.7em;
+  height: .7em;
+}
 </style>

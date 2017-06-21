@@ -61,6 +61,7 @@ export default {
     checkActive () {
       for (let item of this.pageList) {
         if (item.page > this.page) {
+          this.$emit('current', this.activeItem.title);
           break;
         } else {
           this.activeItem = item;
@@ -92,11 +93,11 @@ li {
 
 li a {
   cursor: pointer;
-  color: #eee;
+  color: #4c4c4c;
 }
 
 li a:active, li a.active {
-  color: #fff;
+  color: #000;
   text-decoration: underline;
 }
 
