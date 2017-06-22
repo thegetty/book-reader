@@ -8,15 +8,113 @@
           <img src="../assets/getty_logo.png" alt="Getty Logo" class="logo">
         </a>
 
+        <a class="nav-item">
+          <span class="icon" @click="showSearch = !showSearch">
+            <icon v-if="!showSearch" name="search" title="search"></icon>
+            <icon v-if="showSearch" name="close" title="close"></icon>
+          </span>
+        </a>
+
 
 
       </div>
 
       <div class="nav-center">
 
-        <div class="nav-item">
-          <span id="title-nav">{{ title }}</span>
+        <div class="nav-item" v-if="!showSearch">
+          <div id="prev" class="nav-item arrow" @click="this.prev">
+            <span class="icon is-small">
+              <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
+            </span>
+          </div>
+          <span v-if="!current">{{ title }}</span>
+          <span v-if="current">
+             {{ shortTitle}}<icon class="navbar-breadcrumb" name="caret-right"></icon>{{ current }}
+          </span>
+          <div id="next" class="nav-item arrow" @click="this.next">
+            <span class="icon is-small">
+              <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
+            </span>
+          </div>
         </div>
+
+        <div class="nav-item" v-if="showSearch">
+          <a id="prevMatch" @click="prevMatch" v-if="matchCount">
+            <span class="icon is-small">
+              <icon name="chevron-left" title="Prev Match"></icon>
+            </span>
+          </a>
+          <p class="control" v-if="matchCount">
+            <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
+          </p>
+          <a id="nextMatch" @click="nextMatch" v-if="matchCount">
+            <span class="icon is-small">
+              <icon name="chevron-right" title="Next Match"></icon>
+            </span>
+          </a>
+
+          <p class="control has-icons-right">
+            <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search">
+            <span class="icon is-small is-right">
+              <icon name="search" title="Search"></icon>
+            </span>
+          </p>
+        </div>
+
+      </div>
+
+      <div class="nav-right">
+
+        <div class="nav-item has-addons" v-show="!outlineOpen">
+          <p class="control">
+            <a id="zoomOut" @click="zoomOut">
+              <span class="button is-white is-small">
+                <icon name="minus" title="Zoom Out"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control zoom">
+            <input class="input is-white is-small" type="text" :value="Math.round(zoomLevel * 100)+'%'">
+          </p>
+          <p class="control">
+            <a id="zoomIn" @click="zoomIn">
+              <span class="button is-white is-small">
+                <icon name="plus" title="Zoom In"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control">
+            <a v-if="spreads" @click="setSpreads(false); showGrid = false; showTable = false;">
+              <span class="button is-white is-small">
+                <icon name="file-o" title="Single"></icon>
+              </span>
+            </a>
+            <a v-if="!spreads" @click="setSpreads(true); showGrid = false; showTable = false;">
+              <span class="button is-white is-small">
+                <icon name="columns" title="Spread"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control">
+            <a v-if="false" @click="">
+              <span class="button is-white is-small">
+                <icon name="i-cursor" title="Cursor"></icon>
+              </span>
+            </a>
+            <a v-if="true" @click="">
+              <span class="button is-white is-small">
+                <icon name="hand-paper-o" title="Hand"></icon>
+              </span>
+            </a>
+          </p>
+        </div>
+
+        <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+          <span class="icon">
+            <icon v-if="!outlineOpen" name="bars" title="Open Navigation"></icon>
+            <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
+          </span>
+        </a>
 
       </div>
       <!-- <div class="nav-right">
@@ -57,106 +155,8 @@
 
 
     </nav>
-    <b-tabs class="main" position="is-right" v-model="activeTab">
-      <b-tab-item label="Pages">
-        <nav class="nav section_nav">
-          <div class="nav-left">
 
-            <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
-              <span class="icon is-small">
-                <icon name="list-ul" title="Outline"></icon>
-              </span>
-            </a>
-
-            <div class="zoom nav-item field has-addons">
-              <p class="control">
-                <a id="zoomOut" @click="zoomOut">
-                  <span class="button is-light is-small">
-                    <icon name="minus" title="Zoom Out"></icon>
-                  </span>
-                </a>
-              </p>
-              <p class="control">
-                <input class="input is-light is-small" type="text" :value="Math.round(zoomLevel * 100)+'%'">
-              </p>
-              <p class="control">
-                <a id="zoomIn" @click="zoomIn">
-                  <span class="button is-light is-small">
-                    <icon name="plus" title="Zoom In"></icon>
-                  </span>
-                </a>
-              </p>
-            </div>
-          </div>
-
-          <div class="nav-center">
-            <div id="prev" class="nav-item arrow" @click="this.prev">
-              <span class="icon is-small">
-                <icon name="chevron-left" title="Prev" v-show="activeTab === 0"></icon>
-              </span>
-            </div>
-            <div class="nav-item">
-              <span id="title-nav" v-if="current">
-                 {{ current }}
-              </span>
-            </div>
-            <div id="next" class="nav-item arrow" @click="this.next">
-              <span class="icon is-small">
-                <icon name="chevron-right" title="Next" v-show="activeTab === 0"></icon>
-              </span>
-            </div>
-          </div>
-          <div class="nav-right">
-                <div class="nav-item">
-
-                  <a id="prevMatch" @click="prevMatch" v-if="matchCount">
-                    <span class="icon is-small">
-                      <icon name="chevron-left" title="Prev Match"></icon>
-                    </span>
-                  </a>
-                  <p class="control" v-if="matchCount">
-                    <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
-                  </p>
-                  <a id="nextMatch" @click="nextMatch" v-if="matchCount">
-                    <span class="icon is-small">
-                      <icon name="chevron-right" title="Next Match"></icon>
-                    </span>
-                  </a>
-
-                  <p class="control has-icons-right">
-                    <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search">
-                    <span class="icon is-small is-right">
-                      <icon name="search" title="Search"></icon>
-                    </span>
-                  </p>
-                  <!-- <icon name="search" title="Search"></icon> -->
-                </div>
-          </div>
-        </nav>
-        <PDF id="pdf" ref="pdf"
-            :src="this.manifest.pdf"
-            :page="page"
-            @loaded="loaded"
-            :width="this.width"
-            :height="this.height"
-            :spreads="spreads"
-            :onImageClicked="this.onImageClicked"
-            :onOutlineReady="this.onOutlineReady"
-            @pageChanged="this.onPageChanged"
-            @found="this.onFound"
-            @match="this.onMatch"
-            :query="query"
-            :zoom="zoomLevel"
-          />
-      </b-tab-item>
-      <b-tab-item label="Artworks">
-        <grid id="grid" ref="grid" :data="images" @onClick="this.onImageSelected" />
-      </b-tab-item>
-      <b-tab-item label="Index">
-        <tablegrid id="table" ref="table" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
-      </b-tab-item>
-    </b-tabs>
-    <!-- <section>
+    <section class="main">
       <PDF id="pdf" ref="pdf"
           :src="this.manifest.pdf"
           :page="page"
@@ -173,18 +173,28 @@
           :zoom="zoomLevel"
         />
     </section>
-    <section>
-      <grid id="grid" ref="grid" v-show="showGrid" :data="images" @onClick="this.onImageSelected" />
+
+    <section class="navigation" v-show="outlineOpen">
+      <div class="container">
+        <b-tabs position="is-centered" v-model="activeTab">
+          <b-tab-item label="Outline">
+            <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
+          </b-tab-item>
+          <b-tab-item label="Artworks">
+            <grid id="grid" ref="grid" :data="images" @onClick="this.onImageSelected" />
+          </b-tab-item>
+          <b-tab-item label="Index">
+            <tablegrid id="table" ref="table" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+          </b-tab-item>
+        </b-tabs>
+      </div>
     </section>
-    <section>
-      <tablegrid id="table" ref="table" v-show="showTable" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
-    </section> -->
-    <!-- <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/> -->
-    <section id="outline" v-show="outlineOpen">
+
+    <!-- <section id="outline" v-show="outlineOpen">
       <h2>Outline</h2>
       <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
       <a class="detail_close" @click="outlineOpen = false">Close</a>
-    </section>
+    </section> -->
 
     <div class="modal" :class="{'is-active': isModalActive}">
       <div class="modal-background" @click="isModalActive = false"></div>
@@ -208,7 +218,7 @@ import Detail from '@/components/Detail'
 import 'whatwg-fetch'
 
 // Icons
-import 'vue-awesome/icons/list-ul'
+import 'vue-awesome/icons/bars'
 import 'vue-awesome/icons/search'
 import 'vue-awesome/icons/columns'
 import 'vue-awesome/icons/file-o'
@@ -220,6 +230,8 @@ import 'vue-awesome/icons/close'
 import 'vue-awesome/icons/caret-right'
 import 'vue-awesome/icons/plus'
 import 'vue-awesome/icons/minus'
+import 'vue-awesome/icons/hand-paper-o'
+import 'vue-awesome/icons/i-cursor'
 
 import Icon from 'vue-awesome/components/Icon'
 import Buefy from 'buefy';
@@ -268,14 +280,15 @@ export default {
       query: '',
       matchCount: undefined,
       currentMatchIndex: undefined,
-      zoomLevel: 1.0,
+      zoomLevel: 0.80,
       shownDetail: undefined,
       displayedDetail: undefined,
-      activeTab: 0,
+      activeTab: 1,
       title: '',
       shortTitle: '',
       current: '',
-      isModalActive: false
+      isModalActive: false,
+      showSearch: false
     }
   },
   created () {
@@ -413,13 +426,17 @@ export default {
     },
     onCurrentTitle (title) {
       this.current = title;
+
+      if (title === 'Cover') {
+        this.current = '';
+      }
     },
     getBounds () {
       let width = window.innerWidth;
       let height = window.innerHeight;
-      let header = 105;
+      let header = 52;
       return {
-        width: width - 40,
+        width: width,
         height: height - header
       };
     },
@@ -467,27 +484,29 @@ export default {
 <style>
 
 .nav.fixed {
-  position: absolute;
   top: 0;
   left: 0;
-  width: 70%;
-  background-color: transparent;
+  width: 100%;
+  border-bottom: 1px solid #dbdbdb;
 }
 
 .nav.section_nav {
   background-color: whitesmoke;
 }
 
+.navigation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  margin-bottom: 0;
+  padding: 60px 40px 0 40px;
+  background-color: whitesmoke;
+  overflow: auto;
+}
+
 .main {
-  margin-bottom: 0;
-  padding: 12px 0 0 0;
-}
-
-.main nav.tabs {
-  margin-bottom: 0;
-}
-
-.tab-item {
   background-color: #757575;
 }
 
@@ -496,7 +515,7 @@ export default {
 }
 
 .zoom {
-  width: 132px;
+  width: 45px;
 }
 
 /*h1, h2, h3 {

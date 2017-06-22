@@ -83,8 +83,8 @@ export default {
 <style scoped>
 
 ul {
-  border-top: 1px solid #ccc;
-  padding: 40px;
+  /*border-top: 1px solid #ccc;*/
+  padding: 0 20px;
 }
 
 li {

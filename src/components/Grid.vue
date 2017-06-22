@@ -28,8 +28,7 @@
 <script>
 import VueLazyload from 'vue-lazyload'
 import Vue from 'vue'
-import Buefy from 'buefy';
-import 'buefy/lib/buefy.css';
+
 Vue.use(VueLazyload);
 
 export default {
@@ -126,7 +125,7 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .card_wrapper {
