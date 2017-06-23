@@ -20,8 +20,8 @@
       :bordered="true"
       :striped="true"
       :mobile-cards="true"
-      :paginated="false"
-      :per-page="10"
+      :paginated="true"
+      :per-page="8"
       :pagination-simple="true"
       >
         <template scope="tb">

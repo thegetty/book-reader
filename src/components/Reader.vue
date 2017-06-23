@@ -4,9 +4,9 @@
     <nav class="nav fixed">
       <div class="nav-left">
 
-        <a class="nav-item" href="http://www.getty.edu/" target="_blank" title="The Getty">
+        <!-- <a class="nav-item" href="http://www.getty.edu/" target="_blank" title="The Getty">
           <img src="../assets/getty_logo.png" alt="Getty Logo" class="logo">
-        </a>
+        </a> -->
 
         <a class="nav-item">
           <span class="icon" @click="showSearch = !showSearch">
@@ -95,7 +95,7 @@
               </span>
             </a>
           </p>
-          <p class="control">
+          <!-- <p class="control">
             <a v-if="false" @click="">
               <span class="button is-white is-small">
                 <icon name="i-cursor" title="Cursor"></icon>
@@ -106,7 +106,7 @@
                 <icon name="hand-paper-o" title="Hand"></icon>
               </span>
             </a>
-          </p>
+          </p> -->
         </div>
 
         <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
@@ -176,14 +176,14 @@
 
     <section class="navigation" v-show="outlineOpen">
       <div class="container">
-        <b-tabs position="is-centered" v-model="activeTab">
+        <b-tabs position="is-centered" v-model="activeTab" @change="onTabChanged">
           <b-tab-item label="Outline">
             <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
           </b-tab-item>
           <b-tab-item label="Artworks">
             <grid id="grid" ref="grid" :data="images" @onClick="this.onImageSelected" />
           </b-tab-item>
-          <b-tab-item label="Index">
+          <b-tab-item label="Table">
             <tablegrid id="table" ref="table" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
           </b-tab-item>
         </b-tabs>
@@ -283,7 +283,7 @@ export default {
       zoomLevel: 0.80,
       shownDetail: undefined,
       displayedDetail: undefined,
-      activeTab: 1,
+      activeTab: 0,
       title: '',
       shortTitle: '',
       current: '',
@@ -351,8 +351,7 @@ export default {
           }
 
           this.title += ' – ' + manifest.author_as_it_appears;
-        })
-        .catch((err) => console.error(err));
+        }).catch((err) => console.error(err));
     },
     loaded (pdfDocument) {
       this.loaded = true;
@@ -395,8 +394,7 @@ export default {
       this.outlineOpen = false;
       return pdf.getPageIndex(dest[0]).then((pg) => {
         this.page = pg;
-      })
-      .catch((err) => console.error(err));
+      }).catch((err) => console.error(err));
     },
     onImageSelected (image) {
       // this.page = (image.page - 1);
@@ -411,6 +409,7 @@ export default {
     },
     onImageClicked (image) {
       this.currentDetail = image.objId;
+      this.isModalActive = true;
     },
     onDetailClosed () {
       this.currentDetail = undefined;
@@ -452,6 +451,17 @@ export default {
       this.displayedPage = pages[pages.length - 1];
       this.page = -1; // reset
     },
+    onTabChanged (index) {
+      const { grid, table } = this.$refs;
+
+      if (index === 1) {
+        grid.triggerLoad();
+      }
+
+      if (index === 2) {
+        table.triggerLoad();
+      }
+    },
     toggleTable () {
       this.showTable = !this.showTable;
       this.showGrid = false;
@@ -488,10 +498,12 @@ export default {
   left: 0;
   width: 100%;
   border-bottom: 1px solid #dbdbdb;
+  z-index: 15;
 }
 
 .nav.section_nav {
   background-color: whitesmoke;
+
 }
 
 .navigation {
@@ -663,7 +675,7 @@ a {
   box-sizing: content-box;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
-  z-index: 50;
+  /*z-index: 50;*/
   overflow: auto;
 }
 

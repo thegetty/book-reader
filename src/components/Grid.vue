@@ -1,13 +1,5 @@
 <template>
   <div class="container card_container">
-    <!-- <ol>
-      <li v-for="image in filteredData">
-        <a class="img_link" @click="$emit('onClick', image)">
-          <img v-lazy="image.thumbnail" />
-          <span>{{ image.artwork_title }}</span>
-        </a>
-      </li>
-    </ol> -->
       <div class="card card_wrapper" v-for="image in filteredData">
         <div class="card-image">
           <figure class="image">

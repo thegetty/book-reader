@@ -167,7 +167,7 @@ export default {
 
         if (this.displayedPage > 0) {
           this.loadPage(this.displayedPage) // left
-          this.loadPage(this.displayedPage + 1)  // right
+          this.loadPage(this.displayedPage + 1) // right
           this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
         } else {
           this.loadPage(this.displayedPage) // cover

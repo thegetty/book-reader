@@ -288,8 +288,7 @@ export default {
         return page.getTextContent({
           normalizeWhitespace: true,
         });
-      })
-      .catch((err) => console.error(err));
+      }).catch((err) => console.error(err));
     },
 
     extractText () {

@@ -93,8 +93,7 @@ export default {
           this.matches = this.convertMatches(this.pageMatches, this.pageMatchesLength);
           this.renderMatches(this.matches);
         }
-      })
-      .catch((err) => console.error(err));
+      }).catch((err) => console.error(err));
     },
     onPageError (page) {
       console.error(page);
@@ -202,11 +201,9 @@ export default {
         }
 
         if (begin.divIdx === end.divIdx) {
-          appendTextToDiv(begin.divIdx, begin.offset, end.offset,
-                          'highlight' + highlightSuffix);
+          appendTextToDiv(begin.divIdx, begin.offset, end.offset, 'highlight' + highlightSuffix);
         } else {
-          appendTextToDiv(begin.divIdx, begin.offset, infinity.offset,
-                          'highlight begin' + highlightSuffix);
+          appendTextToDiv(begin.divIdx, begin.offset, infinity.offset, 'highlight begin' + highlightSuffix);
           for (var n0 = begin.divIdx + 1, n1 = end.divIdx; n0 < n1; n0++) {
             textDivs[n0].className = 'highlight middle' + highlightSuffix;
           }

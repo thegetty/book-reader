@@ -10,12 +10,9 @@
 </template>
 
 <script>
-
 export default {
   name: 'outline',
-  components: {
-
-  },
+  components: {},
   props: {
     'data': {
       type: Array

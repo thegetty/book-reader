@@ -55,7 +55,6 @@ export default {
   },
   props: {
     'image': {
-      type: String
     },
     'manifest': {
       type: Object
