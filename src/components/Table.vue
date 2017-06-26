@@ -1,7 +1,31 @@
 <template>
   <div>
     <nav class="nav section_nav">
-      <div class="nav-right">
+      <div class="nav-right" style="overflow: visible">
+        <!-- <b-dropdown>
+          <button class="button" slot="trigger">
+              <span>Artworks</span>
+              <b-icon icon="arrow_drop_down"></b-icon>
+          </button>
+
+          <b-dropdown-option v-for="artwork in artworks" key="option_${artwork.uri}">{{artwork.name}}</b-dropdown-option>
+        </b-dropdown> -->
+        <b-dropdown position="is-bottom-left">
+          <button class="button" slot="trigger">
+              <span>Artists</span>
+              <b-icon icon="arrow_drop_down"></b-icon>
+          </button>
+
+          <b-dropdown-option v-for="artist in artists" key="option_${artist.uri}">{{artist.name}}</b-dropdown-option>
+        </b-dropdown>
+        <b-dropdown position="is-bottom-left">
+          <button class="button" slot="trigger">
+              <span>Collection</span>
+              <b-icon icon="arrow_drop_down"></b-icon>
+          </button>
+
+          <b-dropdown-option v-for="collection in collections" key="option_${collection.uri}">{{collection.name}}</b-dropdown-option>
+        </b-dropdown>
         <div class="nav-item">
           <p class="control has-icons-right">
             <input class="input has-icons-right" name="query" v-model="filterKey">
@@ -12,8 +36,6 @@
         </div>
       </div>
     </nav>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
 
     <b-table
       :data="filteredData"
@@ -94,7 +116,13 @@ export default {
       sortOrders: sortOrders,
       filterKey: '',
       // searchQuery: '',
-      gridColumns: []
+      gridColumns: [],
+      imagesByArtwork: {},
+      imagesByArtist: {},
+      imagesByCollection: {},
+      artworks: [],
+      artists: [],
+      collections: []
     }
   },
   computed: {
@@ -134,7 +162,57 @@ export default {
       return str;
     }
   },
+  watch: {
+    data () {
+      this.data.forEach((image) => {
+        if (image.artist_name) {
+          let artistUri = encodeURI(image.artist_name);
+          if (!this.imagesByArtist[artistUri]) {
+            this.imagesByArtist[artistUri] = [];
+            this.artists.push({
+              uri: artistUri,
+              name: image.artist_name
+            });
+          }
+          this.imagesByArtist[artistUri].push(image);
+        }
+
+        if (image.artwork_title) {
+          let artworkUri = encodeURI(image.artwork_title);
+          if (!this.imagesByArtwork[artworkUri]) {
+            this.imagesByArtwork[artworkUri] = [];
+            this.artworks.push({
+              uri: artworkUri,
+              name: image.artwork_title
+            });
+          }
+          this.imagesByArtwork[artworkUri].push(image);
+        }
+
+        if (image.collection) {
+          let collectionUri = encodeURI(image.collection);
+          if (!this.imagesByCollection[collectionUri]) {
+            this.imagesByCollection[collectionUri] = [];
+            this.collections.push({
+              uri: collectionUri,
+              name: image.collection
+            });
+          }
+          this.imagesByCollection[collectionUri].push(image);
+        }
+      });
+    }
+  },
   methods: {
+    reset () {
+      this.data = [];
+      this.imagesByArtwork = {};
+      this.imagesByArtist = {};
+      this.imagesByCollection = {};
+      this.artworks = {};
+      this.artists = {};
+      this.collections = {};
+    },
     sortBy: function (key) {
       this.sortKey = key
       this.sortOrders[key] = this.sortOrders[key] * -1

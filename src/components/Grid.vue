@@ -125,31 +125,31 @@ export default {
   opacity: 0.5;
 }
 
-.image .img_link img {
+.card_container .image .img_link img {
   object-fit: cover;
   max-width: none;
   width: 100%;
   height: 100%;
 }
 
-.card-image figure {
+.card_container .card-image figure {
   width: 200px;
   max-height: 400px;
   overflow: hidden;
   display: block;
 }
 
-.card {
+.card_container .card {
   width: 200px;
   flex-grow: 0;
   margin-bottom: 24px;
 }
 
-.card .card-footer {
+.card_container .card .card-footer {
   /*display: none;*/
 }
 
-.card:hover .card-footer {
+.card_container .card:hover .card-footer {
   display: block;
 }
 

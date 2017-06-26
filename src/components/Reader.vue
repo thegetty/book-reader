@@ -1,5 +1,6 @@
  <template>
   <div>
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
 
     <nav class="nav fixed" :class="{'open': navOpen || outlineOpen || artworkOpen}" @mouseover="showNav" @mouseout="hideNav">
       <div class="nav-left">
@@ -431,7 +432,7 @@ import Buefy from 'buefy';
 import 'buefy/lib/buefy.css';
 
 Vue.use(Buefy, {
-  defaultIconPack: 'fa'
+  // defaultIconPack: 'fa'
 })
 
 import { directive as onClickOutside } from 'vue-on-click-outside'
@@ -629,8 +630,8 @@ export default {
     },
     onPageSelected (page) {
       this.page = (page - 1);
-      this.showGrid = false;
-      this.showTable = false;
+      this.isModalActive = false;
+      this.artworkOpen = false;
       this.currentDetail = undefined;
     },
     onImageClicked (image) {
@@ -781,7 +782,8 @@ export default {
   margin-bottom: 0;
   /*padding: 0 40px 0 40px;*/
   background-color: white;
-  overflow: auto;
+  overflow: hidden;
+  overflow-y: auto;
   z-index: 40;
   transition: left .25s ease-in;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
@@ -1016,5 +1018,9 @@ a {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   margin-bottom: 0.75rem;
   height: auto;
+}
+
+.modal-content {
+  width: auto !important;
 }
 </style>

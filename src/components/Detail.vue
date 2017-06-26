@@ -1,5 +1,40 @@
 <template>
-  <section class="box" v-if="currentDetail">
+  <div class="card detail_card" v-if="currentDetail">
+    <div class="card-image">
+      <figure class="image_detail">
+        <a :href="currentDetail.artwork_uri">
+          <img :src="currentDetail.asset" v-if="!currentDetail.copyright" />
+          <img :src="currentDetail.downsampled" v-if="currentDetail.copyright" />
+        </a>
+      </figure>
+    </div>
+    <div class="card-content">
+      <div class="content">
+        <h1 class="title">{{currentDetail.artwork_title}}</h1>
+        <h2 class="subtitle">
+          <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a>
+        </h2>
+        <p v-if="currentDetail.collection"><a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a></p>
+      </div>
+    </div>
+    <footer class="card-footer">
+    <p class="card-footer-item" v-if="currentDetail.artwork_uri">
+      <span>
+        View in <a :href="currentDetail.artwork_uri">Collection</a>
+      </span>
+    </p>
+    <p class="card-footer-item">
+      <span>
+        View in <a @click="onPageSelected(currentDetail.page)">Book</a>
+      </span>
+    </p>
+  </footer>
+
+  <div id="prevDetail" class="detail_arrow" @click="this.prevDetail">‹</div>
+  <div id="nextDetail" class="detail_arrow" @click="this.nextDetail">›</div>
+  </div>
+
+  <!-- <section class="box" v-if="currentDetail">
     <div class="image_detail">
       <img :src="currentDetail.asset" v-if="!currentDetail.copyright" />
       <img :src="currentDetail.downsampled" v-if="currentDetail.copyright" />
@@ -42,7 +77,7 @@
     <div id="prevDetail" class="detail_arrow" @click="this.prevDetail">‹</div>
     <div id="nextDetail" class="detail_arrow" @click="this.nextDetail">›</div>
     <a class="detail_close" @click="onDetailClosed">Close</a>
-  </section>
+  </section> -->
 </template>
 
 <script>
@@ -159,7 +194,7 @@ export default {
     },
     onPageSelected (page) {
       this.$emit('pageSelected', page);
-      this.currentDetail = undefined;
+      // this.currentDetail = undefined;
     },
     nextDetail () {
       const index = this.images.indexOf(this.currentDetail);
@@ -197,10 +232,18 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 
+.detail_card.card {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  max-width: 50vw;
+}
 
-.related_images {
+.detail_card .content {
+  max-width: 40vw;
+}
+
+/*.related_images {
   list-style: none;
   padding: 0;
 }
@@ -221,10 +264,10 @@ export default {
 
 .related_images li a {
   cursor: pointer;
-}
+}*/
 
 .detail_arrow {
-  position: absolute;
+  position: fixed;
   top: 50%;
   margin-top: -32px;
   font-size: 64px;
@@ -238,20 +281,30 @@ export default {
 }
 
 #prevDetail {
-  left: 8px;
+  left: 20%;
 }
 
 #nextDetail {
-  right: 8px;
+  right: 20%;
+}
+
+.image_detail {
+  background-color: #444444;
+}
+
+.image_detail a {
+  overflow: hidden;
+  display: block;
 }
 
 .image_detail img {
-
-  max-width: 50vw;
-  max-height: calc(100vh - 152px);
+  max-width: 100%;
+  max-height: calc(100vh - 300px);
+  display: block;
+  margin: 0 auto;
 }
 
-.image_info {
+/*.image_info {
   color: #eee;
   margin-left: 40px;
   min-width: 40vw;
@@ -290,13 +343,8 @@ export default {
   cursor: pointer;
 }
 
-h1, h2, h3 {
-  font-weight: normal;
-  display: inline;
-  font-size: 16px;
-}
 
 a {
   color: #42b983;
-}
+}*/
 </style>
