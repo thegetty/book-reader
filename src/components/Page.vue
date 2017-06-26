@@ -231,12 +231,12 @@ export default {
 }
 </script>
 
-<style scoped>
-.loading {
-  /*background: #eee url('../assets/loading-icon.gif') center no-repeat;*/
+<style >
+.pageWrapper.loading {
+  /*background: #fff url('../assets/loading-icon.gif') center no-repeat;*/
 }
 canvas {
-  /*background-color: #eee;*/
+  background-color: #fff;
 }
 
 .pageWrapper {
@@ -244,5 +244,6 @@ canvas {
   position: relative;
   overflow: visible;
   margin: 0 auto;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 </style>

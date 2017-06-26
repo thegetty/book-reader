@@ -1,19 +1,23 @@
 <template>
-  <div class="container card_container">
-      <div class="card card_wrapper" v-for="image in filteredData">
-        <div class="card-image">
-          <figure class="image">
-            <a class="img_link" @click="$emit('onClick', image)">
-              <img class="downsampled" v-lazy="image.downsampled || image.asset" />
-            </a>
-          </figure>
-        </div>
-        <div class="card-footer">
-          <div class="card-footer-item">
-            <span>{{ image.artwork_title }}</span>
+  <div ref="container" class="container card_container">
+    <div class="columns card_columns">
+      <div class="column" v-for="images in chunkedData">
+        <div class="card card_wrapper" v-for="image in images">
+          <div class="card-image">
+            <figure class="image">
+              <a class="img_link" @click="$emit('onClick', image)">
+                <img class="downsampled" v-lazy="image.downsampled || image.asset" />
+              </a>
+            </figure>
           </div>
+          <!-- <div class="card-footer">
+            <div class="card-footer-item">
+              <span>{{ image.artwork_title }}</span>
+            </div>
+          </div> -->
         </div>
       </div>
+    </div>
   </div>
 </template>
 
@@ -44,8 +48,15 @@ export default {
       sortOrders: sortOrders,
       filterKey: '',
       // searchQuery: '',
-      gridColumns: []
+      gridColumns: 4
     }
+  },
+  created () {
+    window.addEventListener('resize', this.handleResize.bind(this), false);
+    this.$nextTick(() => this.handleResize());
+  },
+  beforeDestory () {
+    window.removeEventListener('resize', this.handleResize);
   },
   computed: {
     filteredData: function () {
@@ -68,6 +79,20 @@ export default {
         })
       }
       return data
+    },
+    chunkedData() {
+      let cols = this.gridColumns || 4;
+      let chunked = [];
+
+      for (let c = 0; c < cols; c++) {
+        chunked[c] = [];
+      }
+
+      for (let i = 0; i < this.data.length; i++) {
+        chunked[i % cols].push(this.data[i]);
+      }
+
+      return chunked;
     }
   },
   methods: {
@@ -77,6 +102,11 @@ export default {
     },
     triggerLoad: function () {
       Vue.nextTick(this.$Lazyload.lazyLoadHandler)
+    },
+    handleResize () {
+      let width = window.innerWidth;
+
+      this.gridColumns = Math.floor((width - 200) / 200);
     }
   }
 }
@@ -104,23 +134,38 @@ export default {
 
 .card-image figure {
   width: 200px;
-  height: 200px;
+  max-height: 400px;
   overflow: hidden;
   display: block;
 }
 
 .card {
   width: 200px;
+  flex-grow: 0;
+  margin-bottom: 24px;
+}
+
+.card .card-footer {
+  /*display: none;*/
+}
+
+.card:hover .card-footer {
+  display: block;
 }
 
 .card_container {
-  display: flex;
+  /*display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  justify-content: center;*/
+  padding-top: 24px;
+}
+
+.card_columns {
   justify-content: center;
 }
 
-.card_wrapper {
-  margin: 12px;
+
+.card_columns .column {
+  flex-grow: 0;
 }
 </style>

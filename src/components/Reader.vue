@@ -1,19 +1,26 @@
-<template>
+ <template>
   <div>
 
-    <nav class="nav fixed">
+    <nav class="nav fixed" :class="{'open': navOpen || outlineOpen || artworkOpen}" @mouseover="showNav" @mouseout="hideNav">
       <div class="nav-left">
 
         <!-- <a class="nav-item" href="http://www.getty.edu/" target="_blank" title="The Getty">
           <img src="../assets/getty_logo.png" alt="Getty Logo" class="logo">
         </a> -->
 
-        <a class="nav-item">
+        <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+          <span class="icon">
+            <icon v-if="!outlineOpen" name="bars" title="Open Navigation"></icon>
+            <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
+          </span>
+        </a>
+
+        <!-- <a class="nav-item">
           <span class="icon" @click="showSearch = !showSearch">
             <icon v-if="!showSearch" name="search" title="search"></icon>
             <icon v-if="showSearch" name="close" title="close"></icon>
           </span>
-        </a>
+        </a> -->
 
 
 
@@ -21,7 +28,7 @@
 
       <div class="nav-center">
 
-        <div class="nav-item" v-if="!showSearch">
+        <div class="nav-item" v-if="!query && !artworkOpen">
           <div id="prev" class="nav-item arrow" @click="this.prev">
             <span class="icon is-small">
               <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
@@ -29,13 +36,37 @@
           </div>
           <span v-if="!current">{{ title }}</span>
           <span v-if="current">
-             {{ shortTitle}}<icon class="navbar-breadcrumb" name="caret-right"></icon>{{ current }}
+             {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>{{ current }}
           </span>
           <div id="next" class="nav-item arrow" @click="this.next">
             <span class="icon is-small">
               <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
             </span>
           </div>
+        </div>
+
+        <div class="nav-item" v-if="query && !artworkOpen">
+          <div class="nav-item arrow" @click="prevMatch">
+            <span class="icon is-small">
+              <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
+            </span>
+          </div>
+          <span>&ldquo;{{ query }}&rdquo;</span>
+          <span>&nbsp;–&nbsp;</span>
+          <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}&nbsp;</span>
+          <span class="icon is-small" @click="query = ''">
+            <icon name="close" title="close"></icon>
+          </span>
+          <div class="nav-item arrow" @click="nextMatch">
+            <span class="icon is-small">
+              <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
+            </span>
+          </div>
+
+        </div>
+
+        <div class="nav-item" v-if="artworkOpen">
+          {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>Artworks
         </div>
 
         <div class="nav-item" v-if="showSearch">
@@ -65,54 +96,28 @@
 
       <div class="nav-right">
 
-        <div class="nav-item has-addons" v-show="!outlineOpen">
-          <p class="control">
-            <a id="zoomOut" @click="zoomOut">
-              <span class="button is-white is-small">
-                <icon name="minus" title="Zoom Out"></icon>
-              </span>
-            </a>
-          </p>
-          <p class="control zoom">
-            <input class="input is-white is-small" type="text" :value="Math.round(zoomLevel * 100)+'%'">
-          </p>
-          <p class="control">
-            <a id="zoomIn" @click="zoomIn">
-              <span class="button is-white is-small">
-                <icon name="plus" title="Zoom In"></icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a v-if="spreads" @click="setSpreads(false); showGrid = false; showTable = false;">
-              <span class="button is-white is-small">
-                <icon name="file-o" title="Single"></icon>
-              </span>
-            </a>
-            <a v-if="!spreads" @click="setSpreads(true); showGrid = false; showTable = false;">
-              <span class="button is-white is-small">
-                <icon name="columns" title="Spread"></icon>
-              </span>
-            </a>
-          </p>
-          <!-- <p class="control">
-            <a v-if="false" @click="">
-              <span class="button is-white is-small">
-                <icon name="i-cursor" title="Cursor"></icon>
-              </span>
-            </a>
-            <a v-if="true" @click="">
-              <span class="button is-white is-small">
-                <icon name="hand-paper-o" title="Hand"></icon>
-              </span>
-            </a>
-          </p> -->
-        </div>
-
-        <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+        <!-- <a class="nav-item" @click="artworkOpen = !artworkOpen; showGrid = false; showTable = false;">
           <span class="icon">
-            <icon v-if="!outlineOpen" name="bars" title="Open Navigation"></icon>
-            <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
+            <icon v-if="!artworkOpen" name="th" title="Open Artwork"></icon>
+            <icon v-if="artworkOpen" name="close" title="Close Artwork"></icon>
+          </span>
+        </a> -->
+
+        <!-- <a class="nav-item" v-if="spreads" @click="setSpreads(false); showGrid = false; showTable = false;">
+          <span class="icon">
+            <icon name="file-o" title="Single"></icon>
+          </span>
+        </a>
+        <a class="nav-item" v-if="!spreads" @click="setSpreads(true); showGrid = false; showTable = false;">
+          <span class="icon">
+            <icon name="columns" title="Spread"></icon>
+          </span>
+        </a> -->
+
+        <a class="nav-item" @click="artworkOpen = !artworkOpen; showGrid = false; showTable = false;">
+          <span class="icon">
+            <icon v-if="!artworkOpen" name="picture-o" title="Open Artwork"></icon>
+            <icon v-if="artworkOpen" name="close" title="Close Artwork"></icon>
           </span>
         </a>
 
@@ -172,15 +177,200 @@
           :query="query"
           :zoom="zoomLevel"
         />
+
+      <div class="floater" :class="{'open': navOpen}" v-show="!artworkOpen" @mouseover="showNav" @mouseout="hideNav">
+        <div class="field has-addons is-pulled-left">
+          <p class="control">
+            <a class="button" @click="zoomOut">
+              <span class="icon is-small">
+                <icon name="search-minus" title="Zoom Out"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control zoom">
+            <input class="input" type="text" :value="Math.round(zoomLevel * 100)+'%'">
+          </p>
+          <p class="control">
+            <a class="button" @click="zoomIn">
+              <span class="icon is-small">
+                <icon name="search-plus" title="Zoom In"></icon>
+              </span>
+            </a>
+          </p>
+        </div>
+        <div class="field has-addons is-pulled-left">
+          <p class="control">
+            <a class="button" :disabled="spreads ? null : 'disabled'" @click="setSpreads(false); showGrid = false; showTable = false;">
+              <span class="icon is-small">
+                <icon name="file-o" title="Single"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control">
+            <a class="button" :disabled="spreads ? 'disabled' : null" @click="setSpreads(true); showGrid = false; showTable = false;">
+              <span class="icon is-small">
+                <icon name="columns" title="Spread"></icon>
+              </span>
+            </a>
+          </p>
+        </div>
+        <div class="field has-addons is-pulled-left" v-show="!matchCount">
+          <p class="control">
+            <a class="button" @click="this.prev">
+              <span class="icon is-small">
+                <icon name="chevron-left" title="Prev"></icon>
+              </span>
+            </a>
+          </p>
+          <!-- <p class="control">
+            <a class="button" @click="zoomOut">
+              <span class="icon is-small">
+                <icon name="minus" title="Zoom Out"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control zoom">
+            <input class="input" type="text" :value="Math.round(zoomLevel * 100)+'%'">
+          </p>
+          <p class="control">
+            <a class="button" @click="zoomIn">
+              <span class="icon is-small">
+                <icon name="plus" title="Zoom In"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control">
+            <a class="button" v-if="spreads" @click="setSpreads(false); showGrid = false; showTable = false;">
+              <span class="icon is-small">
+                <icon name="file-o" title="Single"></icon>
+              </span>
+            </a>
+            <a class="button" v-if="!spreads" @click="setSpreads(true); showGrid = false; showTable = false;">
+              <span class="icon is-small">
+                <icon name="columns" title="Spread"></icon>
+              </span>
+            </a>
+          </p> -->
+          <p class="control">
+            <a class="button" v-if="!editingPage" @click="editingPage = true">
+              {{ displayedPages }} / {{ totalPages }}
+            </a>
+            <input class="input" type="text" :value="displayedPages" v-if="editingPage">
+          </p>
+          <p class="control">
+            <a class="button" @click="this.next">
+              <span class="icon is-small">
+                <icon name="chevron-right" title="Next"></icon>
+              </span>
+            </a>
+          </p>
+
+        </div>
+        <div class="field has-addons is-pulled-left" v-show="matchCount">
+          <p class="control">
+            <a class="button" @click="prevMatch" v-if="matchCount">
+              <span class="icon is-small">
+                <icon name="chevron-left" title="Prev Match"></icon>
+              </span>
+            </a>
+          </p>
+          <p class="control" v-if="matchCount">
+            <a class="button" v-if="matchCount">
+              {{currentMatchIndex}} of {{matchCount}}
+            </a>
+          </p>
+          <p class="control" v-if="matchCount">
+            <a class="button" @click="nextMatch" v-if="matchCount">
+              <span class="icon is-small">
+                <icon name="chevron-right" title="Next Match"></icon>
+              </span>
+            </a>
+          </p>
+          <!-- <p class="control">
+            <a v-if="false" @click="">
+              <span class="button is-small">
+                <icon name="i-cursor" title="Cursor"></icon>
+              </span>
+            </a>
+            <a v-if="true" @click="">
+              <span class="button is-white is-small">
+                <icon name="hand-paper-o" title="Hand"></icon>
+              </span>
+            </a>
+          </p> -->
+        </div>
+      </div>
     </section>
 
-    <section class="navigation" v-show="outlineOpen">
+    <div class="modal-background navigation_background" :class="{active: outlineOpen}" @click="outlineOpen = false;"></div>
+
+    <section class="navigation" :class="{closed: !outlineOpen}">
+      <nav class="nav">
+        <div class="nav-left nav_closer">
+          <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+            <span class="icon">
+              <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
+            </span>
+          </a>
+        </div>
+        <div class="nav-right">
+          <div class="nav-item">
+            <!-- <a id="prevMatch" @click="prevMatch" v-if="matchCount">
+              <span class="icon is-small">
+                <icon name="chevron-left" title="Prev Match"></icon>
+              </span>
+            </a>
+            <p class="control" v-if="matchCount">
+              <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
+            </p>
+            <a id="nextMatch" @click="nextMatch" v-if="matchCount">
+              <span class="icon is-small">
+                <icon name="chevron-right" title="Next Match"></icon>
+              </span>
+            </a> -->
+
+            <p class="control has-icons-right">
+              <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search" @keyup.enter="outlineOpen = false">
+              <span class="icon is-small is-right">
+                <icon name="search" title="Search"></icon>
+              </span>
+            </p>
+          </div>
+
+        </div>
+      </nav>
+
+
+      <div class="container">
+        <div class="contents">
+            <h1 class="title">
+              {{ manifest.title }}
+            </h1>
+            <h2 class="subtitle">
+              {{ manifest.subtitle }}
+            </h2>
+            <h2 class="subtitle">
+              {{ manifest.author_as_it_appears }}
+            </h2>
+            <img class="cover_image" :src="manifest.cover_image_url">
+
+            <p>
+              Download: <a :href="manifest.pdf">PDF</a>
+            </p>
+
+          <!-- <div class="column is-two-thirds">
+            <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
+          </div> -->
+        </div>
+        <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
+
+      </div>
+    </section>
+
+    <section class="artwork" v-show="artworkOpen">
       <div class="container">
         <b-tabs position="is-centered" v-model="activeTab" @change="onTabChanged">
-          <b-tab-item label="Outline">
-            <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
-          </b-tab-item>
-          <b-tab-item label="Artworks">
+          <b-tab-item label="Grid">
             <grid id="grid" ref="grid" :data="images" @onClick="this.onImageSelected" />
           </b-tab-item>
           <b-tab-item label="Table">
@@ -232,6 +422,9 @@ import 'vue-awesome/icons/plus'
 import 'vue-awesome/icons/minus'
 import 'vue-awesome/icons/hand-paper-o'
 import 'vue-awesome/icons/i-cursor'
+import 'vue-awesome/icons/picture-o'
+import 'vue-awesome/icons/search-plus'
+import 'vue-awesome/icons/search-minus'
 
 import Icon from 'vue-awesome/components/Icon'
 import Buefy from 'buefy';
@@ -240,6 +433,10 @@ import 'buefy/lib/buefy.css';
 Vue.use(Buefy, {
   defaultIconPack: 'fa'
 })
+
+import { directive as onClickOutside } from 'vue-on-click-outside'
+Vue.directive('on-click-outside', onClickOutside)
+
 export default {
   name: 'reader',
   components: {
@@ -280,7 +477,7 @@ export default {
       query: '',
       matchCount: undefined,
       currentMatchIndex: undefined,
-      zoomLevel: 0.80,
+      zoomLevel: 1.0,
       shownDetail: undefined,
       displayedDetail: undefined,
       activeTab: 0,
@@ -288,7 +485,12 @@ export default {
       shortTitle: '',
       current: '',
       isModalActive: false,
-      showSearch: false
+      showSearch: false,
+      artworkOpen: false,
+      navOpen: true,
+      totalPages: 1,
+      editingPage: false,
+      navTimeout: undefined
     }
   },
   created () {
@@ -296,10 +498,27 @@ export default {
     window.addEventListener('keyup', this.keyListener.bind(this), false);
     window.addEventListener('resize', this.handleResize.bind(this), false);
     this.currentDetail = undefined;
+
+    this.toggleNav();
+
+    window.addEventListener('mousemove', () => {
+      if (!this.navOpen) {
+        this.toggleNav();
+      }
+    });
   },
   beforeDestory () {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keyup', this.keyListener);
+  },
+  computed: {
+    displayedPages () {
+      if (!this.spreads || this.displayedPage === 0) {
+        return this.displayedPage + 1;
+      } else {
+        return `${this.displayedPage}–${this.displayedPage + 1}`;
+      }
+    }
   },
   watch: {
     showTable () {
@@ -308,6 +527,11 @@ export default {
     },
     showGrid () {
       const { grid } = this.$refs;
+      grid.triggerLoad();
+    },
+    artworkOpen () {
+      const { grid } = this.$refs;
+      grid.handleResize();
       grid.triggerLoad();
     },
     pageUrl () {
@@ -367,6 +591,8 @@ export default {
       if (this.pageUrl) {
         this.page = parseInt(this.pageUrl);
       }
+
+      this.totalPages = pdfDocument.numPages;
     },
     next () {
       const { pdf } = this.$refs;
@@ -433,10 +659,10 @@ export default {
     getBounds () {
       let width = window.innerWidth;
       let height = window.innerHeight;
-      let header = 52;
+      // let header = 52;
       return {
         width: width,
-        height: height - header
+        height: height
       };
     },
     setSpreads (spreads) {
@@ -454,11 +680,12 @@ export default {
     onTabChanged (index) {
       const { grid, table } = this.$refs;
 
-      if (index === 1) {
+      if (index === 0) {
+        grid.handleResize();
         grid.triggerLoad();
       }
 
-      if (index === 2) {
+      if (index === 1) {
         table.triggerLoad();
       }
     },
@@ -486,6 +713,19 @@ export default {
       if (this.zoomLevel > 0.20) {
         this.zoomLevel = Math.round(this.zoomLevel * 10 - 2) / 10;
       }
+    },
+    showNav () {
+      clearTimeout(this.navTimeout);
+      this.navOpen = true;
+    },
+    hideNav () {
+      this.navOpen = false;
+    },
+    toggleNav () {
+      this.showNav()
+      this.navTimeout = setTimeout(() => {
+        this.hideNav();
+      }, 2000);
     }
   }
 }
@@ -494,11 +734,25 @@ export default {
 <style>
 
 .nav.fixed {
-  top: 0;
+  top: -60px;
   left: 0;
   width: 100%;
-  border-bottom: 1px solid #dbdbdb;
+  /*border-bottom: 1px solid #dbdbdb;*/
   z-index: 15;
+  background-color: rgba(45, 45, 45, 0.75);
+  color: whitesmoke;
+  /*mix-blend-mode: overlay;*/
+  position: fixed;
+  transition: top .25s ease-in;
+}
+
+.nav.fixed.open {
+  top: 0;
+  left: 0;
+}
+
+.nav.fixed .icon {
+  color: whitesmoke;
 }
 
 .nav.section_nav {
@@ -506,7 +760,7 @@ export default {
 
 }
 
-.navigation {
+.artwork {
   position: absolute;
   top: 0;
   left: 0;
@@ -518,8 +772,42 @@ export default {
   overflow: auto;
 }
 
+.navigation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 400px;
+  height: 100vh;
+  margin-bottom: 0;
+  /*padding: 0 40px 0 40px;*/
+  background-color: white;
+  overflow: auto;
+  z-index: 40;
+  transition: left .25s ease-in;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.navigation_background {
+  opacity: 0;
+  transition: opacity .25s ease-in;
+  z-index: -1;
+}
+
+.navigation_background.active {
+  opacity: 1;
+  z-index: 39;
+}
+
+.navigation.closed {
+  left: -400px;
+}
+
+.navigation .nav .nav-right {
+  flex-grow: 2;
+}
+
 .main {
-  background-color: #757575;
+  background-color: #3e3e3e;
 }
 
 .icon.is-small svg {
@@ -527,7 +815,16 @@ export default {
 }
 
 .zoom {
-  width: 45px;
+  width: 60px;
+}
+
+.contents {
+  padding: 40px;
+}
+
+.cover_image {
+  max-height: 100px;
+  max-width: 100px;
 }
 
 /*h1, h2, h3 {
@@ -664,7 +961,7 @@ a {
   z-index: 50;
 }
 
-#outline {
+#outline, #artwork {
   position: absolute;
   top: 60px;
   left: 20px;
@@ -695,5 +992,29 @@ a {
 .navbar-breadcrumb {
   margin: 0 0.7em;
   height: .7em;
+}
+
+.floater {
+  position: absolute;
+  bottom: -60px;
+  left: 0;
+  position: fixed;
+  transition: bottom .25s ease-in;
+  color: whitesmoke;
+  border-radius: 5px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.floater.open {
+  bottom: 20px;
+}
+
+.floater .field {
+  margin: 0 4px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  margin-bottom: 0.75rem;
+  height: auto;
 }
 </style>

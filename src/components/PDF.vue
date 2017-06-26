@@ -4,8 +4,8 @@
       <page
         :ref="'page_'+page.pageIndex"
         :page="page"
-        :width="spreads ? width / 2 : width"
-        :height="height"
+        :width="spreads ? (width / 2) - 40 : width - 40"
+        :height="height - 40"
         :scale="zoom"
         :onViewport="handleViewport"
         :onImageClicked="onImageClicked"
@@ -345,6 +345,7 @@ export default {
   flex-direction: row;
   flex-wrap: nowrap;
   overflow: auto;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
 }
 
 .pageContainer.centered {
@@ -354,5 +355,13 @@ export default {
 
 .page {
   flex: none;
+}
+
+.page_right {
+  box-shadow: 6px 0 6px rgba(0, 0, 0, 0.7);
+}
+
+.page_left {
+  box-shadow: -6px 0 6px rgba(0, 0, 0, 0.7);
 }
 </style>

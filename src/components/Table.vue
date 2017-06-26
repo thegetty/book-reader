@@ -211,6 +211,11 @@ th.active .arrow {
 
 .img_link {
   cursor: pointer;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  margin: 0 auto;
+  display: block;
 }
 
 .img_link:hover {

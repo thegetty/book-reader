@@ -81,11 +81,11 @@ export default {
 
 ul {
   /*border-top: 1px solid #ccc;*/
-  padding: 0 20px;
+  padding: 0 40px;
 }
 
 li {
-  margin: 12px;
+  margin: 0 0 8px 0;
 }
 
 li a {
