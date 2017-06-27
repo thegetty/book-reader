@@ -17,7 +17,7 @@
   "dependencies": {
     "buefy": "^0.4.2",
     "eslint-config-airbnb": "^15.0.1",
-    "pdfjs-dist": "^1.8.476",
+    "pdfjs-dist": "1.8.476",
     "vue": "^2.3.4",
     "vue-awesome": "^2.3.1",
     "vue-lazyload": "^1.0.5",
@@ -48,6 +48,8 @@
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.8.0",
     "eslint-plugin-html": "^3.0.0",
+    "eslint-plugin-import": "^2.6.0",
+    "eslint-plugin-node": "^5.1.0",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^3.0.1",
     "eventsource-polyfill": "^0.9.6",

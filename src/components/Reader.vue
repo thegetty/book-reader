@@ -2,7 +2,7 @@
   <div>
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
 
-    <nav class="nav fixed" :class="{'open': navOpen || outlineOpen || artworkOpen}" @mouseover="showNav" @mouseout="hideNav">
+    <nav class="nav fixed" :class="{'open': navOpen || outlineOpen || artworkOpen}">
       <div class="nav-left">
 
         <!-- <a class="nav-item" href="http://www.getty.edu/" target="_blank" title="The Getty">
@@ -16,12 +16,12 @@
           </span>
         </a>
 
-        <!-- <a class="nav-item">
+        <a class="nav-item" v-show="!artworkOpen">
           <span class="icon" @click="showSearch = !showSearch">
             <icon v-if="!showSearch" name="search" title="search"></icon>
             <icon v-if="showSearch" name="close" title="close"></icon>
           </span>
-        </a> -->
+        </a>
 
 
 
@@ -29,25 +29,25 @@
 
       <div class="nav-center">
 
-        <div class="nav-item" v-if="!query && !artworkOpen">
-          <div id="prev" class="nav-item arrow" @click="this.prev">
+        <div class="nav-item" v-if="!showSearch && !query && !artworkOpen">
+          <!-- <div id="prev" class="nav-item arrow" @click="this.prev">
             <span class="icon is-small">
               <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
             </span>
-          </div>
+          </div> -->
           <span v-if="!current">{{ title }}</span>
           <span v-if="current">
              {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>{{ current }}
           </span>
-          <div id="next" class="nav-item arrow" @click="this.next">
+          <!-- <div id="next" class="nav-item arrow" @click="this.next">
             <span class="icon is-small">
               <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
             </span>
-          </div>
+          </div> -->
         </div>
 
-        <div class="nav-item" v-if="query && !artworkOpen">
-          <div class="nav-item arrow" @click="prevMatch">
+        <div class="nav-item" v-if="query && !showSearch && !artworkOpen">
+          <div class="nav-item" @click="prevMatch">
             <span class="icon is-small">
               <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
             </span>
@@ -58,7 +58,7 @@
           <span class="icon is-small" @click="query = ''">
             <icon name="close" title="close"></icon>
           </span>
-          <div class="nav-item arrow" @click="nextMatch">
+          <div class="nav-item" @click="nextMatch">
             <span class="icon is-small">
               <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
             </span>
@@ -70,7 +70,7 @@
           {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>Artworks
         </div>
 
-        <div class="nav-item" v-if="showSearch">
+        <div class="nav-item" v-if="showSearch && !artworkOpen">
           <a id="prevMatch" @click="prevMatch" v-if="matchCount">
             <span class="icon is-small">
               <icon name="chevron-left" title="Prev Match"></icon>
@@ -117,8 +117,8 @@
 
         <a class="nav-item" @click="artworkOpen = !artworkOpen; showGrid = false; showTable = false;">
           <span class="icon">
-            <icon v-if="!artworkOpen" name="picture-o" title="Open Artwork"></icon>
-            <icon v-if="artworkOpen" name="close" title="Close Artwork"></icon>
+            <icon v-if="!artworkOpen" name="picture-o" title="Artwork"></icon>
+            <icon v-if="artworkOpen" name="book" title="Book"></icon>
           </span>
         </a>
 
@@ -162,7 +162,7 @@
 
     </nav>
 
-    <section class="main">
+    <section class="main" ref="main">
       <PDF id="pdf" ref="pdf"
           :src="this.manifest.pdf"
           :page="page"
@@ -179,7 +179,17 @@
           :zoom="zoomLevel"
         />
 
-      <div class="floater" :class="{'open': navOpen}" v-show="!artworkOpen" @mouseover="showNav" @mouseout="hideNav">
+      <div id="prev" class="arrow" @click="this.prev">
+        <span class="icon is-large">
+          <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
+        </span>
+      </div>
+      <div id="next" class="arrow" @click="this.next">
+        <span class="icon is-large">
+          <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
+        </span>
+      </div>
+      <div class="floater" :class="{'open': navOpen}" v-show="!artworkOpen">
         <div class="field has-addons is-pulled-left">
           <p class="control">
             <a class="button" @click="zoomOut">
@@ -330,12 +340,12 @@
               </span>
             </a> -->
 
-            <p class="control has-icons-right">
+            <!-- <p class="control has-icons-right">
               <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search" @keyup.enter="outlineOpen = false">
               <span class="icon is-small is-right">
                 <icon name="search" title="Search"></icon>
               </span>
-            </p>
+            </p> -->
           </div>
 
         </div>
@@ -354,10 +364,6 @@
               {{ manifest.author_as_it_appears }}
             </h2>
             <img class="cover_image" :src="manifest.cover_image_url">
-
-            <p>
-              Download: <a :href="manifest.pdf">PDF</a>
-            </p>
 
           <!-- <div class="column is-two-thirds">
             <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
@@ -426,6 +432,7 @@ import 'vue-awesome/icons/i-cursor'
 import 'vue-awesome/icons/picture-o'
 import 'vue-awesome/icons/search-plus'
 import 'vue-awesome/icons/search-minus'
+import 'vue-awesome/icons/book'
 
 import Icon from 'vue-awesome/components/Icon'
 import Buefy from 'buefy';
@@ -434,9 +441,6 @@ import 'buefy/lib/buefy.css';
 Vue.use(Buefy, {
   // defaultIconPack: 'fa'
 })
-
-import { directive as onClickOutside } from 'vue-on-click-outside'
-Vue.directive('on-click-outside', onClickOutside)
 
 export default {
   name: 'reader',
@@ -501,11 +505,60 @@ export default {
     this.currentDetail = undefined;
 
     this.toggleNav();
+    // TODO: make these methods
+    window.addEventListener('mousemove', (e) => {
+      let {y} = e;
+      let dist = 100;
+      this.mouseMoved = true;
 
-    window.addEventListener('mousemove', () => {
-      if (!this.navOpen) {
+      if (y < dist || y > window.innerHeight - dist) {
+        if (!this.openNav) {
+          this.openNav = setTimeout(() => {
+            this.showNav();
+            // this.openNav = undefined;
+          }, 300);
+        }
+      } else {
+        if (this.openNav) {
+          clearTimeout(this.openNav);
+          this.openNav = undefined;
+
+          if (this.navOpen) {
+            this.hideNav();
+          }
+        }
+      }
+    });
+
+    window.addEventListener('mousedown', (e) => {
+      this.mouseMoved = false;
+    });
+
+    window.addEventListener('click', (e) => {
+      let {y} = e;
+      let dist = 100;
+
+      if (y > dist && y < window.innerHeight - dist) {
+        if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.isModalActive) {
+          this.toggleNav();
+        }
+      }
+      this.mouseMoved = false;
+    });
+
+    window.addEventListener('touchend', (e) => {
+      if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.isModalActive) {
         this.toggleNav();
       }
+      this.mouseMoved = false;
+    });
+
+    window.addEventListener('touchstart', (e) => {
+      this.mouseMoved = false;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      this.mouseMoved = true;
     });
   },
   beforeDestory () {
@@ -595,13 +648,17 @@ export default {
 
       this.totalPages = pdfDocument.numPages;
     },
-    next () {
+    next (e) {
       const { pdf } = this.$refs;
       pdf.next();
+      e.stopPropagation();
+      e.preventDefault();
     },
-    prev () {
+    prev (e) {
       const { pdf } = this.$refs;
       pdf.prev();
+      e.stopPropagation();
+      e.preventDefault();
     },
     keyListener (e) {
       const { keyCode } = e;
@@ -723,10 +780,15 @@ export default {
       this.navOpen = false;
     },
     toggleNav () {
-      this.showNav()
-      this.navTimeout = setTimeout(() => {
+      if (this.navOpen) {
+        clearTimeout(this.navTimeout);
         this.hideNav();
-      }, 2000);
+      } else {
+        this.showNav()
+        this.navTimeout = setTimeout(() => {
+          this.hideNav();
+        }, 2000);
+      }
     }
   }
 }
@@ -738,11 +800,9 @@ export default {
   top: -60px;
   left: 0;
   width: 100%;
-  /*border-bottom: 1px solid #dbdbdb;*/
+  border-bottom: 1px solid rgba(219, 219, 219, 0.85);
   z-index: 15;
-  background-color: rgba(45, 45, 45, 0.75);
-  color: whitesmoke;
-  /*mix-blend-mode: overlay;*/
+  background-color: rgba(255, 255, 255, 0.85);
   position: fixed;
   transition: top .25s ease-in;
 }
@@ -753,7 +813,7 @@ export default {
 }
 
 .nav.fixed .icon {
-  color: whitesmoke;
+  /*color: #4a4a4a;*/
 }
 
 .nav.section_nav {
@@ -809,7 +869,7 @@ export default {
 }
 
 .main {
-  background-color: #3e3e3e;
+  background-color: whitesmoke;
 }
 
 .icon.is-small svg {
@@ -827,6 +887,48 @@ export default {
 .cover_image {
   max-height: 100px;
   max-width: 100px;
+}
+
+.arrow {
+  position: absolute;
+  top: 50vh;
+  margin-top: -24px;
+  /*font-size: 64px;*/
+  /*color: #E2E2E2;*/
+  color: rgb(74, 74, 74);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  background-color: whitesmoke;
+  opacity: .5;
+  padding: 4px;
+}
+
+.arrow .icon {
+  width: 30px;
+}
+
+.arrow:hover {
+  /*color: #777;*/
+}
+
+#prev.arrow:active .icon {
+  justify-content: flex-start;
+}
+
+#next.arrow:active .icon {
+  justify-content: flex-end;
+}
+
+#prev {
+  left: 0px;
+  border-radius: 0 2px 2px 0;
+}
+
+#next {
+  right: 0px;
+  border-radius: 2px 0 0 2px;
 }
 
 /*h1, h2, h3 {

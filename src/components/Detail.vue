@@ -20,7 +20,7 @@
     <footer class="card-footer">
     <p class="card-footer-item" v-if="currentDetail.artwork_uri">
       <span>
-        View in <a :href="currentDetail.artwork_uri">Collection</a>
+        View in <a :href="currentDetail.artwork_uri" target="_blank">Collection</a>
       </span>
     </p>
     <p class="card-footer-item">
