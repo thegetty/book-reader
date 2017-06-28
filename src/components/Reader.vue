@@ -16,12 +16,50 @@
           </span>
         </a>
 
-        <a class="nav-item" v-show="!artworkOpen">
+        <a class="nav-item" v-show="!artworkOpen && !showSearch">
           <span class="icon" @click="showSearch = !showSearch">
             <icon v-if="!showSearch" name="search" title="search"></icon>
-            <icon v-if="showSearch" name="close" title="close"></icon>
+            <icon v-if="showSearch" name="close" title="search"></icon>
           </span>
         </a>
+
+        <div class="nav-item" v-if="showSearch && !artworkOpen">
+          <div class="field has-addons">
+            <p class="control has-icons-right" id="matchCount">
+              <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search">
+              <span class="icon is-small is-right" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
+              <!-- <span class="icon is-small is-right" v-if="!query">
+                <icon name="search" title="Search"></icon>
+              </span> -->
+            </p>
+
+            <p class="control">
+              <a class="button" @click="prevMatch">
+                <span class="icon is-small">
+                  <icon name="chevron-left" title="Prev Match"></icon>
+                </span>
+              </a>
+            </p>
+
+            <p class="control">
+              <a class="button" @click="nextMatch">
+                <span class="icon is-small">
+                  <icon name="chevron-right" title="Next Match"></icon>
+                </span>
+              </a>
+            </p>
+
+            <p class="control">
+              <a class="button" @click="showSearch = false; query = ''">
+                <span class="icon is-small">
+                  <icon name="close" title="Close Search"></icon>
+                </span>
+              </a>
+            </p>
+          </div>
+
+
+        </div>
 
 
 
@@ -29,7 +67,7 @@
 
       <div class="nav-center">
 
-        <div class="nav-item" v-if="!showSearch && !query && !artworkOpen">
+        <div class="nav-item" v-if="!artworkOpen">
           <!-- <div id="prev" class="nav-item arrow" @click="this.prev">
             <span class="icon is-small">
               <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
@@ -46,119 +84,20 @@
           </div> -->
         </div>
 
-        <div class="nav-item" v-if="query && !showSearch && !artworkOpen">
-          <div class="nav-item" @click="prevMatch">
-            <span class="icon is-small">
-              <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
-            </span>
-          </div>
-          <span>&ldquo;{{ query }}&rdquo;</span>
-          <span>&nbsp;–&nbsp;</span>
-          <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}&nbsp;</span>
-          <span class="icon is-small" @click="query = ''">
-            <icon name="close" title="close"></icon>
-          </span>
-          <div class="nav-item" @click="nextMatch">
-            <span class="icon is-small">
-              <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
-            </span>
-          </div>
-
-        </div>
-
         <div class="nav-item" v-if="artworkOpen">
           {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>Artworks
-        </div>
-
-        <div class="nav-item" v-if="showSearch && !artworkOpen">
-          <a id="prevMatch" @click="prevMatch" v-if="matchCount">
-            <span class="icon is-small">
-              <icon name="chevron-left" title="Prev Match"></icon>
-            </span>
-          </a>
-          <p class="control" v-if="matchCount">
-            <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
-          </p>
-          <a id="nextMatch" @click="nextMatch" v-if="matchCount">
-            <span class="icon is-small">
-              <icon name="chevron-right" title="Next Match"></icon>
-            </span>
-          </a>
-
-          <p class="control has-icons-right">
-            <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search">
-            <span class="icon is-small is-right">
-              <icon name="search" title="Search"></icon>
-            </span>
-          </p>
         </div>
 
       </div>
 
       <div class="nav-right">
-
-        <!-- <a class="nav-item" @click="artworkOpen = !artworkOpen; showGrid = false; showTable = false;">
-          <span class="icon">
-            <icon v-if="!artworkOpen" name="th" title="Open Artwork"></icon>
-            <icon v-if="artworkOpen" name="close" title="Close Artwork"></icon>
-          </span>
-        </a> -->
-
-        <!-- <a class="nav-item" v-if="spreads" @click="setSpreads(false); showGrid = false; showTable = false;">
-          <span class="icon">
-            <icon name="file-o" title="Single"></icon>
-          </span>
-        </a>
-        <a class="nav-item" v-if="!spreads" @click="setSpreads(true); showGrid = false; showTable = false;">
-          <span class="icon">
-            <icon name="columns" title="Spread"></icon>
-          </span>
-        </a> -->
-
         <a class="nav-item" @click="artworkOpen = !artworkOpen; showGrid = false; showTable = false;">
           <span class="icon">
             <icon v-if="!artworkOpen" name="picture-o" title="Artwork"></icon>
             <icon v-if="artworkOpen" name="book" title="Book"></icon>
           </span>
         </a>
-
       </div>
-      <!-- <div class="nav-right">
-        <div class="nav-item">
-          <a id="zoomOut" @click="zoomOut">-</a>
-          <span id="zoomLevel" v-if="zoomLevel">{{Math.round(zoomLevel * 100)}}%</span>
-          <a id="zoomIn" @click="zoomIn">+</a>
-        </div>
-        <div class="nav-item">
-          Book:
-          <a id="artwork-nav-single" @click="setSpreads(false); showGrid = false; showTable = false;">
-            <span class="icon is-small">
-              <icon name="file-o" title="Single" style="transform: rotate(180deg) scaleX(-1); height: .95em"></icon>
-            </span>
-          </a>
-           |
-          <a id="artwork-nav-spread" @click="setSpreads(true); showGrid = false; showTable = false;">
-            <span class="icon is-small">
-              <icon name="columns" title="Spread"></icon>
-            </span>
-          </a>
-        </div>
-        <div class="nav-item">
-          Artwork:
-          <a id="artwork-nav-table" @click="toggleTable">
-            <span class="icon is-small">
-              <icon name="table" title="Table"></icon>
-            </span>
-          </a>
-           |
-          <a id="artwork-nav-grid" @click="toggleGrid">
-            <span class="icon is-small">
-              <icon name="th" title="Grid"></icon>
-            </span>
-          </a>
-        </div>
-      </div> -->
-
 
     </nav>
 
@@ -180,12 +119,12 @@
         />
 
       <div id="prev" class="arrow" @click="this.prev">
-        <span class="icon is-large">
+        <span class="icon">
           <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
         </span>
       </div>
       <div id="next" class="arrow" @click="this.next">
-        <span class="icon is-large">
+        <span class="icon">
           <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
         </span>
       </div>
@@ -198,7 +137,7 @@
               </span>
             </a>
           </p>
-          <p class="control zoom">
+          <p class="control zoom_input">
             <input class="input" type="text" :value="Math.round(zoomLevel * 100)+'%'">
           </p>
           <p class="control">
@@ -225,7 +164,7 @@
             </a>
           </p>
         </div>
-        <div class="field has-addons is-pulled-left" v-show="!matchCount">
+        <div class="field has-addons is-pulled-left">
           <p class="control">
             <a class="button" @click="this.prev">
               <span class="icon is-small">
@@ -233,40 +172,14 @@
               </span>
             </a>
           </p>
-          <!-- <p class="control">
-            <a class="button" @click="zoomOut">
-              <span class="icon is-small">
-                <icon name="minus" title="Zoom Out"></icon>
-              </span>
-            </a>
-          </p>
-          <p class="control zoom">
-            <input class="input" type="text" :value="Math.round(zoomLevel * 100)+'%'">
-          </p>
-          <p class="control">
-            <a class="button" @click="zoomIn">
-              <span class="icon is-small">
-                <icon name="plus" title="Zoom In"></icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a class="button" v-if="spreads" @click="setSpreads(false); showGrid = false; showTable = false;">
-              <span class="icon is-small">
-                <icon name="file-o" title="Single"></icon>
-              </span>
-            </a>
-            <a class="button" v-if="!spreads" @click="setSpreads(true); showGrid = false; showTable = false;">
-              <span class="icon is-small">
-                <icon name="columns" title="Spread"></icon>
-              </span>
-            </a>
-          </p> -->
-          <p class="control">
-            <a class="button" v-if="!editingPage" @click="editingPage = true">
+
+          <p class="control page_input" v-if="!editingPage">
+            <a class="button" @click="editingPage = true">
               {{ displayedPages }} / {{ totalPages }}
             </a>
-            <input class="input" type="text" :value="displayedPages" v-if="editingPage">
+          </p>
+          <p class="control page_input" v-if="editingPage">
+            <input class="input" type="text" :value="displayedPages" @keyup.enter="editingPage = false">
           </p>
           <p class="control">
             <a class="button" @click="this.next">
@@ -277,7 +190,7 @@
           </p>
 
         </div>
-        <div class="field has-addons is-pulled-left" v-show="matchCount">
+        <!-- <div class="field has-addons is-pulled-left" v-show="matchCount">
           <p class="control">
             <a class="button" @click="prevMatch" v-if="matchCount">
               <span class="icon is-small">
@@ -297,19 +210,7 @@
               </span>
             </a>
           </p>
-          <!-- <p class="control">
-            <a v-if="false" @click="">
-              <span class="button is-small">
-                <icon name="i-cursor" title="Cursor"></icon>
-              </span>
-            </a>
-            <a v-if="true" @click="">
-              <span class="button is-white is-small">
-                <icon name="hand-paper-o" title="Hand"></icon>
-              </span>
-            </a>
-          </p> -->
-        </div>
+        </div>  -->
       </div>
     </section>
 
@@ -492,7 +393,7 @@ export default {
       isModalActive: false,
       showSearch: false,
       artworkOpen: false,
-      navOpen: true,
+      navOpen: false,
       totalPages: 1,
       editingPage: false,
       navTimeout: undefined
@@ -505,6 +406,7 @@ export default {
     this.currentDetail = undefined;
 
     this.toggleNav();
+
     // TODO: make these methods
     window.addEventListener('mousemove', (e) => {
       let {y} = e;
@@ -876,10 +778,17 @@ export default {
   height: 1em;
 }
 
-.zoom {
+.zoom_input {
   width: 60px;
 }
 
+.page_input {
+  width: auto;
+}
+
+.page_input input {
+  width: 60px;
+}
 .contents {
   padding: 40px;
 }
@@ -931,136 +840,6 @@ export default {
   border-radius: 2px 0 0 2px;
 }
 
-/*h1, h2, h3 {
-  font-weight: normal;
-  display: inline;
-  font-size: 16px;
-}
-
-a {
-  color: #42b983;
-}
-
-#prev {
-  left: 40px;
-}
-
-#next {
-  right: 40px;
-}
-
-.arrow {
-  position: absolute;
-  top: 50vh;
-  margin-top: -32px;
-  font-size: 64px;
-  color: #E2E2E2;
-  font-family: arial, sans-serif;
-  font-weight: bold;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-
-.arrow:hover {
-  color: #777;
-}
-
-.arrow:active {
-  color: #000;
-}
-
-#page-wrap {
-  background: #D3D3D3;
-}
-
-#page-wrap > header {
-  padding: 15px;
-  -webkit-transition: opacity 1s;
-  transition: opacity 0.8s;
-  opacity: 0.3;
-  height: 24px;
-  overflow: hidden;
-}
-
-#page-wrap > header:hover {
-  opacity: 1;
-}
-
-#main {
-  position: relative;
-  width: calc(100vw - 80px);
-  min-height: calc(100vh - 54px);
-  margin: 0;
-  padding: 0 40px;
-  background: #D3D3D3;
-  box-sizing: content-box;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  overflow: auto;
-  display: flex;
-  justify-content: center;
-}
-
-#pdf {
-  margin: 40px auto;
-}
-
-#images {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: #D3D3D3;
-}
-
-#grid {
-  margin: 0 auto;
-}
-
-#table {
-  margin: 0 auto;
-}
-
-#nav {
-  display: flex;
-  flex-direction: row;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#nav li {
-  margin: 0 6px;
-  color: #696969;
-}
-
-#nav li a {
-  cursor: pointer;
-  color: #696969;
-  display: inline-block;
-}
-
-#nav li a:active {
-  color: #151515;
-}
-
-#nav li a:active .fa-icon {
-  margin-bottom: -4px;
-}
-
-#title-nav {
-  flex-grow: 100;
-}
-
-.fa-icon {
-  width: auto;
-  height: 1em;
-  margin-bottom: -3px;
-}
-*/
 #detail {
   z-index: 50;
 }
@@ -1124,5 +903,13 @@ a {
 
 .modal-content {
   width: auto !important;
+}
+
+#matchCount {
+  align-items: flex-end;
+}
+
+#matchCount span {
+  width: 5.25em;
 }
 </style>
