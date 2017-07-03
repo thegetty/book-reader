@@ -81,7 +81,7 @@ export default {
 
 ul {
   /*border-top: 1px solid #ccc;*/
-  padding: 0 40px;
+  padding: 0 20px 20px 52px;
 }
 
 li {

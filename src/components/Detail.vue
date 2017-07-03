@@ -134,6 +134,10 @@ export default {
           imageRef = this.imageRef(this.image);
         }
         this.currentDetail = this.imagesById[imageRef];
+
+        if (!this.currentDetail) {
+          this.$emit('closed');
+        }
       } else {
         this.currentDetail = undefined;
       }
@@ -142,8 +146,10 @@ export default {
       let imageRef;
       if (this.currentDetail) {
         imageRef = this.imageRef(this.currentDetail);
+        this.$emit('displayed', imageRef);
+      } else {
+        this.$emit('closed');
       }
-      this.$emit('displayed', imageRef);
     }
   },
   methods: {

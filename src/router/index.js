@@ -9,8 +9,8 @@ export default new Router({
   routes: [
     {
       path: '/',
+      redirect: '/books/711/editions/884',
       name: 'Main',
-      component: Main
     },
     {
       path: '/books/:book/editions/:edition',

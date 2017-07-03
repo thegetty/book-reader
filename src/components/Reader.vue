@@ -26,7 +26,7 @@
         <div class="nav-item" v-if="showSearch && !artworkOpen">
           <div class="field has-addons">
             <p class="control has-icons-right" id="matchCount">
-              <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search">
+              <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="Search">
               <span class="icon is-small is-right" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
               <!-- <span class="icon is-small is-right" v-if="!query">
                 <icon name="search" title="Search"></icon>
@@ -173,13 +173,13 @@
             </a>
           </p>
 
-          <p class="control page_input" v-if="!editingPage">
-            <a class="button" @click="editingPage = true">
+          <p class="control page_input" v-show="!editingPage">
+            <a class="button" @click="startPageEditing()">
               {{ displayedPages }} / {{ totalPages }}
             </a>
           </p>
-          <p class="control page_input" v-if="editingPage">
-            <input class="input" type="text" :value="displayedPages" @keyup.enter="editingPage = false">
+          <p class="control page_input" v-show="editingPage">
+            <input class="input" type="text" @keyup.enter="(v) => onPageEdited(v)" @keyup.escape="editingPage = false" ref="pageEditor">
           </p>
           <p class="control">
             <a class="button" @click="this.next">
@@ -253,23 +253,24 @@
       </nav>
 
 
-      <div class="container">
-        <div class="contents">
-            <h1 class="title">
-              {{ manifest.title }}
-            </h1>
-            <h2 class="subtitle">
-              {{ manifest.subtitle }}
-            </h2>
-            <h2 class="subtitle">
-              {{ manifest.author_as_it_appears }}
-            </h2>
-            <img class="cover_image" :src="manifest.cover_image_url">
+      <div>
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img class="cover_image" :src="manifest.cover_image_url">
+            </p>
+          </figure>
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <strong class="media_title">{{ manifest.title }}</strong>
+                <small class="media_subtitle">{{ manifest.subtitle }}</small>
+                <small class="media_author">{{ manifest.author_as_it_appears }}</small>
+              </p>
+            </div>
+          </div>
+        </article>
 
-          <!-- <div class="column is-two-thirds">
-            <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
-          </div> -->
-        </div>
         <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
 
       </div>
@@ -339,9 +340,11 @@ import Icon from 'vue-awesome/components/Icon'
 import Buefy from 'buefy';
 import 'buefy/lib/buefy.css';
 
+import debounce from 'debounce';
+
 Vue.use(Buefy, {
   // defaultIconPack: 'fa'
-})
+});
 
 export default {
   name: 'reader',
@@ -373,6 +376,7 @@ export default {
       page: 0,
       displayedPage: 0,
       spreads: true,
+      manualSpreads: false,
       showTable: false,
       showGrid: false,
       currentDetail: undefined,
@@ -400,72 +404,29 @@ export default {
     }
   },
   created () {
+    if (this.pageUrl) {
+      this.page = parseInt(this.pageUrl);
+    }
+
     this.fetchManifest();
-    window.addEventListener('keyup', this.keyListener.bind(this), false);
-    window.addEventListener('resize', this.handleResize.bind(this), false);
+
     this.currentDetail = undefined;
 
     this.toggleNav();
 
-    // TODO: make these methods
-    window.addEventListener('mousemove', (e) => {
-      let {y} = e;
-      let dist = 100;
-      this.mouseMoved = true;
+    this.addListeners();
 
-      if (y < dist || y > window.innerHeight - dist) {
-        if (!this.openNav) {
-          this.openNav = setTimeout(() => {
-            this.showNav();
-            // this.openNav = undefined;
-          }, 300);
-        }
-      } else {
-        if (this.openNav) {
-          clearTimeout(this.openNav);
-          this.openNav = undefined;
+    this.handleResize();
 
-          if (this.navOpen) {
-            this.hideNav();
-          }
-        }
-      }
-    });
-
-    window.addEventListener('mousedown', (e) => {
-      this.mouseMoved = false;
-    });
-
-    window.addEventListener('click', (e) => {
-      let {y} = e;
-      let dist = 100;
-
-      if (y > dist && y < window.innerHeight - dist) {
-        if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.isModalActive) {
-          this.toggleNav();
-        }
-      }
-      this.mouseMoved = false;
-    });
-
-    window.addEventListener('touchend', (e) => {
-      if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.isModalActive) {
-        this.toggleNav();
-      }
-      this.mouseMoved = false;
-    });
-
-    window.addEventListener('touchstart', (e) => {
-      this.mouseMoved = false;
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      this.mouseMoved = true;
-    });
+    /*
+    let spreads = localStorage.getItem('spreads');
+    if (spreads != null) {
+      this.spreads = (spreads === 'true');
+    }
+    */
   },
   beforeDestory () {
-    window.removeEventListener('resize', this.handleResize);
-    window.removeEventListener('keyup', this.keyListener);
+    this.removeListeners();
   },
   computed: {
     displayedPages () {
@@ -514,6 +475,22 @@ export default {
         this.$router.push({ name: 'Manifest' });
       }
     },
+    spreads () {
+      // localStorage.setItem('spreads', this.spreads);
+    },
+    isModalActive (active) {
+      if (!active) {
+        if (this.displayedPage) {
+          this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
+        } else {
+          this.$router.push({ name: 'Manifest' });
+        }
+      } else {
+        if (this.displayedDetail) {
+          this.$router.push({ name: 'ImageLink', params: { image: this.displayedDetail } });
+        }
+      }
+    }
   },
   methods: {
     fetchManifest () {
@@ -531,6 +508,10 @@ export default {
           }
 
           this.title += ' – ' + manifest.author_as_it_appears;
+
+          if (this.imageUrl) {
+            this.currentDetail = this.imageUrl;
+          }
         }).catch((err) => console.error(err));
     },
     loaded (pdfDocument) {
@@ -539,14 +520,6 @@ export default {
       this.pdfDocument = pdfDocument;
       // Wait for PDF to load
       this.images = this.manifest.images;
-
-      if (this.imageUrl) {
-        this.currentDetail = this.imageUrl;
-      }
-
-      if (this.pageUrl) {
-        this.page = parseInt(this.pageUrl);
-      }
 
       this.totalPages = pdfDocument.numPages;
     },
@@ -574,6 +547,16 @@ export default {
       let bounds = this.getBounds();
       this.width = bounds.width;
       this.height = bounds.height;
+
+      if (!this.manualSpreads) {
+        if (this.width < 600 && this.spreads === true) {
+          this.spreads = false;
+        }
+
+        if (this.width >= 600 && this.spreads === false) {
+          this.spreads = true;
+        }
+      }
     },
     goto (dest) {
       const { pdf } = this.$refs;
@@ -585,7 +568,10 @@ export default {
     onImageSelected (image) {
       // this.page = (image.page - 1);
       this.currentDetail = image;
-      this.isModalActive = true;
+
+      if (this.displayedDetail && !this.isModalActive) {
+        this.isModalActive = true;
+      }
     },
     onPageSelected (page) {
       this.page = (page - 1);
@@ -594,14 +580,21 @@ export default {
       this.currentDetail = undefined;
     },
     onImageClicked (image) {
+      // this.isModalActive = true;
       this.currentDetail = image.objId;
-      this.isModalActive = true;
+
+      if (this.displayedDetail && !this.isModalActive) {
+        this.isModalActive = true;
+      }
     },
     onDetailClosed () {
       this.currentDetail = undefined;
+      this.displayedDetail = undefined;
+      this.isModalActive = false;
     },
     onDetailDisplayed (detail) {
       this.displayedDetail = detail;
+      this.isModalActive = true;
     },
     onFound (count) {
       this.matchCount = count;
@@ -629,6 +622,8 @@ export default {
       if (this.spreads !== spreads) {
         this.spreads = spreads;
       }
+
+      this.manualSpreads = true;
     },
     onOutlineReady (outline) {
       this.outline = outline;
@@ -691,10 +686,113 @@ export default {
           this.hideNav();
         }, 2000);
       }
+    },
+    onMouseMove (e) {
+      let {y} = e;
+      let dist = 100;
+      this.mouseMoved = true;
+
+      if (y < dist || y > window.innerHeight - dist) {
+        if (!this.openNav) {
+          this.openNav = setTimeout(() => {
+            this.showNav();
+            // this.openNav = undefined;
+          }, 300);
+        }
+      } else {
+        if (this.openNav) {
+          clearTimeout(this.openNav);
+          this.openNav = undefined;
+
+          if (this.navOpen) {
+            this.hideNav();
+          }
+        }
+      }
+    },
+    onMouseDown (e) {
+      this.mouseMoved = false;
+    },
+    onTouchMove (e) {
+      this.mouseMoved = true;
+    },
+    onClick (e) {
+      let {y} = e;
+      let dist = 100;
+
+      if (y > dist && y < window.innerHeight - dist) {
+        if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.isModalActive) {
+          this.toggleNav();
+        }
+      }
+      this.mouseMoved = false;
+    },
+    addListeners () {
+      this._handleResize = debounce(this.handleResize.bind(this), 200);
+
+      window.addEventListener('keyup', this.keyListener.bind(this), false);
+      window.addEventListener('resize', this._handleResize, false);
+
+      window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+      window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
+      window.addEventListener('click', this.onClick.bind(this), false);
+      window.addEventListener('touchend', this.onClick.bind(this), false);
+      window.addEventListener('touchstart', this.onMouseDown.bind(this), false);
+      window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
+    },
+    removeListeners () {
+      window.removeEventListener('resize', this.handleResize);
+      window.removeEventListener('keyup', this.keyListener);
+
+      window.removeEventListener('mousemove', this.onMouseMove);
+      window.removeEventListener('mousedown', this.onMouseDown);
+      window.removeEventListener('click', this.onClick);
+      window.removeEventListener('touchend', this.onClick);
+      window.removeEventListener('touchstart', this.onMouseDown);
+      window.removeEventListener('touchmove', this.onTouchStart);
+    },
+    startPageEditing () {
+      this.editingPage = true;
+      this.$refs.pageEditor.focus();
+      this.$refs.pageEditor.value = '';
+    },
+    onPageEdited (v) {
+      let value = parseInt(v.target.value);
+      if (value) {
+        this.page = value - 1;
+      }
+      this.editingPage = false;
     }
   }
 }
 </script>
+
+<style lang="scss">
+  // Import Bulma's core
+  @import "~bulma/sass/utilities/_all";
+  // Set your colors
+  $primary: #1565c0;
+  $primary-invert: findColorInvert($primary);
+  // Setup $colors to use as bulma classes (e.g. 'is-twitter')
+  $colors: (
+      "white": ($white, $black),
+      "black": ($black, $white),
+      "light": ($light, $light-invert),
+      "dark": ($dark, $dark-invert),
+      "primary": ($primary, $primary-invert),
+      "info": ($info, $info-invert),
+      "success": ($success, $success-invert),
+      "warning": ($warning, $warning-invert),
+      "danger": ($danger, $danger-invert)
+  );
+  // Links
+  $link: $primary;
+  $link-invert: $primary-invert;
+  $link-focus-border: $primary;
+  // Import Bulma and Buefy styles
+  @import "~bulma";
+  @import "~buefy/src/scss/buefy";
+</style>
 
 <style>
 
@@ -768,6 +866,25 @@ export default {
 
 .navigation .nav .nav-right {
   flex-grow: 2;
+}
+
+.media {
+  /*background: #eee;*/
+  padding: 0 52px 20px 52px;
+}
+
+.media_title {
+  display: block;
+}
+
+.media_subtitle {
+  display: block;
+  line-height: 1em;
+}
+
+.media_author {
+  display: block;
+  margin-top: 1em;
 }
 
 .main {
@@ -903,6 +1020,11 @@ export default {
 
 .modal-content {
   width: auto !important;
+}
+
+.modal-close {
+  min-width: 48px;
+  min-height: 48px;
 }
 
 #matchCount {

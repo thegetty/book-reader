@@ -1,7 +1,14 @@
 <template>
   <div :ref="'container'" class="pageContainer" :class="{ loading: isLoading, centered: (!spreads || zoom <= 1) }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
-    <div class="page" v-for="page in displayedPages" :key="page.pageIndex">
+    <div class="pages" :style="{
+      width: `${viewportWidth}px`,
+      height: `${viewportHeight}px`,
+      top: `${viewportTop}px`,
+      left: `${viewportLeft}px`
+      }">
       <page
+        v-for="page in displayedPages"
+        :key="page.pageIndex"
         :ref="'page_'+page.pageIndex"
         :page="page"
         :width="spreads ? (width / 2) - 40 : width - 40"
@@ -11,6 +18,7 @@
         :onImageClicked="onImageClicked"
         :onSelected="onSelected"
         @displayed="afterDisplayed"
+        class="page"
       />
     </div>
     <search :pdfDocument="pdfDocument" :query="query" @matched="this.onMatched" @found="this.onFound"/>
@@ -78,6 +86,8 @@ export default {
       isLoading: true,
       viewportWidth: 0,
       viewportHeight: 0,
+      viewportLeft: 0,
+      viewportTop: 0,
       displayedPage: 0,
       displayedPages: [],
       displayedPagesNumbers: [],
@@ -93,7 +103,9 @@ export default {
   mounted () {
     if (this.src) {
       this.loadDocument(this.src)
-        .then(() => this.display(this.page))
+        .then(() => {
+          this.display(this.page);
+        })
         .catch((err) => console.error(err));
     }
   },
@@ -101,7 +113,9 @@ export default {
     src () {
       if (this.src) {
         this.loadDocument(this.src)
-          .then(() => this.display(this.page))
+          .then(() => {
+            this.display(this.page);
+          })
           .catch((err) => console.error(err));
       }
     },
@@ -133,7 +147,6 @@ export default {
   },
   methods: {
     loadDocument (src) {
-      console.log('src', src);
       return pdfjsLib.getDocument(src)
         .then((pdfDocument) => {
           // Document loaded, retrieving the page.
@@ -156,6 +169,10 @@ export default {
 
       if (page < 0) {
         return;
+      }
+
+      if (page > this.numPages) {
+        page = 0;
       }
 
       if (this.spreads) {
@@ -244,8 +261,14 @@ export default {
       console.error(page);
     },
     handleViewport (viewport) {
-      this.viewportWidth = viewport.width;
+      this.viewportWidth = (this.spreads && this.displayedPage > 0) ? viewport.width * 2 : viewport.width;
       this.viewportHeight = viewport.height;
+
+      let left = (this.width - this.viewportWidth) / 2;
+      let top = (this.height - this.viewportHeight) / 2;
+
+      this.viewportLeft = left > 0 ? left : 0;
+      this.viewportTop = top > 0 ? top : 0;
     },
     processOutline (outline) {
       this.onOutlineReady && this.onOutlineReady(outline);
@@ -340,28 +363,25 @@ export default {
 }
 
 .pageContainer {
-  margin: 0 auto;
+  overflow: scroll;
+  position: relative;
+}
+
+
+.pages {
+  position: absolute;
+  top: 0;
+  left: 0;
+
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  overflow: auto;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
-}
 
-.pageContainer.centered {
-  justify-content: center;
-  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 .page {
   flex: none;
 }
 
-.page_right {
-  box-shadow: 6px 0 6px rgba(0, 0, 0, 0.7);
-}
-
-.page_left {
-  box-shadow: -6px 0 6px rgba(0, 0, 0, 0.7);
-}
 </style>

@@ -93,7 +93,7 @@ export default {
           this.matches = this.convertMatches(this.pageMatches, this.pageMatchesLength);
           this.renderMatches(this.matches);
         }
-      }).catch((err) => console.error(err));
+      }).catch((err) => console.warn(err));
     },
     onPageError (page) {
       console.error(page);
