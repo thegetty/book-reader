@@ -77,15 +77,9 @@
       :pagination-simple="true"
       >
         <template scope="tb">
-            <b-table-column field="thumbnail" label="" >
+            <b-table-column field="thumbnail" label="" width="40">
               <a class="img_link" @click="$emit('onImageClick', tb.row)">
                 <img v-lazy="tb.row['thumbnail']" />
-              </a>
-            </b-table-column>
-
-            <b-table-column field="page" label="Page" sortable>
-              <a href="#" @click="$emit('onPageClick', tb.row.page)">
-                {{ tb.row['page_label'] || tb.row['page'] }}
               </a>
             </b-table-column>
 
@@ -123,7 +117,24 @@
               <span v-if="collectionFilter === tb.row.collection">
                 {{ tb.row['collection'] }}
               </span>
+              <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection">
+                <span>In Collection</span>
+                <b-icon icon="open_in_new" class="is-small"></b-icon>
+              </a>
             </b-table-column>
+
+            <b-table-column field="page" label="Page" sortable width="30">
+              <a href="#" @click="$emit('onPageClick', tb.row.page)" class="button is-small">
+                <span>{{ tb.row['page_label'] || tb.row['page'] }}</span>
+                <b-icon icon="call_made" class="is-small"></b-icon>
+              </a>
+            </b-table-column>
+
+            <!-- <b-table-column field="viewin" label="View">
+              <a class="button" :href="tb.row['collection_uri']" target="_blank">
+                In Collection
+              </a>
+            </b-table-column> -->
         </template>
     </b-table>
   </div>
@@ -432,6 +443,10 @@ th.active .arrow {
 
 #search {
   text-align: center;
+}
+
+.table td, .table th {
+  vertical-align: middle;
 }
 
 </style>
