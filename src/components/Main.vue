@@ -12,15 +12,28 @@ export default {
   },
   props: {
     'origin': {
-      default: 'https://s3.amazonaws.com/pubs-fchasen/books/',
+      default: 'https://s3.amazonaws.com/pubs-fchasen/books',
+      type: String
+    },
+    'book': {
+      default: '',
+      type: String
+    },
+    'edition': {
+      default: '',
+      type: String
+    },
+    'page': {
+      default: undefined
+    },
+    'image': {
+      default: undefined,
       type: String
     }
   },
   data () {
     return {
-      url: `${this.origin}${this.$route.params.book}/editions/${this.$route.params.edition}/manifest.json`,
-      page: this.$route.params.page,
-      image: this.$route.params.image
+      url: `${this.origin}/${this.book}/editions/${this.edition}/manifest.json`
     }
   }
 }

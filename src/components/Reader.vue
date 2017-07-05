@@ -283,7 +283,7 @@
             <grid id="grid" ref="grid" :data="images" @onClick="this.onImageSelected" />
           </b-tab-item>
           <b-tab-item label="Table">
-            <tablegrid id="table" ref="table" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+            <tablegrid id="table" ref="table" :data="images" :filter="tableFilter" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
           </b-tab-item>
         </b-tabs>
       </div>
@@ -298,7 +298,7 @@
     <div class="modal" :class="{'is-active': isModalActive}">
       <div class="modal-background" @click="isModalActive = false"></div>
       <div class="modal-content">
-        <detail :image="currentDetail" :manifest="manifest" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/>
+        <detail :image="currentDetail" :manifest="manifest" @infoSelected="this.onInfoSelected" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/>
       </div>
       <button class="modal-close" @click="isModalActive = false"></button>
     </div>
@@ -361,7 +361,7 @@ export default {
       type: String
     },
     'page-url': {
-      type: String
+      default: undefined
     },
     'image-url': {
       type: String
@@ -400,7 +400,8 @@ export default {
       navOpen: false,
       totalPages: 1,
       editingPage: false,
-      navTimeout: undefined
+      navTimeout: undefined,
+      tableFilter: undefined
     }
   },
   created () {
@@ -453,7 +454,10 @@ export default {
     },
     pageUrl () {
       if (this.loaded) {
-        this.page = parseInt(this.pageUrl);
+        let pg = parseInt(this.pageUrl);
+        if (this.page !== pg && this.displayedPage !== pg) {
+          this.page = pg;
+        }
       }
     },
     imageUrl () {
@@ -577,6 +581,13 @@ export default {
       this.page = (page - 1);
       this.isModalActive = false;
       this.artworkOpen = false;
+      this.currentDetail = undefined;
+    },
+    onInfoSelected (filter) {
+      this.activeTab = 1;
+      this.tableFilter = filter;
+      this.isModalActive = false;
+      this.artworkOpen = true;
       this.currentDetail = undefined;
     },
     onImageClicked (image) {

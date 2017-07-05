@@ -15,17 +15,20 @@ export default new Router({
     {
       path: '/books/:book/editions/:edition',
       name: 'Manifest',
-      component: Main
+      component: Main,
+      props: true
     },
     {
       path: '/books/:book/editions/:edition/pages/:page',
       name: 'PageLink',
-      component: Main
+      component: Main,
+      props: true
     },
     {
       path: '/books/:book/editions/:edition/images/:image',
       name: 'ImageLink',
-      component: Main
+      component: Main,
+      props: true
     }
   ]
 })

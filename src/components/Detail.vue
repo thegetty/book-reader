@@ -10,11 +10,46 @@
     </div>
     <div class="card-content">
       <div class="content">
-        <h1 class="title">{{currentDetail.artwork_title}}</h1>
-        <h2 class="subtitle">
-          <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a>
+        <h1 class="title" :class="{'hover': hoverArtist}">
+          {{currentDetail.artwork_title}}
+          <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" @mouseenter="hoverArtist = true" @mouseleave="hoverArtist = false" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
+            <b-icon
+                icon="filter"
+                size="is-small">
+            </b-icon>
+            <span>
+            {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }}
+            </span>
+          </a>
+        </h1>
+        <h2 class="subtitle" :class="{'hover': hoverArtwork}">
+          <!-- <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a> -->
+          <!-- <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">{{currentDetail.artist_name}}</a> -->
+          {{currentDetail.artist_name}}
+          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" @mouseenter="hoverArtwork = true" @mouseleave="hoverArtwork = false" class="button is-small" v-if="imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
+            <b-icon
+                icon="filter"
+                size="is-small">
+            </b-icon>
+            <span>
+              {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }}
+            </span>
+          </a>
         </h2>
-        <p v-if="currentDetail.collection"><a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a></p>
+        <p v-if="currentDetail.collection" :class="{'hover': hoverCollection}">
+          <!-- <a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a> -->
+          <!-- <a @click="$emit('infoSelected', {'collection': currentDetail.collection})">{{currentDetail.collection}}</a> -->
+          {{currentDetail.collection}}
+          <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" @mouseenter="hoverCollection = true" @mouseleave="hoverCollection = false" class="button is-small" v-if="imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
+            <b-icon
+                icon="filter"
+                size="is-small">
+            </b-icon>
+            <span>
+              {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }}
+            </span>
+          </a>
+        </p>
       </div>
     </div>
     <footer class="card-footer">
@@ -102,7 +137,10 @@ export default {
       imagesByArtwork: {},
       imagesByArtist: {},
       imagesByCollection: {},
-      currentDetail: undefined
+      currentDetail: undefined,
+      hoverArtwork: false,
+      hoverArtist: false,
+      hoverCollection: false
     }
   },
   created () {
@@ -308,6 +346,27 @@ export default {
   max-height: calc(100vh - 300px);
   display: block;
   margin: 0 auto;
+}
+
+.detail_card .card-content {
+  position: relative;
+}
+
+.detail_card .card-content .content .button {
+  vertical-align: middle;
+  position: absolute;
+  right: 1.5rem;
+  font-style: normal !important;
+}
+
+.detail_card .card-content .content h1.hover,
+.detail_card .card-content .content h2.hover,
+.detail_card .card-content .content p.hover {
+  text-decoration: underline;
+}
+
+.detail_card .card-content .content .subtitle {
+  font-style: italic;
 }
 
 /*.image_info {

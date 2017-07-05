@@ -11,32 +11,51 @@
           <b-dropdown-option v-for="artwork in artworks" key="option_${artwork.uri}">{{artwork.name}}</b-dropdown-option>
         </b-dropdown> -->
 
-        <b-dropdown position="is-bottom-left" v-model="artworkFilter">
-          <button class="button" slot="trigger">
+        <b-dropdown position="is-bottom-left" v-model="artworkFilter" v-show="!artworkFilter">
+          <button class="button" slot="trigger" @click="artworkFilter = undefined;">
               <span>Artworks</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
           <b-dropdown-option v-for="artwork in artworks" :key="artwork.uri" :value="artwork.name" :selected="artworkFilter === artwork.name">{{artwork.name}}</b-dropdown-option>
         </b-dropdown>
+        <span class="dropdown" v-if="artworkFilter">
+          <button class="button" slot="trigger" @click="artworkFilter = undefined;">
+              <span>{{artworkFilter}}</span>
+              <b-icon icon="close" class="is-small"></b-icon>
+          </button>
+        </span>
 
-        <b-dropdown position="is-bottom-left" v-model="artistFilter">
-          <button class="button" slot="trigger">
-              <span>Artists</span>
+        <b-dropdown position="is-bottom-left" v-model="artistFilter" v-show="!artistFilter">
+          <button class="button" slot="trigger" @click="artistFilter = undefined;">
+              <span>Artist</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
           <b-dropdown-option v-for="artist in artists" :key="artist.uri" :value="artist.name" :selected="artistFilter === artist.name">{{artist.name}}</b-dropdown-option>
         </b-dropdown>
+        <span class="dropdown" v-if="artistFilter">
+          <button class="button" slot="trigger" @click="artistFilter = undefined;">
+              <span>{{artistFilter}}</span>
+              <b-icon icon="close" class="is-small"></b-icon>
+          </button>
+        </span>
 
-        <b-dropdown position="is-bottom-left" v-model="collectionFilter">
-          <button class="button" slot="trigger">
+        <b-dropdown position="is-bottom-left" v-model="collectionFilter" v-show="!collectionFilter">
+          <button class="button" slot="trigger" @click="collectionFilter = undefined;">
               <span>Collection</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
           <b-dropdown-option v-for="collection in collections" :key="collection.uri" :value="collection.name" :selected="collectionFilter === collection.name">{{collection.name}}</b-dropdown-option>
         </b-dropdown>
+        <span class="dropdown" v-if="collectionFilter">
+          <button class="button" slot="trigger" @click="collectionFilter = undefined;">
+              <span>{{collectionFilter}}</span>
+              <b-icon icon="close" class="is-small"></b-icon>
+          </button>
+        </span>
+
         <div class="nav-item">
           <p class="control has-icons-right">
             <input class="input has-icons-right" name="query" v-model="filterKey">
@@ -71,21 +90,39 @@
             </b-table-column>
 
             <b-table-column field="artwork" label="Artwork" sortable>
-              <a :href="tb.row['artwork_uri']" target="_blank" >
+              <!-- <a :href="tb.row['artwork_uri']" target="_blank" >
+                {{ tb.row['artwork_title'] }}
+              </a> -->
+              <a @click="artworkFilter = tb.row.artwork_title" v-if="artworkFilter != tb.row.artwork_title">
                 {{ tb.row['artwork_title'] }}
               </a>
+              <span v-if="artworkFilter === tb.row.artwork_title">
+                {{ tb.row['artwork_title'] }}
+              </span>
             </b-table-column>
 
             <b-table-column field="artist" label="Artist" sortable>
-              <a :href="tb.row['artist_uri']" target="_blank" >
+              <!-- <a :href="tb.row['artist_uri']" target="_blank" >
+                {{ tb.row['artist_name'] }}
+              </a> -->
+              <a @click="artistFilter = tb.row.artist_name" v-if="artistFilter != tb.row.artist_name">
                 {{ tb.row['artist_name'] }}
               </a>
+              <span v-if="artistFilter === tb.row.artist_name">
+                {{ tb.row['artist_name'] }}
+              </span>
             </b-table-column>
 
             <b-table-column field="collection" label="Collection" sortable>
-              <a :href="tb.row['collection_uri']" target="_blank" >
+              <!-- <a :href="tb.row['collection_uri']" target="_blank" >
+                {{ tb.row['collection'] }}
+              </a> -->
+              <a @click="collectionFilter = tb.row.collection" v-if="collectionFilter != tb.row.collection">
                 {{ tb.row['collection'] }}
               </a>
+              <span v-if="collectionFilter === tb.row.collection">
+                {{ tb.row['collection'] }}
+              </span>
             </b-table-column>
         </template>
     </b-table>
@@ -114,6 +151,29 @@ export default {
   props: {
     'data': {
       type: Array
+    },
+    'filter': {
+      type: Object,
+      default: undefined
+    }
+  },
+  created () {
+    if (this.filter) {
+      Object.keys(this.filter).forEach((key) => {
+        let value = this.filter[key];
+
+        if (key === 'artwork_title') {
+          this.artworkFilter = value;
+        }
+
+        if (key === 'artist_name') {
+          this.artistFilter = value;
+        }
+
+        if (key === 'collection') {
+          this.collectionFilter = value;
+        }
+      });
     }
   },
   data () {
@@ -243,6 +303,25 @@ export default {
           this.imagesByCollection[collectionUri].push(image);
         }
       });
+    },
+    filter () {
+      if (this.filter) {
+        Object.keys(this.filter).forEach((key) => {
+          let value = this.filter[key];
+
+          if (key === 'artwork_title') {
+            this.artworkFilter = value;
+          }
+
+          if (key === 'artist_name') {
+            this.artistFilter = value;
+          }
+
+          if (key === 'collection') {
+            this.collectionFilter = value;
+          }
+        });
+      }
     }
   },
   methods: {
