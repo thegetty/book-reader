@@ -433,6 +433,8 @@ export default {
     displayedPages () {
       if (!this.spreads || this.displayedPage === 0) {
         return this.displayedPage + 1;
+      } else if (this.displayedPage === this.totalPages - 1) {
+        return this.displayedPage + 1;
       } else {
         return `${this.displayedPage}–${this.displayedPage + 1}`;
       }

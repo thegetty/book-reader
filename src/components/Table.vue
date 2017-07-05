@@ -93,6 +93,10 @@
               <span v-if="artworkFilter === tb.row.artwork_title">
                 {{ tb.row['artwork_title'] }}
               </span>
+              <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection">
+                <span>View in Collection</span>
+                <b-icon icon="open_in_new" class="is-small"></b-icon>
+              </a>
             </b-table-column>
 
             <b-table-column field="artist" label="Artist" sortable>
@@ -117,16 +121,16 @@
               <span v-if="collectionFilter === tb.row.collection">
                 {{ tb.row['collection'] }}
               </span>
-              <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection">
+              <!-- <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection">
                 <span>In Collection</span>
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a>
+              </a> -->
             </b-table-column>
 
             <b-table-column field="page" label="Page" sortable width="30">
-              <a href="#" @click="$emit('onPageClick', tb.row.page)" class="button is-small">
+              <a href="#" @click="$emit('onPageClick', tb.row.page)" class="button">
                 <span>{{ tb.row['page_label'] || tb.row['page'] }}</span>
-                <b-icon icon="call_made" class="is-small"></b-icon>
+                <b-icon icon="keyboard_arrow_right" class="is-small"></b-icon>
               </a>
             </b-table-column>
 

@@ -184,8 +184,12 @@ export default {
 
         if (this.displayedPage > 0) {
           this.loadPage(this.displayedPage) // left
-          this.loadPage(this.displayedPage + 1) // right
-          this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
+          if (this.displayedPage !== this.numPages - 1) {
+            this.loadPage(this.displayedPage + 1) // right
+            this.displayedPagesNumbers = [this.displayedPage, this.displayedPage + 1];
+          } else {
+            this.displayedPagesNumbers = [this.displayedPage];
+          }
         } else {
           this.loadPage(this.displayedPage) // cover
           this.displayedPagesNumbers = [this.displayedPage];
@@ -261,7 +265,7 @@ export default {
       console.error(page);
     },
     handleViewport (viewport) {
-      this.viewportWidth = (this.spreads && this.displayedPage > 0) ? viewport.width * 2 : viewport.width;
+      this.viewportWidth = (this.spreads && this.displayedPage > 0 && this.displayedPage < this.numPages - 1) ? viewport.width * 2 : viewport.width;
       this.viewportHeight = viewport.height;
 
       let left = (this.width - this.viewportWidth) / 2;
