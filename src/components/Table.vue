@@ -10,21 +10,32 @@
 
           <b-dropdown-option v-for="artwork in artworks" key="option_${artwork.uri}">{{artwork.name}}</b-dropdown-option>
         </b-dropdown> -->
-        <b-dropdown position="is-bottom-left">
+
+        <b-dropdown position="is-bottom-left" v-model="artworkFilter">
+          <button class="button" slot="trigger">
+              <span>Artworks</span>
+              <b-icon icon="arrow_drop_down"></b-icon>
+          </button>
+
+          <b-dropdown-option v-for="artwork in artworks" :key="artwork.uri" :value="artwork.name" :selected="artworkFilter === artwork.name">{{artwork.name}}</b-dropdown-option>
+        </b-dropdown>
+
+        <b-dropdown position="is-bottom-left" v-model="artistFilter">
           <button class="button" slot="trigger">
               <span>Artists</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="artist in artists" key="option_${artist.uri}">{{artist.name}}</b-dropdown-option>
+          <b-dropdown-option v-for="artist in artists" :key="artist.uri" :value="artist.name" :selected="artistFilter === artist.name">{{artist.name}}</b-dropdown-option>
         </b-dropdown>
-        <b-dropdown position="is-bottom-left">
+
+        <b-dropdown position="is-bottom-left" v-model="collectionFilter">
           <button class="button" slot="trigger">
               <span>Collection</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="collection in collections" key="option_${collection.uri}">{{collection.name}}</b-dropdown-option>
+          <b-dropdown-option v-for="collection in collections" :key="collection.uri" :value="collection.name" :selected="collectionFilter === collection.name">{{collection.name}}</b-dropdown-option>
         </b-dropdown>
         <div class="nav-item">
           <p class="control has-icons-right">
@@ -109,7 +120,7 @@ export default {
     var sortOrders = {}
     this.columns = ['thumbnail', 'page', 'artwork_title', 'artist', 'collection'];
     this.columns.forEach(function (key) {
-      sortOrders[key] = 1
+      sortOrders[key] = 1;
     })
     return {
       sortKey: '',
@@ -122,30 +133,61 @@ export default {
       imagesByCollection: {},
       artworks: [],
       artists: [],
-      collections: []
+      collections: [],
+      artistFilter: '',
+      artworkFilter: '',
+      collectionFilter: ''
     }
   },
   computed: {
     filteredData: function () {
-      var sortKey = this.sortKey
-      var filterKey = this.filterKey && this.filterKey.toLowerCase()
-      var order = this.sortOrders[sortKey] || 1
-      var data = this.data
+      var sortKey = this.sortKey;
+      var filterKey = this.filterKey && this.filterKey.toLowerCase();
+      var artworkFilter = this.artworkFilter && this.artworkFilter.toLowerCase();
+      var artistFilter = this.artistFilter && this.artistFilter.toLowerCase();
+      var collectionFilter = this.collectionFilter && this.collectionFilter.toLowerCase();
+      var order = this.sortOrders[sortKey] || 1;
+      var data = this.data;
+
+      if (artworkFilter && data) {
+        data = data.filter(function (row) {
+          if (row.artwork_title) {
+            return String(row.artwork_title).toLowerCase().indexOf(artworkFilter) > -1;
+          }
+        });
+      }
+
+      if (artistFilter && data) {
+        data = data.filter(function (row) {
+          if (row.artist_name) {
+            return String(row.artist_name).toLowerCase().indexOf(artistFilter) > -1;
+          }
+        });
+      }
+
+      if (collectionFilter && data) {
+        data = data.filter(function (row) {
+          if (row.collection) {
+            return String(row.collection).toLowerCase().indexOf(collectionFilter) > -1;
+          }
+        });
+      }
+
       if (filterKey && data) {
         data = data.filter(function (row) {
           return Object.keys(row).some(function (key) {
-            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+            return String(row[key]).toLowerCase().indexOf(filterKey) > -1;
           })
         })
       }
       if (sortKey) {
         data = data.slice().sort(function (a, b) {
-          a = a[sortKey]
-          b = b[sortKey]
-          return (a === b ? 0 : a > b ? 1 : -1) * order
+          a = a[sortKey];
+          b = b[sortKey];
+          return (a === b ? 0 : a > b ? 1 : -1) * order;
         })
       }
-      return data
+      return data;
     }
   },
   filters: {
@@ -313,4 +355,10 @@ th.active .arrow {
   text-align: center;
 }
 
+</style>
+
+<style>
+  .artwork .b-tabs .tab-content {
+    overflow: visible !important;
+  }
 </style>
