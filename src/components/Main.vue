@@ -1,5 +1,5 @@
 <template>
-  <Reader :manifest-url="url" :page-url="page" :image-url="image"/>
+  <Reader :manifest-url="url" :page-url="page" :image-url="image" :show-grid="tab === 'grid'" :show-table="tab === 'table'"/>
 </template>
 
 <script>
@@ -29,6 +29,9 @@ export default {
     'image': {
       default: undefined,
       type: String
+    },
+    'tab': {
+      default: undefined
     }
   },
   data () {

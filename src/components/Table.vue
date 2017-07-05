@@ -84,47 +84,41 @@
             </b-table-column>
 
             <b-table-column field="artwork" label="Artwork" sortable>
-              <!-- <a :href="tb.row['artwork_uri']" target="_blank" >
-                {{ tb.row['artwork_title'] }}
-              </a> -->
-              <a @click="artworkFilter = tb.row.artwork_title" v-if="artworkFilter != tb.row.artwork_title">
+              <a @click="artworkFilter = tb.row.artwork_title" v-show="artworkFilter != tb.row.artwork_title">
                 {{ tb.row['artwork_title'] }}
               </a>
-              <span v-if="artworkFilter === tb.row.artwork_title">
+              <span v-show="artworkFilter === tb.row.artwork_title">
                 {{ tb.row['artwork_title'] }}
               </span>
-              <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection">
+              <a class="button is-small is-pulled-right" :href="tb.row['artwork_uri']" target="_blank"  v-if="tb.row.artwork_uri">
                 <span>View in Collection</span>
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
               </a>
             </b-table-column>
 
             <b-table-column field="artist" label="Artist" sortable>
-              <!-- <a :href="tb.row['artist_uri']" target="_blank" >
-                {{ tb.row['artist_name'] }}
-              </a> -->
-              <a @click="artistFilter = tb.row.artist_name" v-if="artistFilter != tb.row.artist_name">
+              <a @click="artistFilter = tb.row.artist_name" v-show="artistFilter != tb.row.artist_name">
                 {{ tb.row['artist_name'] }}
               </a>
-              <span v-if="artistFilter === tb.row.artist_name">
+              <span v-show="artistFilter === tb.row.artist_name">
                 {{ tb.row['artist_name'] }}
               </span>
+              <a class="button is-small is-pulled-right" :href="tb.row['artist_uri']" target="_blank"  v-if="tb.row.artist_uri">
+                <span>ULAN</span>
+                <b-icon icon="open_in_new" class="is-small"></b-icon>
+              </a>
             </b-table-column>
 
             <b-table-column field="collection" label="Collection" sortable>
-              <!-- <a :href="tb.row['collection_uri']" target="_blank" >
-                {{ tb.row['collection'] }}
-              </a> -->
-              <a @click="collectionFilter = tb.row.collection" v-if="collectionFilter != tb.row.collection">
+              <a @click="collectionFilter = tb.row.collection" v-show="collectionFilter != tb.row.collection">
                 {{ tb.row['collection'] }}
               </a>
-              <span v-if="collectionFilter === tb.row.collection">
+              <span v-show="collectionFilter === tb.row.collection">
                 {{ tb.row['collection'] }}
               </span>
-              <!-- <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection">
-                <span>In Collection</span>
+              <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection_uri">
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a> -->
+              </a>
             </b-table-column>
 
             <b-table-column field="page" label="Page" sortable width="30">

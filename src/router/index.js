@@ -29,6 +29,12 @@ export default new Router({
       name: 'ImageLink',
       component: Main,
       props: true
+    },
+    {
+      path: '/books/:book/editions/:edition/artworks/:tab',
+      name: 'ArtworkLink',
+      component: Main,
+      props: true
     }
   ]
 })

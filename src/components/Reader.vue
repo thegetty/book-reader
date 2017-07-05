@@ -9,7 +9,7 @@
           <img src="../assets/getty_logo.png" alt="Getty Logo" class="logo">
         </a> -->
 
-        <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+        <a class="nav-item" @click="outlineOpen = !outlineOpen;">
           <span class="icon">
             <icon v-if="!outlineOpen" name="bars" title="Open Navigation"></icon>
             <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
@@ -91,7 +91,7 @@
       </div>
 
       <div class="nav-right">
-        <a class="nav-item" @click="artworkOpen = !artworkOpen; showGrid = false; showTable = false;">
+        <a class="nav-item" @click="artworkOpen = !artworkOpen;">
           <span class="icon">
             <icon v-if="!artworkOpen" name="picture-o" title="Artwork"></icon>
             <icon v-if="artworkOpen" name="book" title="Book"></icon>
@@ -150,14 +150,14 @@
         </div>
         <div class="field has-addons is-pulled-left">
           <p class="control">
-            <a class="button" :disabled="spreads ? null : 'disabled'" @click="setSpreads(false); showGrid = false; showTable = false;">
+            <a class="button" :disabled="spreads ? null : 'disabled'" @click="setSpreads(false)">
               <span class="icon is-small">
                 <icon name="file-o" title="Single"></icon>
               </span>
             </a>
           </p>
           <p class="control">
-            <a class="button" :disabled="spreads ? 'disabled' : null" @click="setSpreads(true); showGrid = false; showTable = false;">
+            <a class="button" :disabled="spreads ? 'disabled' : null" @click="setSpreads(true)">
               <span class="icon is-small">
                 <icon name="columns" title="Spread"></icon>
               </span>
@@ -219,7 +219,7 @@
     <section class="navigation" :class="{closed: !outlineOpen}">
       <nav class="nav">
         <div class="nav-left nav_closer">
-          <a class="nav-item" @click="outlineOpen = !outlineOpen; showGrid = false; showTable = false;">
+          <a class="nav-item" @click="outlineOpen = !outlineOpen">
             <span class="icon">
               <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
             </span>
@@ -365,6 +365,12 @@ export default {
     },
     'image-url': {
       type: String
+    },
+    'show-grid': {
+      default: undefined
+    },
+    'show-table': {
+      default: undefined
     }
   },
   data () {
@@ -377,8 +383,8 @@ export default {
       displayedPage: 0,
       spreads: true,
       manualSpreads: false,
-      showTable: false,
-      showGrid: false,
+      // showTable: false,
+      // showGrid: false,
       currentDetail: undefined,
       width: bounds.width,
       height: bounds.height,
@@ -419,6 +425,9 @@ export default {
 
     this.handleResize();
 
+    this._showTable();
+    this._showGrid();
+
     /*
     let spreads = localStorage.getItem('spreads');
     if (spreads != null) {
@@ -442,17 +451,32 @@ export default {
   },
   watch: {
     showTable () {
-      const { table } = this.$refs;
-      table.triggerLoad();
+      this._showTable();
     },
     showGrid () {
-      const { grid } = this.$refs;
-      grid.triggerLoad();
+      this._showGrid();
     },
-    artworkOpen () {
+    artworkOpen (active) {
       const { grid } = this.$refs;
       grid.handleResize();
       grid.triggerLoad();
+
+      if (!active) {
+        if (this.displayedPage) {
+          this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
+        } else {
+          this.$router.push({ name: 'Manifest' });
+        }
+      } else {
+        this.$router.push({ name: 'ArtworkLink', params: { tab: this.activeTab === 0 ? 'grid' : 'table' } });
+      }
+    },
+    activeTab () {
+      if (this.activeTab === 0) {
+        this.$router.push({ name: 'ArtworkLink', params: { tab: 'grid' } });
+      } else if (this.activeTab === 1) {
+        this.$router.push({ name: 'ArtworkLink', params: { tab: 'table' } });
+      }
     },
     pageUrl () {
       if (this.loaded) {
@@ -586,7 +610,7 @@ export default {
       this.currentDetail = undefined;
     },
     onInfoSelected (filter) {
-      this.activeTab = 1;
+      this.toggleTable();
       this.tableFilter = filter;
       this.isModalActive = false;
       this.artworkOpen = true;
@@ -658,12 +682,10 @@ export default {
       }
     },
     toggleTable () {
-      this.showTable = !this.showTable;
-      this.showGrid = false;
+      this.activeTab = 1;
     },
     toggleGrid () {
-      this.showGrid = !this.showGrid;
-      this.showTable = false;
+      this.activeTab = 0;
     },
     nextMatch () {
       const { pdf } = this.$refs;
@@ -775,7 +797,31 @@ export default {
         this.page = value - 1;
       }
       this.editingPage = false;
-    }
+    },
+    _showTable () {
+      const { table } = this.$refs;
+
+      if (this.showTable) {
+        this.artworkOpen = true;
+        this.toggleTable();
+      } else if (!this.showTable && !this.showGrid) {
+        this.artworkOpen = false;
+      }
+
+      table && table.triggerLoad();
+    },
+    _showGrid () {
+      const { grid } = this.$refs;
+
+      if (this.showGrid) {
+        this.artworkOpen = true;
+        this.toggleGrid();
+      } else if (!this.showGrid && !this.showTable) {
+        this.artworkOpen = false;
+      }
+
+      grid && grid.triggerLoad();
+    },
   }
 }
 </script>
