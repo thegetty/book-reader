@@ -12,11 +12,10 @@
       <div class="content">
         <h1 class="title" :class="{'hover': hoverArtist}">
           {{currentDetail.artwork_title}}
-          <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" @mouseenter="hoverArtist = true" @mouseleave="hoverArtist = false" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
-            <b-icon
-                icon="filter"
-                size="is-small">
-            </b-icon>
+          <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
+            <span class="icon is-small">
+              <icon name="picture-o" title="Filter by Artist"></icon>
+            </span>
             <span>
             {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }}
             </span>
@@ -26,11 +25,10 @@
           <!-- <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a> -->
           <!-- <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">{{currentDetail.artist_name}}</a> -->
           {{currentDetail.artist_name}}
-          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" @mouseenter="hoverArtwork = true" @mouseleave="hoverArtwork = false" class="button is-small" v-if="imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
-            <b-icon
-                icon="filter"
-                size="is-small">
-            </b-icon>
+          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" class="button is-small" v-if="imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
+            <span class="icon is-small">
+              <icon name="user" title="Filter by Artist"></icon>
+            </span>
             <span>
               {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }}
             </span>
@@ -40,11 +38,10 @@
           <!-- <a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a> -->
           <!-- <a @click="$emit('infoSelected', {'collection': currentDetail.collection})">{{currentDetail.collection}}</a> -->
           {{currentDetail.collection}}
-          <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" @mouseenter="hoverCollection = true" @mouseleave="hoverCollection = false" class="button is-small" v-if="imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
-            <b-icon
-                icon="filter"
-                size="is-small">
-            </b-icon>
+          <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" class="button is-small" v-if="imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
+            <span class="icon is-small">
+              <icon name="institution" title="Filter by Artist"></icon>
+            </span>
             <span>
               {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }}
             </span>
@@ -117,11 +114,16 @@
 
 <script>
 import 'whatwg-fetch'
+import 'vue-awesome/icons/institution'
+import 'vue-awesome/icons/user'
+import 'vue-awesome/icons/picture-o'
+
+import Icon from 'vue-awesome/components/Icon'
 
 export default {
   name: 'Detail',
   components: {
-
+    'icon': Icon
   },
   props: {
     'image': {

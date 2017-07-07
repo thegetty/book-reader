@@ -1,6 +1,17 @@
 <template>
   <div>
     <nav class="nav section_nav">
+      <div class="nav-left">
+        <div class="nav-item">
+          <p class="control has-icons-right">
+            <input class="input has-icons-right" name="query" v-model="filterKey">
+            <span class="icon is-small is-right">
+              <icon name="search" title="Search"></icon>
+            </span>
+          </p>
+        </div>
+      </div>
+
       <div class="nav-right" style="overflow: visible">
         <!-- <b-dropdown>
           <button class="button" slot="trigger">
@@ -56,14 +67,7 @@
           </button>
         </span>
 
-        <div class="nav-item">
-          <p class="control has-icons-right">
-            <input class="input has-icons-right" name="query" v-model="filterKey">
-            <span class="icon is-small is-right">
-              <icon name="search" title="Search"></icon>
-            </span>
-          </p>
-        </div>
+
       </div>
     </nav>
 
@@ -75,55 +79,111 @@
       :paginated="true"
       :per-page="8"
       :pagination-simple="true"
+      class="artwork_table"
       >
         <template scope="tb">
-            <b-table-column field="thumbnail" label="" width="40">
+            <b-table-column field="thumbnail" label="" width="40" height="130">
               <a class="img_link" @click="$emit('onImageClick', tb.row)">
                 <img v-lazy="tb.row['thumbnail']" />
               </a>
             </b-table-column>
 
             <b-table-column field="artwork" label="Artwork" sortable>
-              <a @click="artworkFilter = tb.row.artwork_title" v-show="artworkFilter != tb.row.artwork_title">
+              {{ tb.row['artwork_title'] }}
+              <!-- <a @click="artworkFilter = tb.row.artwork_title" v-show="artworkFilter != tb.row.artwork_title">
                 {{ tb.row['artwork_title'] }}
               </a>
               <span v-show="artworkFilter === tb.row.artwork_title">
                 {{ tb.row['artwork_title'] }}
-              </span>
-              <a class="button is-small is-pulled-right" :href="tb.row['artwork_uri']" target="_blank"  v-if="tb.row.artwork_uri">
-                <span>View in Collection</span>
+              </span> -->
+              <!-- <a :href="tb.row['artwork_uri']" target="_blank" class="external_link">
+                {{ tb.row['artwork_title'] }}
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
               </a>
+
+              <a @click="artworkFilter = tb.row.artwork_title" class="button is-small is-pulled-right filterer">
+                <b-icon
+                    icon="filter"
+                    size="is-small">
+                </b-icon>
+                <span>
+                {{ imagesByArtwork[encodeURI(tb.row.artwork_title)] && imagesByArtwork[encodeURI(tb.row.artwork_title)].length }}
+                </span>
+              </a> -->
             </b-table-column>
 
             <b-table-column field="artist" label="Artist" sortable>
-              <a @click="artistFilter = tb.row.artist_name" v-show="artistFilter != tb.row.artist_name">
+              {{ tb.row['artist_name'] }}
+              <!-- <a :href="tb.row['artist_uri']" target="_blank" class="external_link">
+                {{ tb.row['artist_name'] }}
+                <b-icon icon="open_in_new" class="is-small"></b-icon>
+              </a> -->
+              <!-- <a @click="artistFilter = tb.row.artist_name" v-show="artistFilter != tb.row.artist_name">
                 {{ tb.row['artist_name'] }}
               </a>
               <span v-show="artistFilter === tb.row.artist_name">
                 {{ tb.row['artist_name'] }}
-              </span>
-              <a class="button is-small is-pulled-right" :href="tb.row['artist_uri']" target="_blank"  v-if="tb.row.artist_uri">
+              </span> -->
+              <!-- <a class="button is-small is-pulled-right" :href="tb.row['artist_uri']" target="_blank"  v-if="tb.row.artist_uri">
                 <span>ULAN</span>
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a>
+              </a> -->
+
+              <!-- <a @click="artistFilter = tb.row.artist_name" class="button is-small is-pulled-right filterer">
+                <b-icon
+                    icon="filter"
+                    size="is-small">
+                </b-icon>
+                <span>
+                {{ imagesByArtist[encodeURI(tb.row.artist_name)] && imagesByArtist[encodeURI(tb.row.artist_name)].length }}
+                </span>
+              </a> -->
             </b-table-column>
 
-            <b-table-column field="collection" label="Collection" sortable>
-              <a @click="collectionFilter = tb.row.collection" v-show="collectionFilter != tb.row.collection">
+            <b-table-column field="collection" label="Collection" class="artwork_info" sortable>
+              {{ tb.row['collection'] }}
+              <!-- <a :href="tb.row['collection_uri']" target="_blank" class="external_link">
+                {{ tb.row['collection'] }}
+                <b-icon icon="open_in_new" class="is-small"></b-icon>
+              </a> -->
+              <!-- <a @click="collectionFilter = tb.row.collection" v-show="collectionFilter != tb.row.collection">
                 {{ tb.row['collection'] }}
               </a>
               <span v-show="collectionFilter === tb.row.collection">
                 {{ tb.row['collection'] }}
-              </span>
-              <a class="button is-small is-pulled-right" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection_uri">
+              </span> -->
+              <!-- <a class="button is-small" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection_uri">
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a>
+              </a> -->
+
+              <!-- <a @click="collectionFilter = tb.row.collection" class="button is-small is-pulled-right filterer">
+                <b-icon
+                    icon="filter"
+                    size="is-small">
+                </b-icon>
+                <span>
+                {{ imagesByCollection[encodeURI(tb.row.collection)] && imagesByCollection[encodeURI(tb.row.collection)].length }}
+                </span>
+              </a> -->
+
             </b-table-column>
 
-            <b-table-column field="page" label="Page" sortable width="30">
-              <a href="#" @click="$emit('onPageClick', tb.row.page)" class="button">
-                <span>{{ tb.row['page_label'] || tb.row['page'] }}</span>
+            <b-table-column field="page" label="Location" sortable width="10" class="location">
+              <!-- <a @click="$emit('onPageClick', tb.row.page)">
+                <span v-if="parseInt(tb.row.page)">pg. {{ tb.row.page }}</span>
+                <span v-if="!parseInt(tb.row.page)">{{ tb.row.page }}</span>
+              </a> -->
+              <span v-if="parseInt(tb.row.page)">pg. {{ tb.row.page }}</span>
+              <span v-if="!parseInt(tb.row.page)">{{ tb.row.page }}</span>
+            </b-table-column>
+
+            <b-table-column label="View" sortable width="30">
+              <a class="button is-small" :href="tb.row['artwork_uri']" target="_blank"  v-if="tb.row.artwork_uri">
+                <span>View in Collection</span>
+                <b-icon icon="open_in_new" class="is-small"></b-icon>
+              </a>
+              <a class="button is-small view_in_book" @click="$emit('onPageClick', tb.row.page)">
+                <span>View in Book</span>
                 <b-icon icon="keyboard_arrow_right" class="is-small"></b-icon>
               </a>
             </b-table-column>
@@ -384,8 +444,8 @@ td {
 
 th, td {
   /*min-width: 220px;*/
-  padding: 10px 40px;
-  border: 2px solid #cecece;
+  /*padding: 10px 40px;*/
+  /*border: 2px solid #cecece;*/
 }
 
 th.active {
@@ -420,10 +480,7 @@ th.active .arrow {
 .img_link {
   cursor: pointer;
   width: 100px;
-  height: 100px;
   text-align: center;
-  margin: 0 auto;
-  display: block;
 }
 
 .img_link:hover {
@@ -443,8 +500,25 @@ th.active .arrow {
   text-align: center;
 }
 
-.table td, .table th {
+.artwork_table .table td, .artwork_table .table th {
   vertical-align: middle;
+}
+
+.artwork_table .table td.location {
+  text-align: center;
+}
+
+.view_in_book {
+  width: 131px;
+  margin-top: 0.2rem;
+}
+
+.filterer {
+  visibility: hidden;
+}
+
+.table td:hover .filterer {
+  visibility: visible;
 }
 
 </style>
@@ -452,5 +526,13 @@ th.active .arrow {
 <style>
   .artwork .b-tabs .tab-content {
     overflow: visible !important;
+  }
+
+  .external_link .icon {
+    visibility: hidden;
+  }
+
+  .external_link:hover .icon {
+    visibility: visible;
   }
 </style>
