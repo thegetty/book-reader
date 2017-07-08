@@ -12,42 +12,72 @@
       <div class="content">
         <h1 class="title" :class="{'hover': hoverArtist}">
           {{currentDetail.artwork_title}}
-          <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
+          <!-- <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
             <span class="icon is-small">
               <icon name="picture-o" title="Filter by Artist"></icon>
             </span>
             <span>
             {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }}
             </span>
-          </a>
+          </a> -->
         </h1>
         <h2 class="subtitle" :class="{'hover': hoverArtwork}">
           <!-- <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a> -->
           <!-- <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">{{currentDetail.artist_name}}</a> -->
           {{currentDetail.artist_name}}
-          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" class="button is-small" v-if="imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
+          <!-- <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" class="button is-small" v-if="imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
             <span class="icon is-small">
               <icon name="user" title="Filter by Artist"></icon>
             </span>
             <span>
               {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }}
             </span>
-          </a>
+          </a> -->
         </h2>
         <p v-if="currentDetail.collection" :class="{'hover': hoverCollection}">
           <!-- <a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a> -->
           <!-- <a @click="$emit('infoSelected', {'collection': currentDetail.collection})">{{currentDetail.collection}}</a> -->
           {{currentDetail.collection}}
-          <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" class="button is-small" v-if="imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
+          <!-- <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" class="button is-small" v-if="imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
             <span class="icon is-small">
               <icon name="institution" title="Filter by Artist"></icon>
             </span>
             <span>
               {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }}
             </span>
+          </a> -->
+        </p>
+        <p class="moreby">
+          <span>Images in the book:&nbsp;</span>
+          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
+            <span>
+              {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }} of this artwork
+            </span>
+            <span class="icon is-small">
+              <icon name="picture-o" title="Filter by Artist"></icon>
+            </span>
+          </a>
+          <span class="spacer">/</span>
+          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
+            <span>
+              {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }} by this artist
+            </span>
+            <span class="icon is-small">
+              <icon name="user" title="Filter by Artist"></icon>
+            </span>
+          </a>
+          <span class="spacer">/</span>
+          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
+            <span>
+              {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }} from this collection
+            </span>
+            <span class="icon is-small">
+              <icon name="institution" title="Filter by Artist"></icon>
+            </span>
           </a>
         </p>
       </div>
+
     </div>
     <footer class="card-footer">
     <p class="card-footer-item" v-if="currentDetail.artwork_uri">
@@ -62,8 +92,8 @@
     </p>
   </footer>
 
-  <div id="prevDetail" class="detail_arrow" @click="this.prevDetail">‹</div>
-  <div id="nextDetail" class="detail_arrow" @click="this.nextDetail">›</div>
+  <div id="prevDetail" class="detail_arrow" @click="this.prevDetail" v-show="!atStart">‹</div>
+  <div id="nextDetail" class="detail_arrow" @click="this.nextDetail" v-show="!atEnd">›</div>
   </div>
 
   <!-- <section class="box" v-if="currentDetail">
@@ -142,7 +172,9 @@ export default {
       currentDetail: undefined,
       hoverArtwork: false,
       hoverArtist: false,
-      hoverCollection: false
+      hoverCollection: false,
+      atStart: true,
+      atEnd: true
     }
   },
   created () {
@@ -160,6 +192,11 @@ export default {
     } else {
       this.currentDetail = undefined;
     }
+
+    window.addEventListener('keyup', this.keyListener.bind(this), false);
+  },
+  beforeDestory () {
+    window.removeEventListener('keyup', this.keyListener);
   },
   watch: {
     manifest () {
@@ -189,6 +226,19 @@ export default {
         this.$emit('displayed', imageRef);
       } else {
         this.$emit('closed');
+      }
+
+      const index = this.images.indexOf(this.currentDetail);
+      if (index + 1 >= this.images.length) {
+        this.atEnd = true;
+      } else if (this.atEnd) {
+        this.atEnd = false;
+      }
+
+      if (index <= 0) {
+        this.atStart = true;
+      } else if (this.atStart) {
+        this.atStart = false;
       }
     }
   },
@@ -242,6 +292,19 @@ export default {
       this.$emit('pageSelected', page);
       // this.currentDetail = undefined;
     },
+    keyListener (e) {
+      const { keyCode } = e;
+
+      if (!this.currentDetail) {
+        return;
+      }
+
+      if (keyCode === 37) {
+        this.prevDetail();
+      } else if (keyCode === 39) {
+        this.nextDetail();
+      }
+    },
     nextDetail () {
       const index = this.images.indexOf(this.currentDetail);
       if (index + 1 < this.images.length) {
@@ -286,7 +349,7 @@ export default {
 }
 
 .detail_card .content {
-  max-width: 40vw;
+  /*max-width: 40vw;*/
 }
 
 /*.related_images {
@@ -335,7 +398,7 @@ export default {
 }
 
 .image_detail {
-  background-color: #444444;
+  background-color: #1d1d1d;
 }
 
 .image_detail a {
@@ -345,7 +408,7 @@ export default {
 
 .image_detail img {
   max-width: 100%;
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 360px);
   display: block;
   margin: 0 auto;
 }
@@ -371,6 +434,15 @@ export default {
   font-style: italic;
 }
 
+.spacer {
+  padding: 0 .25rem;
+}
+
+.moreby {
+  color: #777777;
+  text-align: center;
+  font-size: 0.75rem;
+}
 /*.image_info {
   color: #eee;
   margin-left: 40px;

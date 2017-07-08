@@ -118,12 +118,12 @@
           :zoom="zoomLevel"
         />
 
-      <div id="prev" class="arrow" @click="this.prev">
+      <div id="prev" class="arrow" @click="this.prev" v-show="!atStart">
         <span class="icon">
           <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
         </span>
       </div>
-      <div id="next" class="arrow" @click="this.next">
+      <div id="next" class="arrow" @click="this.next" v-show="!atEnd">
         <span class="icon">
           <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
         </span>
@@ -166,7 +166,7 @@
         </div>
         <div class="field has-addons is-pulled-left">
           <p class="control">
-            <a class="button" @click="this.prev">
+            <a class="button" @click="this.prev" :disabled="atStart ? 'disabled' : null">
               <span class="icon is-small">
                 <icon name="chevron-left" title="Prev"></icon>
               </span>
@@ -182,7 +182,7 @@
             <input class="input" type="text" @keyup.enter="(v) => onPageEdited(v)" @keyup.escape="editingPage = false" ref="pageEditor">
           </p>
           <p class="control">
-            <a class="button" @click="this.next">
+            <a class="button" @click="this.next" :disabled="atEnd ? 'disabled' : null">
               <span class="icon is-small">
                 <icon name="chevron-right" title="Next"></icon>
               </span>
@@ -407,7 +407,9 @@ export default {
       totalPages: 1,
       editingPage: false,
       navTimeout: undefined,
-      tableFilter: undefined
+      tableFilter: undefined,
+      atStart: true,
+      atEnd: true
     }
   },
   created () {
@@ -501,7 +503,19 @@ export default {
       if (this.displayedPage) {
         this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
       } else {
-        this.$router.push({ name: 'Manifest' });
+        // this.$router.push({ name: 'Manifest' });
+      }
+
+      if (this.displayedPage === 0) {
+        this.atStart = true;
+      } else if (this.atStart) {
+        this.atStart = false;
+      }
+
+      if (this.displayedPage === this.totalPages - (this.spreads ? 1 : 0)) {
+        this.atEnd = true;
+      } else if (this.atEnd) {
+        this.atEnd = false;
       }
     },
     spreads () {
@@ -568,10 +582,15 @@ export default {
     },
     keyListener (e) {
       const { keyCode } = e;
+
+      if (this.currentDetail || this.artworkOpen) {
+        return;
+      }
+
       if (keyCode === 37) {
-        this.prev();
+        this.prev(e);
       } else if (keyCode === 39) {
-        this.next();
+        this.next(e);
       }
     },
     handleResize () {
@@ -592,6 +611,7 @@ export default {
     goto (dest) {
       const { pdf } = this.$refs;
       this.outlineOpen = false;
+      this.artworkOpen = false;
       return pdf.getPageIndex(dest[0]).then((pg) => {
         this.page = pg;
       }).catch((err) => console.error(err));
@@ -805,8 +825,6 @@ export default {
       if (this.showTable) {
         this.artworkOpen = true;
         this.toggleTable();
-      } else if (!this.showTable && !this.showGrid) {
-        this.artworkOpen = false;
       }
 
       table && table.triggerLoad();
@@ -817,8 +835,6 @@ export default {
       if (this.showGrid) {
         this.artworkOpen = true;
         this.toggleGrid();
-      } else if (!this.showGrid && !this.showTable) {
-        this.artworkOpen = false;
       }
 
       grid && grid.triggerLoad();

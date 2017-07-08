@@ -2,7 +2,7 @@
   <div>
     <nav class="nav section_nav">
       <div class="nav-left">
-        <div class="nav-item">
+        <div class="nav-item first-nav-item">
           <p class="control has-icons-right">
             <input class="input has-icons-right" name="query" v-model="filterKey">
             <span class="icon is-small is-right">
@@ -24,11 +24,14 @@
 
         <b-dropdown position="is-bottom-left" v-model="artworkFilter" v-show="!artworkFilter">
           <button class="button" slot="trigger" @click="artworkFilter = undefined;">
+              <span class="icon is-small">
+                <icon name="picture-o" title="Filter by Artwork"></icon>
+              </span>
               <span>Artworks</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="artwork in artworks" :key="artwork.uri" :value="artwork.name" :selected="artworkFilter === artwork.name">{{artwork.name}}</b-dropdown-option>
+          <b-dropdown-option v-for="artwork in artworks" :key="artwork.uri" :value="artwork.name" :selected="artworkFilter === artwork.name">{{artwork.name | truncate }}</b-dropdown-option>
         </b-dropdown>
         <span class="dropdown" v-if="artworkFilter">
           <button class="button" slot="trigger" @click="artworkFilter = undefined;">
@@ -39,11 +42,14 @@
 
         <b-dropdown position="is-bottom-left" v-model="artistFilter" v-show="!artistFilter">
           <button class="button" slot="trigger" @click="artistFilter = undefined;">
+              <span class="icon is-small">
+                <icon name="user" title="Filter by Artist"></icon>
+              </span>
               <span>Artist</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="artist in artists" :key="artist.uri" :value="artist.name" :selected="artistFilter === artist.name">{{artist.name}}</b-dropdown-option>
+          <b-dropdown-option v-for="artist in artists" :key="artist.uri" :value="artist.name" :selected="artistFilter === artist.name">{{artist.name | truncate }}</b-dropdown-option>
         </b-dropdown>
         <span class="dropdown" v-if="artistFilter">
           <button class="button" slot="trigger" @click="artistFilter = undefined;">
@@ -54,11 +60,14 @@
 
         <b-dropdown position="is-bottom-left" v-model="collectionFilter" v-show="!collectionFilter">
           <button class="button" slot="trigger" @click="collectionFilter = undefined;">
+            <span class="icon is-small">
+              <icon name="institution" title="Filter by Collection"></icon>
+            </span>
               <span>Collection</span>
               <b-icon icon="arrow_drop_down"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="collection in collections" :key="collection.uri" :value="collection.name" :selected="collectionFilter === collection.name">{{collection.name}}</b-dropdown-option>
+          <b-dropdown-option v-for="collection in collections" :key="collection.uri" :value="collection.name" :selected="collectionFilter === collection.name">{{collection.name | truncate }}</b-dropdown-option>
         </b-dropdown>
         <span class="dropdown" v-if="collectionFilter">
           <button class="button" slot="trigger" @click="collectionFilter = undefined;">
@@ -202,6 +211,9 @@
 import VueLazyload from 'vue-lazyload'
 import Vue from 'vue'
 import 'vue-awesome/icons/search'
+import 'vue-awesome/icons/institution'
+import 'vue-awesome/icons/user'
+import 'vue-awesome/icons/picture-o'
 
 import Icon from 'vue-awesome/components/Icon'
 
@@ -331,6 +343,9 @@ export default {
       });
 
       return str;
+    },
+    truncate: function (text, stop = 60, clamp) {
+      return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '');
     }
   },
   watch: {
@@ -519,6 +534,10 @@ th.active .arrow {
 
 .table td:hover .filterer {
   visibility: visible;
+}
+
+.first-nav-item {
+  padding-left: 0;
 }
 
 </style>
