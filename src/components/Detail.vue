@@ -47,10 +47,10 @@
             </span>
           </a> -->
         </p>
-        <p class="filter_links">
+        <p class="filter_links" v-if="currentDetail.artwork_title">
           <span class="filter_header">Images in the book:&nbsp;</span>
 
-          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
+          <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="filter_item">
             <span>
               {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }} of this artwork
             </span>
@@ -58,8 +58,8 @@
               <icon name="picture-o" title="Filter by Artist"></icon>
             </span>
           </a>
-          <span class="spacer">/</span>
-          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
+          <span class="spacer" v-if="currentDetail.artist_name">/</span>
+          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" class="filter_item" v-if="currentDetail.artist_name">
             <span>
               {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }} by this artist
             </span>
@@ -67,8 +67,8 @@
               <icon name="user" title="Filter by Artist"></icon>
             </span>
           </a>
-          <span class="spacer">/</span>
-          <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
+          <span class="spacer" v-if="currentDetail.collection">/</span>
+          <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" class="filter_item" v-if="currentDetail.collection">
             <span>
               {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }} from this collection
             </span>
@@ -445,8 +445,8 @@ export default {
   font-size: 0.75rem;
 }
 
-.filter_header {
-  /*display: inline-block;*/
+.filter_item {
+  white-space: nowrap;
 }
 /*.image_info {
   color: #eee;

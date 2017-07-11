@@ -390,6 +390,9 @@ export default {
     },
     filter () {
       if (this.filter) {
+        this.artworkFilter = undefined;
+        this.artistFilter = undefined;
+        this.collectionFilter = undefined;
         Object.keys(this.filter).forEach((key) => {
           let value = this.filter[key];
 
