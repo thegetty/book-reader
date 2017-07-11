@@ -430,6 +430,11 @@ export default {
     this._showTable();
     this._showGrid();
 
+    if (this.page === 0) {
+      this.atStart = true;
+      this.atEnd = false;
+    }
+
     /*
     let spreads = localStorage.getItem('spreads');
     if (spreads != null) {
@@ -463,8 +468,8 @@ export default {
       grid.handleResize();
       grid.triggerLoad();
       if (!active) {
-        if (this.displayedPage) {
-          this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
+        if (typeof this.displayedPage !== 'undefined') {
+          this.$router.push({ name: 'PageLink', params: { page: this.displayedPage + 1 } });
         } else {
           this.$router.push({ name: 'Manifest' });
         }
@@ -481,7 +486,7 @@ export default {
     },
     pageUrl () {
       if (this.loaded) {
-        let pg = parseInt(this.pageUrl);
+        let pg = parseInt(this.pageUrl) - 1;
         if (this.page !== pg && this.displayedPage !== pg) {
           this.page = pg;
         }
@@ -500,8 +505,8 @@ export default {
       }
     },
     displayedPage () {
-      if (this.displayedPage) {
-        this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
+      if (typeof this.displayedPage !== 'undefined') {
+        this.$router.push({ name: 'PageLink', params: { page: this.displayedPage + 1 } });
       } else {
         // this.$router.push({ name: 'Manifest' });
       }
@@ -525,8 +530,8 @@ export default {
       if (!active) {
         if (this.artworkOpen) {
           this.$router.push({ name: 'ArtworkLink', params: { tab: this.activeTab === 0 ? 'grid' : 'table' } });
-        } else if (this.displayedPage) {
-          this.$router.push({ name: 'PageLink', params: { page: this.displayedPage } });
+        } else if (typeof this.displayedPage !== 'undefined') {
+          this.$router.push({ name: 'PageLink', params: { page: this.displayedPage + 1 } });
         } else {
           this.$router.push({ name: 'Manifest' });
         }
