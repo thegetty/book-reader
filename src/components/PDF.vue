@@ -30,9 +30,8 @@ import Page from '@/components/Page'
 import Search from '@/components/Search'
 
 const pdfjsLib = require('pdfjs-dist');
-// require('pdfjs-dist/lib/shared/compatibility.js');
 
-pdfjsLib.PDFJS.workerSrc = 'static/libs/pdfjs-dist/build/pdf.worker.js';
+pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.min.js';
 
 export default {
   name: 'pdf',

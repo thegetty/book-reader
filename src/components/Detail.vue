@@ -47,8 +47,9 @@
             </span>
           </a> -->
         </p>
-        <p class="moreby">
-          <span>Images in the book:&nbsp;</span>
+        <p class="filter_links">
+          <span class="filter_header">Images in the book:&nbsp;</span>
+
           <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">
             <span>
               {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }} of this artwork
@@ -438,10 +439,14 @@ export default {
   padding: 0 .25rem;
 }
 
-.moreby {
+.filter_links {
   color: #777777;
   text-align: center;
   font-size: 0.75rem;
+}
+
+.filter_header {
+  /*display: inline-block;*/
 }
 /*.image_info {
   color: #eee;

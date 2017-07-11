@@ -11,9 +11,6 @@
 import TextLayer from '@/components/TextLayer'
 import ImageLayer from '@/components/ImageLayer'
 
-const pdfjsLib = require('pdfjs-dist');
-pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.js';
-
 export default {
   name: 'page',
   components: {
