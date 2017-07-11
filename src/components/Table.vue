@@ -406,6 +406,27 @@ export default {
           }
         });
       }
+    },
+    artworkFilter () {
+      this.$emit('update:filter', {
+        'artwork_title': this.artworkFilter,
+        'artist_name': this.artistFilter,
+        'collection': this.collectionFilter
+      });
+    },
+    artistFilter () {
+      this.$emit('update:filter', {
+        'artwork_title': this.artworkFilter,
+        'artist_name': this.artistFilter,
+        'collection': this.collectionFilter
+      });
+    },
+    collectionFilter () {
+      this.$emit('update:filter', {
+        'artwork_title': this.artworkFilter,
+        'artist_name': this.artistFilter,
+        'collection': this.collectionFilter
+      });
     }
   },
   methods: {

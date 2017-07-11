@@ -280,10 +280,10 @@
       <div class="container">
         <b-tabs position="is-centered" v-model="activeTab" @change="onTabChanged">
           <b-tab-item label="Grid">
-            <grid id="grid" ref="grid" :data="images" :filter="tableFilter" @onClick="this.onImageSelected" />
+            <grid id="grid" ref="grid" :data="images" :filter="tableFilter" @update:filter="(val) => tableFilter = val" @onClick="this.onImageSelected" />
           </b-tab-item>
           <b-tab-item label="Table">
-            <tablegrid id="table" ref="table" :data="images" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+            <tablegrid id="table" ref="table" :data="images" :filter="tableFilter" @update:filter="(val) => tableFilter = val" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
           </b-tab-item>
         </b-tabs>
       </div>
