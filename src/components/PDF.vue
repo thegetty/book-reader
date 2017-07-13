@@ -31,7 +31,7 @@ import Search from '@/components/Search'
 
 const pdfjsLib = require('pdfjs-dist');
 
-pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.min.js';
+pdfjsLib.PDFJS.workerSrc = 'static/libs/pdfjs-dist/build/pdf.worker.min.js';
 
 export default {
   name: 'pdf',

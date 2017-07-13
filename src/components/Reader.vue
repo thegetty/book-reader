@@ -67,15 +67,18 @@
 
       <div class="nav-center">
 
-        <div class="nav-item" v-if="!artworkOpen">
+        <div class="nav-item" v-if="!artworkOpen" v-show="!showSearch">
           <!-- <div id="prev" class="nav-item arrow" @click="this.prev">
             <span class="icon is-small">
               <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
             </span>
           </div> -->
-          <span v-if="!current">{{ title }}</span>
+          <span v-if="!current" class="nav_title is-hidden-mobile">{{ title }}</span>
+          <span v-if="!current" class="nav_title is-hidden-tablet">{{ shortTitle }}</span>
           <span v-if="current">
-             {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>{{ current }}
+            <span class="nav_title is-hidden-mobile">{{ shortTitle }}</span>
+            <icon class="navbar-breadcrumb is-hidden-mobile" name="caret-right"></icon>
+            <span class="nav_title">{{ current }}</span>
           </span>
           <!-- <div id="next" class="nav-item arrow" @click="this.next">
             <span class="icon is-small">
@@ -85,7 +88,9 @@
         </div>
 
         <div class="nav-item" v-if="artworkOpen">
-          {{ shortTitle }}<icon class="navbar-breadcrumb" name="caret-right"></icon>Artworks
+          <span class="nav_title is-hidden-mobile">{{ shortTitle }}</span>
+          <icon class="navbar-breadcrumb is-hidden-mobile" name="caret-right"></icon>
+          <span>Artworks</span>
         </div>
 
       </div>
@@ -101,7 +106,7 @@
 
     </nav>
 
-    <section class="main" ref="main">
+    <section class="main" ref="main" :class="{'chrome_open': navOpen }">
       <PDF id="pdf" ref="pdf"
           :src="this.manifest.pdf"
           :page="page"
@@ -970,6 +975,9 @@ export default {
 
 .main {
   background-color: whitesmoke;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .icon.is-small svg {
@@ -1114,5 +1122,39 @@ export default {
 
 #matchCount span {
   width: 5.25em;
+}
+
+@media screen and (max-width: 400px) {
+  .nav-item {
+    padding: 0.5rem 0.5rem;
+  }
+
+  .arrow {
+    transition: right .25s ease-in, left .25s ease-in;
+  }
+
+  #next {
+    right: -38px;
+  }
+
+  #prev {
+    left: -38px;
+  }
+
+  .chrome_open #next {
+    right: 0;
+  }
+
+  .chrome_open #prev {
+    left: 0;
+  }
+
+  .nav-center {
+    flex: 100;
+  }
+
+  .nav_title {
+    margin-left: -34px;
+  }
 }
 </style>
