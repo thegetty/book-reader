@@ -661,8 +661,10 @@ export default {
       this.isModalActive = false;
     },
     onDetailDisplayed (detail) {
-      this.displayedDetail = detail;
-      this.isModalActive = true;
+      if (detail) {
+        this.displayedDetail = detail;
+        this.isModalActive = true;
+      }
     },
     onFound (count) {
       this.matchCount = count;
@@ -988,6 +990,11 @@ export default {
   width: 60px;
 }
 
+.zoom_input .input {
+  text-align: center;
+}
+
+
 .page_input {
   width: auto;
 }
@@ -1125,8 +1132,10 @@ export default {
 }
 
 @media screen and (max-width: 400px) {
+
   .nav-item {
     padding: 0.5rem 0.5rem;
+    font-size: 0.9rem;
   }
 
   .arrow {
@@ -1155,6 +1164,31 @@ export default {
 
   .nav_title {
     margin-left: -34px;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    max-height: calc(100vh - 80px);
+    margin-bottom: 40px;
+  }
+
+  .modal-close {
+    top: auto;
+    bottom: 12px;
+    left: 50%;
+    margin-left: -24px;
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  .floater .page_input .button,
+  .floater .zoom_input .input {
+    font-size: 0.8rem;
+    min-height: 100%;
+  }
+
+  .zoom_input {
+    width: 50px;
   }
 }
 </style>

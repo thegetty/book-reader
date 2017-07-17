@@ -11,7 +11,8 @@
     <div class="card-content">
       <div class="content">
         <h1 class="title" :class="{'hover': hoverArtist}">
-          {{currentDetail.artwork_title}}
+          <span class="is-hidden-mobile">{{currentDetail.artwork_title }}</span>
+          <span class="is-hidden-tablet">{{currentDetail.artwork_title | truncate}}</span>
           <!-- <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
             <span class="icon is-small">
               <icon name="picture-o" title="Filter by Artist"></icon>
@@ -198,6 +199,11 @@ export default {
   },
   beforeDestory () {
     window.removeEventListener('keyup', this.keyListener);
+  },
+  filters: {
+    truncate: function (text, stop = 48, clamp) {
+      return text.slice(0, stop) + (stop < text.length ? clamp || '…' : '');
+    }
   },
   watch: {
     manifest () {
@@ -448,6 +454,38 @@ export default {
 .filter_item {
   white-space: nowrap;
 }
+
+@media screen and (max-width: 400px) {
+
+  .detail_arrow {
+    top: auto;
+    bottom: 5px;
+    font-size: 40px;
+    margin-top: 0;
+  }
+
+  #prevDetail {
+    left: 5%;
+  }
+
+  #nextDetail {
+    right: 5%;
+  }
+
+  .detail_card.card {
+    max-width: 90vw;
+  }
+
+  .detail_card .content {
+    max-width: 80vw;
+  }
+
+  .modal-content {
+    font-size: 0.7rem;
+  }
+
+}
+
 /*.image_info {
   color: #eee;
   margin-left: 40px;

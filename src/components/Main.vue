@@ -12,7 +12,7 @@ export default {
   },
   props: {
     'origin': {
-      default: 'https://s3.amazonaws.com/pubs-fchasen/books',
+      default: 'https://gettypubs-viewing-pdfs.s3.amazonaws.com',
       type: String
     },
     'book': {
@@ -36,7 +36,7 @@ export default {
   },
   data () {
     return {
-      url: `${this.origin}/${this.book}/editions/${this.edition}/manifest.json`
+      url: `${this.origin}/books/${this.book}/editions/${this.edition}/manifest.json`
     }
   }
 }
