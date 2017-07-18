@@ -50,12 +50,7 @@
               </a>
             </p>
           </div>
-
-
         </div>
-
-
-
       </div>
 
       <div class="nav-center">
@@ -94,18 +89,18 @@
       <PDF id="pdf" ref="pdf"
           :src="this.manifest.pdf"
           :page="page"
-          @loaded="loaded"
           :width="this.width"
           :height="this.height"
           :spreads="spreads"
+          :query="query"
+          :zoom="zoomLevel"
           :onImageClicked="this.onImageClicked"
           :onOutlineReady="this.onOutlineReady"
           :onProgress="this.onProgress"
           @pageChanged="this.onPageChanged"
           @found="this.onFound"
           @match="this.onMatch"
-          :query="query"
-          :zoom="zoomLevel"
+          @loaded="loaded"
           v-touch:swipe="onSwipe"
         />
 
@@ -181,27 +176,6 @@
           </p>
 
         </div>
-        <!-- <div class="field has-addons is-pulled-left" v-show="matchCount">
-          <p class="control">
-            <a class="button" @click="prevMatch" v-if="matchCount">
-              <span class="icon is-small">
-                <icon name="chevron-left" title="Prev Match"></icon>
-              </span>
-            </a>
-          </p>
-          <p class="control" v-if="matchCount">
-            <a class="button" v-if="matchCount">
-              {{currentMatchIndex}} of {{matchCount}}
-            </a>
-          </p>
-          <p class="control" v-if="matchCount">
-            <a class="button" @click="nextMatch" v-if="matchCount">
-              <span class="icon is-small">
-                <icon name="chevron-right" title="Next Match"></icon>
-              </span>
-            </a>
-          </p>
-        </div>  -->
       </div>
     </section>
 
@@ -246,25 +220,50 @@
       <div class="container">
         <b-tabs position="is-centered" v-model="activeTab" @change="onTabChanged">
           <b-tab-item label="Grid">
-            <grid id="grid" ref="grid" :data="images" :filter="tableFilter" @update:filter="(val) => tableFilter = val" @onClick="this.onImageSelected" />
+            <grid
+              id="grid"
+              ref="grid"
+              :images="images"
+              :imagesByArtwork="imagesByArtwork"
+              :imagesByArtist="imagesByArtist"
+              :imagesByCollection="imagesByCollection"
+              :artworks="artworks"
+              :artists="artists"
+              :collections="collections"
+              :filter="tableFilter"
+              @update:filter="(val) => tableFilter = val"
+              @onClick="this.onImageSelected" />
           </b-tab-item>
           <b-tab-item label="Table">
-            <tablegrid id="table" ref="table" :data="images" :filter="tableFilter" @update:filter="(val) => tableFilter = val" @onImageClick="this.onImageSelected" @onPageClick="this.onPageSelected" />
+            <tablegrid
+              id="table"
+              ref="table"
+              :images="images"
+              :imagesByArtwork="imagesByArtwork"
+              :imagesByArtist="imagesByArtist"
+              :imagesByCollection="imagesByCollection"
+              :artworks="artworks"
+              :artists="artists"
+              :collections="collections"
+              :filter="tableFilter"
+              @update:filter="(val) => tableFilter = val"
+              @onImageClick="this.onImageSelected"
+              @onPageClick="this.onPageSelected" />
           </b-tab-item>
         </b-tabs>
       </div>
     </section>
 
-    <!-- <section id="outline" v-show="outlineOpen">
-      <h2>Outline</h2>
-      <outline :data="outline" :pdf="$refs.pdf" :page="displayedPage" @onClick="this.goto" @current="this.onCurrentTitle"/>
-      <a class="detail_close" @click="outlineOpen = false">Close</a>
-    </section> -->
-
     <div class="modal" :class="{'is-active': isModalActive}">
       <div class="modal-background" @click="isModalActive = false"></div>
       <div class="modal-content">
-        <detail :image="currentDetail" :manifest="manifest" @infoSelected="this.onInfoSelected" @pageSelected="this.onPageSelected" @closed="this.onDetailClosed" @displayed="this.onDetailDisplayed"/>
+        <detail
+          :image="currentDetail"
+          :manifest="manifest"
+          @infoSelected="this.onInfoSelected"
+          @pageSelected="this.onPageSelected"
+          @closed="this.onDetailClosed"
+          @displayed="this.onDetailDisplayed"/>
       </div>
       <button class="modal-close" @click="isModalActive = false"></button>
     </div>
@@ -360,8 +359,6 @@ export default {
       displayedPage: 0,
       spreads: true,
       manualSpreads: false,
-      // showTable: false,
-      // showGrid: false,
       currentDetail: undefined,
       width: bounds.width,
       height: bounds.height,
@@ -387,7 +384,13 @@ export default {
       tableFilter: undefined,
       atStart: true,
       atEnd: true,
-      loadingValue: 0
+      loadingValue: 0,
+      imagesByArtwork: {},
+      imagesByArtist: {},
+      imagesByCollection: {},
+      artworks: [],
+      artists: [],
+      collections: []
     }
   },
   created () {
@@ -548,6 +551,44 @@ export default {
       this.pdfDocument = pdfDocument;
       // Wait for PDF to load
       this.images = this.manifest.images;
+
+      this.images.forEach((image) => {
+        if (image.artist_name) {
+          let artistUri = encodeURI(image.artist_name);
+          if (!this.imagesByArtist[artistUri]) {
+            this.imagesByArtist[artistUri] = [];
+            this.artists.push({
+              uri: artistUri,
+              name: image.artist_name
+            });
+          }
+          this.imagesByArtist[artistUri].push(image);
+        }
+
+        if (image.artwork_title) {
+          let artworkUri = encodeURI(image.artwork_title);
+          if (!this.imagesByArtwork[artworkUri]) {
+            this.imagesByArtwork[artworkUri] = [];
+            this.artworks.push({
+              uri: artworkUri,
+              name: image.artwork_title
+            });
+          }
+          this.imagesByArtwork[artworkUri].push(image);
+        }
+
+        if (image.collection) {
+          let collectionUri = encodeURI(image.collection);
+          if (!this.imagesByCollection[collectionUri]) {
+            this.imagesByCollection[collectionUri] = [];
+            this.collections.push({
+              uri: collectionUri,
+              name: image.collection
+            });
+          }
+          this.imagesByCollection[collectionUri].push(image);
+        }
+      });
 
       this.totalPages = pdfDocument.numPages;
     },
@@ -786,9 +827,6 @@ export default {
       window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
       window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
       window.addEventListener('click', this.onClick.bind(this), false);
-      // window.addEventListener('touchend', this.onClick.bind(this), false);
-      // window.addEventListener('touchstart', this.onMouseDown.bind(this), false);
-      // window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
     },
     removeListeners () {
       window.removeEventListener('resize', this.handleResize);
@@ -797,9 +835,6 @@ export default {
       window.removeEventListener('mousemove', this.onMouseMove);
       window.removeEventListener('mousedown', this.onMouseDown);
       window.removeEventListener('click', this.onClick);
-      // window.removeEventListener('touchend', this.onClick);
-      // window.removeEventListener('touchstart', this.onMouseDown);
-      // window.removeEventListener('touchmove', this.onTouchStart);
     },
     startPageEditing () {
       this.editingPage = true;

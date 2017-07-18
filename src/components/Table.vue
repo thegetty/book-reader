@@ -144,12 +144,30 @@ export default {
     'icon': Icon
   },
   props: {
-    'data': {
+    'images': {
       type: Array
     },
     'filter': {
       type: Object,
       default: undefined
+    },
+    'imagesByArtwork': {
+      type: Object
+    },
+    'imagesByArtist': {
+      type: Object
+    },
+    'imagesByCollection': {
+      type: Object
+    },
+    'artworks': {
+      type: Array
+    },
+    'artists': {
+      type: Array
+    },
+    'collections': {
+      type: Array
     }
   },
   created () {
@@ -182,12 +200,6 @@ export default {
       sortOrders: sortOrders,
       filterKey: '',
       gridColumns: [],
-      imagesByArtwork: {},
-      imagesByArtist: {},
-      imagesByCollection: {},
-      artworks: [],
-      artists: [],
-      collections: [],
       artistFilter: '',
       artworkFilter: '',
       collectionFilter: ''
@@ -201,7 +213,7 @@ export default {
       var artistFilter = this.artistFilter && this.artistFilter.toLowerCase();
       var collectionFilter = this.collectionFilter && this.collectionFilter.toLowerCase();
       var order = this.sortOrders[sortKey] || 1;
-      var data = this.data;
+      var data = this.images;
 
       if (artworkFilter && data) {
         data = data.filter(function (row) {
@@ -262,45 +274,6 @@ export default {
     }
   },
   watch: {
-    data () {
-      this.data.forEach((image) => {
-        if (image.artist_name) {
-          let artistUri = encodeURI(image.artist_name);
-          if (!this.imagesByArtist[artistUri]) {
-            this.imagesByArtist[artistUri] = [];
-            this.artists.push({
-              uri: artistUri,
-              name: image.artist_name
-            });
-          }
-          this.imagesByArtist[artistUri].push(image);
-        }
-
-        if (image.artwork_title) {
-          let artworkUri = encodeURI(image.artwork_title);
-          if (!this.imagesByArtwork[artworkUri]) {
-            this.imagesByArtwork[artworkUri] = [];
-            this.artworks.push({
-              uri: artworkUri,
-              name: image.artwork_title
-            });
-          }
-          this.imagesByArtwork[artworkUri].push(image);
-        }
-
-        if (image.collection) {
-          let collectionUri = encodeURI(image.collection);
-          if (!this.imagesByCollection[collectionUri]) {
-            this.imagesByCollection[collectionUri] = [];
-            this.collections.push({
-              uri: collectionUri,
-              name: image.collection
-            });
-          }
-          this.imagesByCollection[collectionUri].push(image);
-        }
-      });
-    },
     filter () {
       if (this.filter) {
         this.artworkFilter = undefined;
@@ -347,7 +320,7 @@ export default {
   },
   methods: {
     reset () {
-      this.data = [];
+      this.images = [];
       this.imagesByArtwork = {};
       this.imagesByArtist = {};
       this.imagesByCollection = {};
