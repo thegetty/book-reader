@@ -354,7 +354,7 @@ import Vue2TouchEvents from 'vue2-touch-events';
 import ProgressBar from 'vue-bulma-progress-bar'
 
 Vue.use(Vue2TouchEvents, {
-  disableClick: false,
+  disableClick: true,
   touchClass: 'touched',
   tapTolerance: 10,
   swipeTolerance: 30

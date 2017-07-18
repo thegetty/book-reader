@@ -159,21 +159,19 @@ export default {
 
       // If width is defined, calculate the scale of the page so it could be of desired width.
       if (width < height) {
-        pageScale = width / page.getViewport(scale).width;
+        pageScale = width / page.getViewport(1 / scale).width;
       } else {
-        pageScale = height / page.getViewport(scale).height;
+        pageScale = height / page.getViewport(1 / scale).height;
       }
 
-      // console.log('pageScale', pageScale, width, height);
-
-      return scale * pageScale;
+      return pageScale;
     },
     displayPage (page) {
       // const scale = this.getPageScale(page);
       const { canvas } = this.$refs;
       const canvasContext = canvas.getContext('2d');
       const { scale } = this;
-      const scaled = scale !== 1 ? scale : this.getPageScale(page);
+      const scaled = this.getPageScale(page);
       const viewport = page.getViewport(scaled);
       let images = this.images;
       let imageCount = 0;
