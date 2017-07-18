@@ -254,8 +254,8 @@
       </div>
     </section>
 
-    <div class="modal" :class="{'is-active': isModalActive}">
-      <div class="modal-background" @click="isModalActive = false"></div>
+    <div class="modal" :class="{'is-active': modalActive}">
+      <div class="modal-background" @click="modalActive = false"></div>
       <div class="modal-content">
         <detail
           :image="currentDetail"
@@ -265,7 +265,7 @@
           @closed="this.onDetailClosed"
           @displayed="this.onDetailDisplayed"/>
       </div>
-      <button class="modal-close" @click="isModalActive = false"></button>
+      <button class="modal-close" @click="modalActive = false"></button>
     </div>
 
   </div>
@@ -374,7 +374,7 @@ export default {
       title: '',
       shortTitle: '',
       current: '',
-      isModalActive: false,
+      modalActive: false,
       showSearch: false,
       artworkOpen: false,
       navOpen: false,
@@ -507,7 +507,7 @@ export default {
     spreads () {
       // localStorage.setItem('spreads', this.spreads);
     },
-    isModalActive (active) {
+    modalActive (active) {
       if (!active) {
         if (this.artworkOpen) {
           this.$router.push({ name: 'ArtworkLink', params: { tab: this.activeTab === 0 ? 'grid' : 'table' } });
@@ -653,13 +653,13 @@ export default {
       // this.page = (image.page - 1);
       this.currentDetail = image;
 
-      if (this.displayedDetail && !this.isModalActive) {
-        this.isModalActive = true;
+      if (this.displayedDetail && !this.modalActive) {
+        this.modalActive = true;
       }
     },
     onPageSelected (page) {
       this.page = (page - 1);
-      this.isModalActive = false;
+      this.modalActive = false;
       this.artworkOpen = false;
       this.currentDetail = undefined;
     },
@@ -667,26 +667,26 @@ export default {
       this.toggleGrid();
       this.tableFilter = filter;
       this.artworkOpen = true;
-      this.isModalActive = false;
+      this.modalActive = false;
       this.currentDetail = undefined;
     },
     onImageClicked (image) {
-      // this.isModalActive = true;
+      // this.modalActive = true;
       this.currentDetail = image.objId;
 
-      if (this.displayedDetail && !this.isModalActive) {
-        this.isModalActive = true;
+      if (this.displayedDetail && !this.modalActive) {
+        this.modalActive = true;
       }
     },
     onDetailClosed () {
       this.currentDetail = undefined;
       this.displayedDetail = undefined;
-      this.isModalActive = false;
+      this.modalActive = false;
     },
     onDetailDisplayed (detail) {
       if (detail) {
         this.displayedDetail = detail;
-        this.isModalActive = true;
+        this.modalActive = true;
       }
     },
     onFound (count) {
@@ -812,7 +812,7 @@ export default {
       let dist = 100;
 
       if (y > dist && y < window.innerHeight - dist) {
-        if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.isModalActive) {
+        if (!this.mouseMoved && !this.outlineOpen && !this.outlineOpen && !this.modalActive) {
           this.toggleNav();
         }
       }
