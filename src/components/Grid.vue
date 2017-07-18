@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="grid">
     <nav class="nav section_nav">
       <div class="nav-center" style="overflow: visible">
 
@@ -342,114 +342,119 @@ export default {
 }
 </script>
 
-<style>
-.img_link {
-  cursor: pointer;
-}
+<style lang="scss">
+#grid {
+  .img_link {
+    cursor: pointer;
+  }
 
-.img_link:hover {
-  opacity: 0.8;
-}
+  .img_link:hover {
+    opacity: 0.8;
+  }
 
-.img_link:active {
-  opacity: 0.5;
-}
+  .img_link:active {
+    opacity: 0.5;
+  }
 
-.card_container .image .img_link img {
-  object-fit: cover;
-  max-width: none;
-  width: 100%;
-  height: 100%;
-}
-
-.card_container .card-image figure {
-  width: 200px;
-  max-height: 400px;
-  overflow: hidden;
-  display: block;
-}
-
-.card_container .card {
-  width: 200px;
-  flex-grow: 0;
-  margin-bottom: 24px;
-}
-
-.card_container .card .card-footer {
-  /*display: none;*/
-}
-
-.card_container .card:hover .card-footer {
-  display: block;
-}
-
-.card_container {
-  /*display: flex;
-  flex-direction: row;
-  justify-content: center;*/
-  padding-top: 24px;
-}
-
-.card_columns {
-  justify-content: center;
-}
-
-
-.card_columns .column {
-  flex-grow: 0;
-}
-
-@media screen and (max-width: 400px) {
-  .card_container .card-image figure {
+  .card_container .image .img_link img {
+    object-fit: cover;
+    max-width: none;
     width: 100%;
+    height: 100%;
+  }
+
+  .card_container .card-image figure {
+    width: 200px;
     max-height: 400px;
+    overflow: hidden;
+    display: block;
   }
 
   .card_container .card {
-    width: 300px;
+    width: 200px;
+    flex-grow: 0;
+    margin-bottom: 24px;
   }
 
-  #grid .nav, #grid .nav-center {
+  .card_container .card .card-footer {
+    /*display: none;*/
+  }
+
+  .card_container .card:hover .card-footer {
     display: block;
-    height: auto;
   }
 
-  .dropdown, .dropdown + .dropdown {
-    width: 100%;
-    max-width: 100%;
-    margin-left: 0;
+  .card_container {
+    /*display: flex;
+    flex-direction: row;
+    justify-content: center;*/
+    padding-top: 24px;
+  }
+
+  .card_columns {
+    justify-content: center;
   }
 
 
-  .dropdown a, .dropdown .button {
-    width: 100%;
-    display: inline-block;
-    max-width: 100%;
-  }
-
-  .dropdown + .dropdown {
-    margin-top: 4px;
-  }
-
-  .dropdown .button {
-    text-align: left;
-  }
-
-  .dropdown .button .button_action {
-    float: right;
-  }
-
-  .dropdown .box.is-dropdown {
-    overflow: scroll;
-    margin-top: 24px;
-  }
-
-  .dropdown .selected_title {
-    max-width: 80%;
-    overflow: hidden;
-    display: inline-block;
-    height: 100%;
-    line-height: 1.5rem;
+  .card_columns .column {
+    flex-grow: 0;
   }
 }
+
+@media screen and (max-width: 400px) {
+  #grid {
+    .card_container .card-image figure {
+      width: 100%;
+      max-height: 400px;
+    }
+
+    .card_container .card {
+      width: 300px;
+    }
+
+    .nav, .nav-center {
+      display: block;
+      height: auto;
+    }
+
+    .dropdown, .dropdown + .dropdown {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+    }
+
+
+    .dropdown a, .dropdown .button {
+      width: 100%;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .dropdown + .dropdown {
+      margin-top: 4px;
+    }
+
+    .dropdown .button {
+      text-align: left;
+    }
+
+    .dropdown .button .button_action {
+      float: right;
+    }
+
+    .dropdown .box.is-dropdown {
+      overflow: scroll;
+      margin-top: 24px;
+    }
+
+    .dropdown .selected_title {
+      max-width: 80%;
+      overflow: hidden;
+      display: inline-block;
+      height: 100%;
+      line-height: 1.5rem;
+    }
+  }
+}
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="table">
     <nav class="nav section_nav">
       <div class="nav-left">
         <div class="nav-item first-nav-item">
@@ -27,7 +27,7 @@
             <span class="icon is-small">
               <icon name="picture-o" title="Filter by Artwork"></icon>
             </span>
-            <span>Artworks</span>
+            <span class="dropdown_title">Artworks</span>
             <b-icon icon="arrow_drop_down" class="button_action"></b-icon>
           </button>
 
@@ -45,7 +45,7 @@
             <span class="icon is-small">
               <icon name="user" title="Filter by Artist"></icon>
             </span>
-            <span>Artist</span>
+            <span class="dropdown_title">Artist</span>
             <b-icon icon="arrow_drop_down" class="button_action"></b-icon>
           </button>
 
@@ -63,7 +63,7 @@
             <span class="icon is-small">
               <icon name="institution" title="Filter by Collection"></icon>
             </span>
-            <span>Collection</span>
+            <span class="dropdown_title">Collection</span>
             <b-icon icon="arrow_drop_down" class="button_action"></b-icon>
           </button>
 
@@ -187,11 +187,11 @@
             </b-table-column>
 
             <b-table-column label="View" sortable width="30">
-              <a class="button is-small" :href="tb.row['artwork_uri']" target="_blank"  v-if="tb.row.artwork_uri">
+              <a class="button is-small action_items" :href="tb.row['artwork_uri']" target="_blank"  v-if="tb.row.artwork_uri">
                 <span>View in Collection</span>
                 <b-icon icon="open_in_new" class="is-small"></b-icon>
               </a>
-              <a class="button is-small view_in_book" @click="$emit('onPageClick', tb.row.page)">
+              <a class="button is-small view_in_book action_items" @click="$emit('onPageClick', tb.row.page)">
                 <span>View in Book</span>
                 <b-icon icon="keyboard_arrow_right" class="is-small"></b-icon>
               </a>
@@ -456,195 +456,204 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 
-table.table {
-  background-color: transparent;
-}
-
-th {
-  background-color: #cecece;
-  color: #000;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-td {
-  background-color: #f9f9f9;
-  min-width: 140px;
-}
-
-th, td {
-  /*min-width: 220px;*/
-  /*padding: 10px 40px;*/
-  /*border: 2px solid #cecece;*/
-}
-
-th.active {
-  color: #fff;
-}
-
-th.active .arrow {
-  opacity: 1;
-}
-
-#table .arrow {
-  display: inline-block;
-  vertical-align: middle;
-  width: 0;
-  height: 0;
-  margin-left: 5px;
-  opacity: 0.66;
-}
-
-#table .arrow.asc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 4px solid #fff;
-}
-
-#table .arrow.dsc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #fff;
-}
-
-#table .img_link {
-  cursor: pointer;
-  width: 100px;
-  text-align: center;
-}
-
-#table  .img_link:hover {
-  opacity: 0.8;
-}
-
-#table .img_link:active {
-  opacity: 0.5;
-}
-
-#table .img_link img {
-  max-width: 100px;
-  max-height: 100px;
-}
-
-#search {
-  text-align: center;
-}
-
-.artwork_table .table td, .artwork_table .table th {
-  vertical-align: middle;
-}
-
-.artwork_table .table td.location {
-  text-align: center;
-}
-
-.view_in_book {
-  width: 134px;
-  margin-top: 0.2rem;
-}
-
-.filterer {
-  visibility: hidden;
-}
-
-.table td:hover .filterer {
-  visibility: visible;
-}
-
-.first-nav-item {
-  padding-left: 0;
-}
-
-.artwork .b-tabs .tab-content {
-  overflow: visible !important;
-}
-
-.external_link .icon {
-  visibility: hidden;
-}
-
-.external_link:hover .icon {
-  visibility: visible;
-}
-
-.img_thumbnail_row {
-  background: #1d1d1d;
-}
-
-@media screen and (max-width: 400px) {
-  .card_container .card-image figure {
-    width: 100%;
-    max-height: 400px;
+#table {
+  table.table {
+    background-color: transparent;
   }
 
-  .card_container .card {
-    width: 300px;
+  th {
+    background-color: #cecece;
+    color: #000;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
-  #table .nav, #table .nav-left , #table .nav-right {
-    display: block;
-    height: auto;
-    margin-bottom: 4px;
+  td {
+    background-color: #f9f9f9;
+    min-width: 140px;
   }
 
-  .dropdown, .dropdown + .dropdown {
-    width: 100%;
-    max-width: 100%;
-    margin-left: 0;
+  th, td {
+    /*min-width: 220px;*/
+    /*padding: 10px 40px;*/
+    /*border: 2px solid #cecece;*/
   }
 
+  th.active {
+    color: #fff;
+  }
 
-  .dropdown a, .dropdown .button {
-    width: 100%;
+  th.active .arrow {
+    opacity: 1;
+  }
+
+  .arrow {
     display: inline-block;
-    max-width: 100%;
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+    margin-left: 5px;
+    opacity: 0.66;
   }
 
-  .dropdown + .dropdown {
-    margin-top: 4px;
+  .arrow.asc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #fff;
   }
 
-  .dropdown .button {
-    text-align: left;
+  .arrow.dsc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #fff;
   }
 
-  .dropdown .button .button_action {
-    float: right;
+  .img_link {
+    cursor: pointer;
+    width: 100px;
+    text-align: center;
   }
 
-  .dropdown .box.is-dropdown {
-    overflow: scroll;
-    margin-top: 24px;
+  .img_link:hover {
+    opacity: 0.8;
   }
 
-  .dropdown .selected_title {
-    max-width: 80%;
-    overflow: hidden;
-    display: inline-block;
-    height: 100%;
+  .img_link:active {
+    opacity: 0.5;
+  }
+
+  .img_link img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .artwork_table .table td, .artwork_table .table th {
+    vertical-align: middle;
+  }
+
+  .artwork_table .table td.location {
+    text-align: center;
+  }
+
+  .action_items {
+    width: 135px;
+  }
+
+  .dropdown_title {
     line-height: 1.5rem;
   }
 
-  #table .is-hidden-tablet {
-    display: none;
+  .view_in_book {
+    width: 135px;
+    margin-top: 0.2rem;
   }
 
-  #table .nav-left .nav-item {
-    padding: 0;
+  .filterer {
+    visibility: hidden;
   }
 
-  #table .search {
-    width: 100%;
+  .table td:hover .filterer {
+    visibility: visible;
   }
 
-  #table .img_thumbnail_row {
-    text-align: center;
-    width: 100%;
+  .first-nav-item {
+    padding-left: 0;
+  }
+
+  .artwork .b-tabs .tab-content {
+    overflow: visible !important;
+  }
+
+  .external_link .icon {
+    visibility: hidden;
+  }
+
+  .external_link:hover .icon {
+    visibility: visible;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  #table {
+    .card_container .card-image figure {
+      width: 100%;
+      max-height: 400px;
+    }
+
+    .card_container .card {
+      width: 300px;
+    }
+
+    .nav, .nav-left , .nav-right {
+      display: block;
+      height: auto;
+      margin-bottom: 4px;
+    }
+
+    .dropdown, .dropdown + .dropdown {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+    }
+
+
+    .dropdown a, .dropdown .button {
+      width: 100%;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .dropdown + .dropdown {
+      margin-top: 4px;
+    }
+
+    .dropdown .button {
+      text-align: left;
+    }
+
+    .dropdown .button .button_action {
+      float: right;
+    }
+
+    .dropdown .box.is-dropdown {
+      overflow: scroll;
+      margin-top: 24px;
+    }
+
+    .dropdown .selected_title {
+      max-width: 80%;
+      overflow: hidden;
+      display: inline-block;
+      height: 100%;
+      line-height: 1.5rem;
+    }
+
+    .is-hidden-tablet {
+      display: none;
+    }
+
+    .nav-left .nav-item {
+      padding: 0;
+    }
+
+    .search {
+      width: 100%;
+    }
+
+    .img_thumbnail_row {
+      text-align: center;
+      width: 100%;
+      background: #1d1d1d;
+    }
+
+    .action_items {
+      float: right;
+    }
   }
 }
 </style>
