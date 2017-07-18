@@ -106,7 +106,8 @@
 
     </nav>
 
-    <section class="main" ref="main" :class="{'chrome_open': navOpen }">
+    <section class="main" ref="main" :class="{'chrome_open': navOpen }" v-touch:tap="toggleNav">
+      <progress-bar v-show="loadingValue < 100" :size="'small'" :value="loadingValue" :max="100" :show-label="false"></progress-bar>
       <PDF id="pdf" ref="pdf"
           :src="this.manifest.pdf"
           :page="page"
@@ -116,11 +117,13 @@
           :spreads="spreads"
           :onImageClicked="this.onImageClicked"
           :onOutlineReady="this.onOutlineReady"
+          :onProgress="this.onProgress"
           @pageChanged="this.onPageChanged"
           @found="this.onFound"
           @match="this.onMatch"
           :query="query"
           :zoom="zoomLevel"
+          v-touch:swipe="onSwipe"
         />
 
       <div id="prev" class="arrow" @click="this.prev" v-show="!atStart">
@@ -347,6 +350,16 @@ import 'buefy/lib/buefy.css';
 
 import debounce from 'debounce';
 
+import Vue2TouchEvents from 'vue2-touch-events';
+import ProgressBar from 'vue-bulma-progress-bar'
+
+Vue.use(Vue2TouchEvents, {
+  disableClick: false,
+  touchClass: 'touched',
+  tapTolerance: 10,
+  swipeTolerance: 30
+});
+
 Vue.use(Buefy, {
   // defaultIconPack: 'fa'
 });
@@ -359,7 +372,8 @@ export default {
     'tablegrid': Table,
     'icon': Icon,
     'outline': Outline,
-    'detail': Detail
+    'detail': Detail,
+    'progress-bar': ProgressBar
   },
   props: {
     'manifest-url': {
@@ -414,7 +428,8 @@ export default {
       navTimeout: undefined,
       tableFilter: undefined,
       atStart: true,
-      atEnd: true
+      atEnd: true,
+      loadingValue: 0
     }
   },
   created () {
@@ -589,6 +604,15 @@ export default {
       pdf.prev();
       e.stopPropagation();
       e.preventDefault();
+    },
+    onSwipe (dir) {
+      const { pdf } = this.$refs;
+
+      if (dir === 'left') {
+        pdf.next();
+      } else if (dir === 'right') {
+        pdf.prev();
+      }
     },
     keyListener (e) {
       const { keyCode } = e;
@@ -804,9 +828,9 @@ export default {
       window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
       window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
       window.addEventListener('click', this.onClick.bind(this), false);
-      window.addEventListener('touchend', this.onClick.bind(this), false);
-      window.addEventListener('touchstart', this.onMouseDown.bind(this), false);
-      window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
+      // window.addEventListener('touchend', this.onClick.bind(this), false);
+      // window.addEventListener('touchstart', this.onMouseDown.bind(this), false);
+      // window.addEventListener('touchmove', this.onTouchMove.bind(this), false);
     },
     removeListeners () {
       window.removeEventListener('resize', this.handleResize);
@@ -815,9 +839,9 @@ export default {
       window.removeEventListener('mousemove', this.onMouseMove);
       window.removeEventListener('mousedown', this.onMouseDown);
       window.removeEventListener('click', this.onClick);
-      window.removeEventListener('touchend', this.onClick);
-      window.removeEventListener('touchstart', this.onMouseDown);
-      window.removeEventListener('touchmove', this.onTouchStart);
+      // window.removeEventListener('touchend', this.onClick);
+      // window.removeEventListener('touchstart', this.onMouseDown);
+      // window.removeEventListener('touchmove', this.onTouchStart);
     },
     startPageEditing () {
       this.editingPage = true;
@@ -830,6 +854,10 @@ export default {
         this.page = value - 1;
       }
       this.editingPage = false;
+    },
+    onProgress (progress) {
+      let val = progress * 100;
+      this.loadingValue = val;
     },
     _showTable () {
       const { table } = this.$refs;
@@ -980,6 +1008,8 @@ export default {
   width: 100%;
   overflow: hidden;
   position: relative;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: transparent; /* For some Androids */
 }
 
 .icon.is-small svg {
@@ -1131,6 +1161,18 @@ export default {
   width: 5.25em;
 }
 
+.progress-container {
+  position: fixed;
+  top: 0;
+  margin-bottom: 0;
+  width: 100vw;
+}
+
+.progress.is-small {
+  height: 2px;
+  border-radius: 0;
+}
+
 @media screen and (max-width: 400px) {
 
   .nav-item {
@@ -1172,7 +1214,7 @@ export default {
     margin-bottom: 40px;
   }
 
-  .modal-close {
+  .modal .modal-close {
     top: auto;
     bottom: 12px;
     left: 50%;
@@ -1184,7 +1226,10 @@ export default {
   .floater .page_input .button,
   .floater .zoom_input .input {
     font-size: 0.8rem;
-    min-height: 100%;
+    padding-top: .44rem;
+    padding-bottom: .44rem;
+    height: auto;
+    display: inline-block;
   }
 
   .zoom_input {

@@ -21,9 +21,11 @@
     "pdfjs-dist": "1.8.524",
     "vue": "^2.3.4",
     "vue-awesome": "^2.3.1",
+    "vue-bulma-progress-bar": "^1.0.2",
     "vue-lazyload": "^1.0.5",
     "vue-on-click-outside": "^1.0.3",
     "vue-router": "^2.7.0",
+    "vue2-touch-events": "^0.2.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {

@@ -348,185 +348,120 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 
-.detail_card.card {
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  max-width: 50vw;
-}
+.detail_card {
+  &.card {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    max-width: 50vw;
+  }
 
-.detail_card .content {
-  /*max-width: 40vw;*/
-}
-
-/*.related_images {
-  list-style: none;
-  padding: 0;
-}
-
-.related_images li {
-  display: inline-block;
-  margin-right: 12px;
-}
-
-.related_images img {
-  display: block;
-}
-
-.related_images span {
-  display: block;
-  text-align: center;
-}
-
-.related_images li a {
-  cursor: pointer;
-}*/
-
-.detail_arrow {
-  position: fixed;
-  top: 50%;
-  margin-top: -32px;
-  font-size: 64px;
-  color: #E2E2E2;
-  font-family: arial, sans-serif;
-  font-weight: bold;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-
-#prevDetail {
-  left: 20%;
-}
-
-#nextDetail {
-  right: 20%;
-}
-
-.image_detail {
-  background-color: #1d1d1d;
-}
-
-.image_detail a {
-  overflow: hidden;
-  display: block;
-}
-
-.image_detail img {
-  max-width: 100%;
-  max-height: calc(100vh - 360px);
-  display: block;
-  margin: 0 auto;
-}
-
-.detail_card .card-content {
-  position: relative;
-}
-
-.detail_card .card-content .content .button {
-  vertical-align: middle;
-  position: absolute;
-  right: 1.5rem;
-  font-style: normal !important;
-}
-
-.detail_card .card-content .content h1.hover,
-.detail_card .card-content .content h2.hover,
-.detail_card .card-content .content p.hover {
-  text-decoration: underline;
-}
-
-.detail_card .card-content .content .subtitle {
-  font-style: italic;
-}
-
-.spacer {
-  padding: 0 .25rem;
-}
-
-.filter_links {
-  color: #777777;
-  text-align: center;
-  font-size: 0.75rem;
-}
-
-.filter_item {
-  white-space: nowrap;
-}
-
-@media screen and (max-width: 400px) {
+  .content {
+    /*max-width: 40vw;*/
+  }
 
   .detail_arrow {
-    top: auto;
-    bottom: 5px;
-    font-size: 40px;
-    margin-top: 0;
+    position: fixed;
+    top: 50%;
+    margin-top: -32px;
+    font-size: 64px;
+    color: #E2E2E2;
+    font-family: arial, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
   }
 
   #prevDetail {
-    left: 5%;
+    left: 20%;
   }
 
   #nextDetail {
-    right: 5%;
+    right: 20%;
   }
 
-  .detail_card.card {
-    max-width: 90vw;
+  .image_detail {
+    background-color: #1d1d1d;
   }
 
-  .detail_card .content {
-    max-width: 80vw;
+  .image_detail a {
+    overflow: hidden;
+    display: block;
   }
 
-  .modal-content {
-    font-size: 0.7rem;
+  .image_detail img {
+    max-width: 100%;
+    max-height: calc(100vh - 360px);
+    display: block;
+    margin: 0 auto;
   }
 
+  .card-content {
+    position: relative;
+  }
+
+  .card-content .content .button {
+    vertical-align: middle;
+    position: absolute;
+    right: 1.5rem;
+    font-style: normal !important;
+  }
+
+  .card-content .content h1.hover,
+  .card-content .content h2.hover,
+  .card-content .content p.hover {
+    text-decoration: underline;
+  }
+
+  .card-content .content .subtitle {
+    font-style: italic;
+  }
+
+  .spacer {
+    padding: 0 .25rem;
+  }
+
+  .filter_links {
+    color: #777777;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+
+  .filter_item {
+    white-space: nowrap;
+  }
 }
 
-/*.image_info {
-  color: #eee;
-  margin-left: 40px;
-  min-width: 40vw;
+@media screen and (max-width: 400px) {
+  .detail_card {
+    .detail_arrow {
+      top: auto;
+      bottom: 5px;
+      font-size: 40px;
+      margin-top: 0;
+    }
+
+    #prevDetail {
+      left: 5%;
+    }
+
+    #nextDetail {
+      right: 5%;
+    }
+
+    .detail_card.card {
+      max-width: 90vw;
+    }
+
+    .detail_card .content {
+      max-width: 80vw;
+    }
+
+    .modal-content {
+      font-size: 0.7rem;
+    }
+  }
 }
-
-.image_info h1 {
-  font-size: 34px;
-  font-weight: bold;
-}
-
-.image_info h2 {
-  font-size: 24px;
-}
-
-.image_info h3 {
-  font-size: 24px;
-}
-
-.image_info h4 {
-  margin: 0 0 40px 0;
-}
-
-.detail_close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 10px 10px 0 0;
-  cursor: pointer;
-}
-
-.detail_view {
-  position: absolute;
-  top: 0;
-  right: 50px;
-  padding: 10px 10px 0 0;
-  cursor: pointer;
-}
-
-
-a {
-  color: #42b983;
-}*/
 </style>

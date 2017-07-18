@@ -578,7 +578,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 700px) {
   #table {
     .card_container .card-image figure {
       width: 100%;
@@ -586,7 +586,7 @@ export default {
     }
 
     .card_container .card {
-      width: 300px;
+      width: 100%;
     }
 
     .nav, .nav-left , .nav-right {

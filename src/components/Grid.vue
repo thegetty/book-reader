@@ -401,15 +401,22 @@ export default {
   }
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (min-width: 400px) {
+  .card_columns {
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 768px) {
   #grid {
     .card_container .card-image figure {
-      width: 100%;
+      width: 292px;
       max-height: 400px;
     }
 
     .card_container .card {
-      width: 300px;
+      width: 292px;
+      margin-left: 1px;
     }
 
     .nav, .nav-center {

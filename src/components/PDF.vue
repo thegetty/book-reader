@@ -1,5 +1,8 @@
 <template>
-  <div :ref="'container'" class="pageContainer" :class="{ loading: isLoading, centered: (!spreads || zoom <= 1) }" :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }" >
+  <div :ref="'container'"
+       class="pageContainer"
+       :class="{ loading: isLoading, centered: (!spreads || zoom <= 1) }"
+       :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }">
     <div class="pages" :style="{
       width: `${viewportWidth}px`,
       height: `${viewportHeight}px`,
@@ -26,8 +29,8 @@
 </template>
 
 <script>
-import Page from '@/components/Page'
-import Search from '@/components/Search'
+import Page from '@/components/Page';
+import Search from '@/components/Search';
 
 const pdfjsLib = require('pdfjs-dist');
 
@@ -74,6 +77,10 @@ export default {
     'zoom': {
       default: 1,
       type: Number
+    },
+    'onProgress': {
+      default: undefined,
+      type: Function
     }
   },
   data () {
@@ -146,7 +153,13 @@ export default {
   },
   methods: {
     loadDocument (src) {
-      return pdfjsLib.getDocument(src)
+      let loadingTask = pdfjsLib.getDocument(src);
+
+      loadingTask.onProgress = (progressData) => {
+        this.onProgress && this.onProgress(progressData.loaded / progressData.total)
+      };
+
+      return loadingTask.promise
         .then((pdfDocument) => {
           // Document loaded, retrieving the page.
           var pagesCount = pdfDocument.numPages;
@@ -201,6 +214,9 @@ export default {
       }
     },
     next () {
+      if (!this.pdfDocument) {
+        return;
+      }
       if (this.displayedPage === 0) {
         this.displayedPage += 1;
       } else {
@@ -213,6 +229,9 @@ export default {
       }
     },
     prev () {
+      if (!this.pdfDocument) {
+        return;
+      }
       if (this.displayedPage > 0) {
         if (this.displayedPage === 1) {
           this.displayedPage -= 1;
