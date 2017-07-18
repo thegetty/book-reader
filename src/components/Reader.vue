@@ -1226,8 +1226,8 @@ export default {
   .floater .page_input .button,
   .floater .zoom_input .input {
     font-size: 0.8rem;
-    padding-top: .44rem;
-    padding-bottom: .44rem;
+    padding-top: .45rem;
+    padding-bottom: .45rem;
     height: auto;
     display: inline-block;
   }

@@ -13,40 +13,12 @@
         <h1 class="title" :class="{'hover': hoverArtist}">
           <span class="is-hidden-mobile">{{currentDetail.artwork_title }}</span>
           <span class="is-hidden-tablet">{{currentDetail.artwork_title | truncate}}</span>
-          <!-- <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="button is-small" v-if="imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
-            <span class="icon is-small">
-              <icon name="picture-o" title="Filter by Artist"></icon>
-            </span>
-            <span>
-            {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }}
-            </span>
-          </a> -->
         </h1>
         <h2 class="subtitle" :class="{'hover': hoverArtwork}">
-          <!-- <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a> -->
-          <!-- <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})">{{currentDetail.artist_name}}</a> -->
           {{currentDetail.artist_name}}
-          <!-- <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" class="button is-small" v-if="imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
-            <span class="icon is-small">
-              <icon name="user" title="Filter by Artist"></icon>
-            </span>
-            <span>
-              {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }}
-            </span>
-          </a> -->
         </h2>
         <p v-if="currentDetail.collection" :class="{'hover': hoverCollection}">
-          <!-- <a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a> -->
-          <!-- <a @click="$emit('infoSelected', {'collection': currentDetail.collection})">{{currentDetail.collection}}</a> -->
           {{currentDetail.collection}}
-          <!-- <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" class="button is-small" v-if="imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length > 1">
-            <span class="icon is-small">
-              <icon name="institution" title="Filter by Artist"></icon>
-            </span>
-            <span>
-              {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }}
-            </span>
-          </a> -->
         </p>
         <p class="filter_links" v-if="currentDetail.artwork_title">
           <span class="filter_header">Images in the book:&nbsp;</span>
@@ -97,51 +69,6 @@
   <div id="prevDetail" class="detail_arrow" @click="this.prevDetail" v-show="!atStart">‹</div>
   <div id="nextDetail" class="detail_arrow" @click="this.nextDetail" v-show="!atEnd">›</div>
   </div>
-
-  <!-- <section class="box" v-if="currentDetail">
-    <div class="image_detail">
-      <img :src="currentDetail.asset" v-if="!currentDetail.copyright" />
-      <img :src="currentDetail.downsampled" v-if="currentDetail.copyright" />
-      <p><a :href="currentDetail.collection_uri">{{currentDetail.collection}}</a></p>
-    </div>
-    <div class="image_info" v-if="currentDetail.artwork_title">
-      <h1>{{currentDetail.artwork_title}}</h1>
-
-      <h4><a :href="currentDetail.artwork_uri">{{currentDetail.artwork_uri}}</a></h4>
-      <aside v-if="this.imagesByArtwork[encodeURI(currentDetail.artwork_title)].length > 1">
-        <h5>Also in this book</h5>
-        <ul class="related_images">
-          <li v-for="relatedImage in this.imagesByArtwork[encodeURI(currentDetail.artwork_title)]" v-if="currentDetail != relatedImage">
-            <a class="related_img_link" @click="currentDetail = relatedImage">
-              <img :src="relatedImage.thumbnail" />
-              <span>{{ relatedImage.page_label || relatedImage.page }}</span>
-            </a>
-          </li>
-        </ul>
-      </aside>
-
-      <h2>
-        <a :href="currentDetail.artist_uri" @click="artistLookup">{{currentDetail.artist_name}}</a>
-      </h2>
-      <aside v-if="this.imagesByArtist[encodeURI(currentDetail.artist_name)].length > 1">
-        <h5>Also in this book</h5>
-        <ul class="related_images">
-          <li v-for="relatedImage in this.imagesByArtist[encodeURI(currentDetail.artist_name)]"
-              v-if="currentDetail != relatedImage && (imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].indexOf(relatedImage) === -1)">
-            <a class="related_img_link" @click="currentDetail = relatedImage">
-              <img :src="relatedImage.thumbnail" />
-              <span>{{ relatedImage.page_label || relatedImage.page }}</span>
-            </a>
-          </li>
-        </ul>
-      </aside>
-
-    </div>
-    <a class="detail_view" @click="onPageSelected(currentDetail.page);">View in Book</a>
-    <div id="prevDetail" class="detail_arrow" @click="this.prevDetail">‹</div>
-    <div id="nextDetail" class="detail_arrow" @click="this.nextDetail">›</div>
-    <a class="detail_close" @click="onDetailClosed">Close</a>
-  </section> -->
 </template>
 
 <script>
@@ -451,11 +378,11 @@ export default {
       right: 5%;
     }
 
-    .detail_card.card {
+    &.card {
       max-width: 90vw;
     }
 
-    .detail_card .content {
+    .content {
       max-width: 80vw;
     }
 
