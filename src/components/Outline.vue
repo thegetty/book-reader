@@ -80,7 +80,6 @@ export default {
 <style scoped>
 
 ul {
-  /*border-top: 1px solid #ccc;*/
   padding: 0 20px 20px 52px;
 }
 

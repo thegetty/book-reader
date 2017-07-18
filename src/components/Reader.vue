@@ -5,10 +5,6 @@
     <nav class="nav fixed" :class="{'open': navOpen || outlineOpen || artworkOpen}">
       <div class="nav-left">
 
-        <!-- <a class="nav-item" href="http://www.getty.edu/" target="_blank" title="The Getty">
-          <img src="../assets/getty_logo.png" alt="Getty Logo" class="logo">
-        </a> -->
-
         <a class="nav-item" @click="outlineOpen = !outlineOpen;">
           <span class="icon">
             <icon v-if="!outlineOpen" name="bars" title="Open Navigation"></icon>
@@ -28,9 +24,6 @@
             <p class="control has-icons-right" id="matchCount">
               <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="Search">
               <span class="icon is-small is-right" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
-              <!-- <span class="icon is-small is-right" v-if="!query">
-                <icon name="search" title="Search"></icon>
-              </span> -->
             </p>
 
             <p class="control">
@@ -68,11 +61,6 @@
       <div class="nav-center">
 
         <div class="nav-item" v-if="!artworkOpen" v-show="!showSearch">
-          <!-- <div id="prev" class="nav-item arrow" @click="this.prev">
-            <span class="icon is-small">
-              <icon name="chevron-left" title="Prev" v-show="!outlineOpen"></icon>
-            </span>
-          </div> -->
           <span v-if="!current" class="nav_title is-hidden-mobile">{{ title }}</span>
           <span v-if="!current" class="nav_title is-hidden-tablet">{{ shortTitle }}</span>
           <span v-if="current">
@@ -80,11 +68,6 @@
             <icon class="navbar-breadcrumb is-hidden-mobile" name="caret-right"></icon>
             <span class="nav_title">{{ current }}</span>
           </span>
-          <!-- <div id="next" class="nav-item arrow" @click="this.next">
-            <span class="icon is-small">
-              <icon name="chevron-right" title="Next" v-show="!outlineOpen"></icon>
-            </span>
-          </div> -->
         </div>
 
         <div class="nav-item" v-if="artworkOpen">
@@ -232,31 +215,6 @@
               <icon v-if="outlineOpen" name="close" title="Close Navigation"></icon>
             </span>
           </a>
-        </div>
-        <div class="nav-right">
-          <div class="nav-item">
-            <!-- <a id="prevMatch" @click="prevMatch" v-if="matchCount">
-              <span class="icon is-small">
-                <icon name="chevron-left" title="Prev Match"></icon>
-              </span>
-            </a>
-            <p class="control" v-if="matchCount">
-              <span class="found" v-if="matchCount">{{currentMatchIndex}} of {{matchCount}}</span>
-            </p>
-            <a id="nextMatch" @click="nextMatch" v-if="matchCount">
-              <span class="icon is-small">
-                <icon name="chevron-right" title="Next Match"></icon>
-              </span>
-            </a> -->
-
-            <!-- <p class="control has-icons-right">
-              <input class="input has-icons-right" name="query" v-model="query" results="5" placeholder="search" @keyup.enter="outlineOpen = false">
-              <span class="icon is-small is-right">
-                <icon name="search" title="Search"></icon>
-              </span>
-            </p> -->
-          </div>
-
         </div>
       </nav>
 
@@ -1098,7 +1056,6 @@ export default {
   box-sizing: content-box;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
-  /*z-index: 50;*/
   overflow: auto;
 }
 
@@ -1168,7 +1125,7 @@ export default {
   width: 100vw;
 }
 
-.progress.is-small {
+.main .progress, .main .progress.is-small {
   height: 2px;
   border-radius: 0;
 }

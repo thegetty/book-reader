@@ -13,14 +13,6 @@
       </div>
 
       <div class="nav-right" style="overflow: visible">
-        <!-- <b-dropdown>
-          <button class="button" slot="trigger">
-              <span>Artworks</span>
-              <b-icon icon="arrow_drop_down"></b-icon>
-          </button>
-
-          <b-dropdown-option v-for="artwork in artworks" key="option_${artwork.uri}">{{artwork.name}}</b-dropdown-option>
-        </b-dropdown> -->
 
         <b-dropdown position="is-bottom-left" v-model="artworkFilter" v-show="!artworkFilter">
           <button class="button" slot="trigger" @click="artworkFilter = undefined;">
@@ -99,89 +91,17 @@
 
             <b-table-column field="artwork" label="Artwork" sortable>
               {{ tb.row['artwork_title'] }}
-              <!-- <a @click="artworkFilter = tb.row.artwork_title" v-show="artworkFilter != tb.row.artwork_title">
-                {{ tb.row['artwork_title'] }}
-              </a>
-              <span v-show="artworkFilter === tb.row.artwork_title">
-                {{ tb.row['artwork_title'] }}
-              </span> -->
-              <!-- <a :href="tb.row['artwork_uri']" target="_blank" class="external_link">
-                {{ tb.row['artwork_title'] }}
-                <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a>
-
-              <a @click="artworkFilter = tb.row.artwork_title" class="button is-small is-pulled-right filterer">
-                <b-icon
-                    icon="filter"
-                    size="is-small">
-                </b-icon>
-                <span>
-                {{ imagesByArtwork[encodeURI(tb.row.artwork_title)] && imagesByArtwork[encodeURI(tb.row.artwork_title)].length }}
-                </span>
-              </a> -->
             </b-table-column>
 
             <b-table-column field="artist" label="Artist" sortable>
               {{ tb.row['artist_name'] }}
-              <!-- <a :href="tb.row['artist_uri']" target="_blank" class="external_link">
-                {{ tb.row['artist_name'] }}
-                <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a> -->
-              <!-- <a @click="artistFilter = tb.row.artist_name" v-show="artistFilter != tb.row.artist_name">
-                {{ tb.row['artist_name'] }}
-              </a>
-              <span v-show="artistFilter === tb.row.artist_name">
-                {{ tb.row['artist_name'] }}
-              </span> -->
-              <!-- <a class="button is-small is-pulled-right" :href="tb.row['artist_uri']" target="_blank"  v-if="tb.row.artist_uri">
-                <span>ULAN</span>
-                <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a> -->
-
-              <!-- <a @click="artistFilter = tb.row.artist_name" class="button is-small is-pulled-right filterer">
-                <b-icon
-                    icon="filter"
-                    size="is-small">
-                </b-icon>
-                <span>
-                {{ imagesByArtist[encodeURI(tb.row.artist_name)] && imagesByArtist[encodeURI(tb.row.artist_name)].length }}
-                </span>
-              </a> -->
             </b-table-column>
 
             <b-table-column field="collection" label="Collection" class="artwork_info" sortable>
               {{ tb.row['collection'] }}
-              <!-- <a :href="tb.row['collection_uri']" target="_blank" class="external_link">
-                {{ tb.row['collection'] }}
-                <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a> -->
-              <!-- <a @click="collectionFilter = tb.row.collection" v-show="collectionFilter != tb.row.collection">
-                {{ tb.row['collection'] }}
-              </a>
-              <span v-show="collectionFilter === tb.row.collection">
-                {{ tb.row['collection'] }}
-              </span> -->
-              <!-- <a class="button is-small" :href="tb.row['collection_uri']" target="_blank"  v-if="tb.row.collection_uri">
-                <b-icon icon="open_in_new" class="is-small"></b-icon>
-              </a> -->
-
-              <!-- <a @click="collectionFilter = tb.row.collection" class="button is-small is-pulled-right filterer">
-                <b-icon
-                    icon="filter"
-                    size="is-small">
-                </b-icon>
-                <span>
-                {{ imagesByCollection[encodeURI(tb.row.collection)] && imagesByCollection[encodeURI(tb.row.collection)].length }}
-                </span>
-              </a> -->
-
             </b-table-column>
 
             <b-table-column field="page" label="Location" sortable width="10" class="location">
-              <!-- <a @click="$emit('onPageClick', tb.row.page)">
-                <span v-if="parseInt(tb.row.page)">pg. {{ tb.row.page }}</span>
-                <span v-if="!parseInt(tb.row.page)">{{ tb.row.page }}</span>
-              </a> -->
               <span v-if="parseInt(tb.row.page)">pg. {{ tb.row.page }}</span>
               <span v-if="!parseInt(tb.row.page)">{{ tb.row.page }}</span>
             </b-table-column>
@@ -196,12 +116,6 @@
                 <b-icon icon="keyboard_arrow_right" class="is-small"></b-icon>
               </a>
             </b-table-column>
-
-            <!-- <b-table-column field="viewin" label="View">
-              <a class="button" :href="tb.row['collection_uri']" target="_blank">
-                In Collection
-              </a>
-            </b-table-column> -->
         </template>
     </b-table>
   </div>
@@ -267,7 +181,6 @@ export default {
       sortKey: '',
       sortOrders: sortOrders,
       filterKey: '',
-      // searchQuery: '',
       gridColumns: [],
       imagesByArtwork: {},
       imagesByArtist: {},

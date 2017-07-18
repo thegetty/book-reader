@@ -48,22 +48,6 @@ export default {
       default: undefined,
       type: Function
     }
-    // 'pageMatchesLength': {
-    //   default: undefined,
-    //   type: Object
-    // },
-    // 'pageMatches': {
-    //   default: undefined,
-    //   type: Object
-    // },
-    // 'selectedMatch': {
-    //   default: undefined,
-    //   type: Object
-    // },
-    // 'query': {
-    //   default: undefined,
-    //   type: String
-    // }
   },
   data () {
     return {
@@ -84,22 +68,6 @@ export default {
     if (this.page) {
       this.displayPage(this.page);
     }
-
-    // if (this.pageMatches && this.pageMatchesLength) {
-    //   // For some reason changes to the array isn't picked up, so sent as an object.
-    //   const {pageMatches} = this.pageMatches;
-    //   const {pageMatchesLength} = this.pageMatchesLength;
-    //
-    //   if (this.pageIndex in pageMatches) {
-    //     this.$refs.textLayer.updateTextLayerMatches(this.query, pageMatchesLength ? pageMatchesLength[this.pageIndex] : null, pageMatches[this.pageIndex]);
-    //   } else {
-    //     this.$refs.textLayer.clearTextLayerMatches();
-    //   }
-    // }
-    //
-    // if (this.pageIndex === this.selectedMatch.pageIdx) {
-    //   this.$refs.textLayer.selectedMatch(this.selectedMatch.pageIdx, this.selectedMatch.matchIdx);
-    // }
   },
   watch: {
     page () {
@@ -130,25 +98,7 @@ export default {
       if (typeof this.scale !== 'undefined') {
         this.displayPage(this.page);
       }
-    },
-    pageMatches () {
-      // if (this.pageMatches && this.pageMatchesLength) {
-      //   // For some reason changes to the array isn't picked up, so sent as an object.
-      //   const {pageMatches} = this.pageMatches;
-      //   const {pageMatchesLength} = this.pageMatchesLength;
-      //
-      //   if (this.pageIndex in pageMatches) {
-      //     this.$refs.textLayer.updateTextLayerMatches(this.query, pageMatchesLength ? pageMatchesLength[this.pageIndex] : null, pageMatches[this.pageIndex]);
-      //   } else {
-      //     this.$refs.textLayer.clearTextLayerMatches();
-      //   }
-      // }
     }
-    // selectedMatch () {
-    //   if (this.pageIndex === this.selectedMatch.pageIdx) {
-    //     this.$refs.textLayer.selectedMatch(this.selectedMatch.pageIdx, this.selectedMatch.matchIdx);
-    //   }
-    // }
   },
   methods: {
     getPageScale (page = this.page) {
@@ -167,7 +117,6 @@ export default {
       return pageScale;
     },
     displayPage (page) {
-      // const scale = this.getPageScale(page);
       const { canvas } = this.$refs;
       const canvasContext = canvas.getContext('2d');
       const { scale } = this;
@@ -226,10 +175,7 @@ export default {
 }
 </script>
 
-<style >
-.pageWrapper.loading {
-  /*background: #fff url('../assets/loading-icon.gif') center no-repeat;*/
-}
+<style>
 canvas {
   background-color: #fff;
 }

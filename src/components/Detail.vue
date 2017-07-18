@@ -283,10 +283,6 @@ export default {
     max-width: 50vw;
   }
 
-  .content {
-    /*max-width: 40vw;*/
-  }
-
   .detail_arrow {
     position: fixed;
     top: 50%;

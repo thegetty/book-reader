@@ -5,7 +5,6 @@
 
 <script>
 const pdfjsLib = require('pdfjs-dist');
-// pdfjsLib.PDFJS.workerSrc = '/static/libs/pdfjs-dist/build/pdf.worker.js';
 
 export default {
   name: 'textlayer',

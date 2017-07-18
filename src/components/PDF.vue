@@ -380,10 +380,6 @@ export default {
 </script>
 
 <style scoped>
-.loading {
-  /*background: #eee url('../assets/loading-icon.gif') center no-repeat;*/
-}
-
 .pageContainer {
   overflow: scroll;
   position: relative;
