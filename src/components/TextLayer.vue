@@ -1,5 +1,5 @@
 <template>
-  <div ref="textLayer" :style="{ width: `${viewport ? viewport.width : 0}px`, height: `${viewport ? viewport.height : 0}px` }" class="textLayer"></div>
+  <div ref="textLayer" :style="computedStyle" class="textLayer"></div>
 </template>
 
 
@@ -43,6 +43,14 @@ export default {
   },
   destroyed () {
 
+  },
+  computed: {
+    computedStyle () {
+      return {
+        width: `${this.viewport ? this.viewport.width : 0}px`,
+        height: `${this.viewport ? this.viewport.height : 0}px`
+      }
+    }
   },
   watch: {
     page () {

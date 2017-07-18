@@ -1,11 +1,11 @@
 <template>
   <div ref="imageLayer"
-        :style="{ width: `${viewport ? viewport.width : 0}px`, height: `${viewport ? viewport.height : 0}px` }"
+        :style="computedStyle"
         class="imageLayer">
     <div v-for="image in images" class="imageLayerItem"
          :ref="image.objId"
          :id="image.objId"
-         :style="{ width: `${image.width}px`, height: `${image.height}px`, top: `${image.top-image.height}px`, left: `${image.left}px`}"
+         :style="imageStyle(image)"
          @click="handleClick(image)">
 
     </div>
@@ -42,6 +42,14 @@ export default {
       // console.log('images', this.images);
     }
   },
+  computed: {
+    computedStyle () {
+      return {
+        width: `${this.viewport ? this.viewport.width : 0}px`,
+        height: `${this.viewport ? this.viewport.height : 0}px`
+      }
+    }
+  },
   watch: {
     images () {
       if (this.images) {
@@ -55,6 +63,14 @@ export default {
         this.onImageClicked(image);
       }
       this.$emit('imageClicked', image);
+    },
+    imageStyle (image) {
+      return {
+        width: `${image.width}px`,
+        height: `${image.height}px`,
+        top: `${image.top - image.height}px`,
+        left: `${image.left}px`
+      }
     }
   }
 }

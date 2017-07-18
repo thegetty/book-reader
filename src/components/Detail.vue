@@ -25,7 +25,7 @@
 
           <a @click="$emit('infoSelected', {'artwork_title': currentDetail.artwork_title})" class="filter_item">
             <span>
-              {{ imagesByArtwork[encodeURI(currentDetail.artwork_title)] && imagesByArtwork[encodeURI(currentDetail.artwork_title)].length }} of this artwork
+              {{ numByArtwork(currentDetail.artwork_title) }} of this artwork
             </span>
             <span class="icon is-small">
               <icon name="picture-o" title="Filter by Artist"></icon>
@@ -34,7 +34,7 @@
           <span class="spacer" v-if="currentDetail.artist_name">/</span>
           <a @click="$emit('infoSelected', {'artist_name': currentDetail.artist_name})" class="filter_item" v-if="currentDetail.artist_name">
             <span>
-              {{ imagesByArtist[encodeURI(currentDetail.artist_name)] && imagesByArtist[encodeURI(currentDetail.artist_name)].length }} by this artist
+              {{ numByArtist(currentDetail.artist_name) }} by this artist
             </span>
             <span class="icon is-small">
               <icon name="user" title="Filter by Artist"></icon>
@@ -43,7 +43,7 @@
           <span class="spacer" v-if="currentDetail.collection">/</span>
           <a @click="$emit('infoSelected', {'collection': currentDetail.collection})" class="filter_item" v-if="currentDetail.collection">
             <span>
-              {{ imagesByCollection[encodeURI(currentDetail.collection)] && imagesByCollection[encodeURI(currentDetail.collection)].length }} from this collection
+              {{ numByCollection(currentDetail.collection) }} from this collection
             </span>
             <span class="icon is-small">
               <icon name="institution" title="Filter by Artist"></icon>
@@ -254,6 +254,30 @@ export default {
     onDetailClosed () {
       this.currentDetail = undefined;
       this.$emit('closed');
+    },
+    numByArtwork (artwork) {
+      let hash = encodeURI(artwork);
+      let found = this.imagesByArtwork[hash];
+      if (!found) {
+        return 0;
+      }
+      return found.length;
+    },
+    numByArtist (artist) {
+      let hash = encodeURI(artist);
+      let found = this.imagesByArtist[hash];
+      if (!found) {
+        return 0;
+      }
+      return found.length;
+    },
+    numByCollection (collection) {
+      let hash = encodeURI(collection);
+      let found = this.imagesByCollection[hash];
+      if (!found) {
+        return 0;
+      }
+      return found.length;
     },
     artistLookup (e) {
       let uri = this.currentDetail.artist_uri;

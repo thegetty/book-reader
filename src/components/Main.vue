@@ -1,5 +1,11 @@
 <template>
-  <Reader :manifest-url="url" :page-url="page" :image-url="image" :show-grid="tab === 'grid'" :show-table="tab === 'table'"/>
+  <Reader
+    :manifest-url="url"
+    :page-url="page"
+    :image-url="image"
+    :show-grid="tab === 'grid'"
+    :show-table="tab === 'table'"
+    />
 </template>
 
 <script>

@@ -23,7 +23,14 @@
             <b-icon icon="arrow_drop_down" class="button_action"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="artwork in artworks" :key="artwork.uri" :value="artwork.name" :selected="artworkFilter === artwork.name">{{artwork.name | truncate }}</b-dropdown-option>
+          <b-dropdown-option
+            v-for="artwork in artworks"
+            :key="artwork.uri"
+            :value="artwork.name"
+            :selected="artworkFilter === artwork.name">
+            {{artwork.name | truncate }}
+          </b-dropdown-option>
+
         </b-dropdown>
         <span class="dropdown" v-if="artworkFilter">
           <button class="button" slot="trigger" @click="artworkFilter = undefined;">
@@ -41,7 +48,14 @@
             <b-icon icon="arrow_drop_down" class="button_action"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="artist in artists" :key="artist.uri" :value="artist.name" :selected="artistFilter === artist.name">{{artist.name | truncate}}</b-dropdown-option>
+          <b-dropdown-option
+            v-for="artist in artists"
+            :key="artist.uri"
+            :value="artist.name"
+            :selected="artistFilter === artist.name">
+            {{artist.name | truncate}}
+          </b-dropdown-option>
+
         </b-dropdown>
         <span class="dropdown" v-if="artistFilter">
           <button class="button" slot="trigger" @click="artistFilter = undefined;">
@@ -59,7 +73,14 @@
             <b-icon icon="arrow_drop_down" class="button_action"></b-icon>
           </button>
 
-          <b-dropdown-option v-for="collection in collections" :key="collection.uri" :value="collection.name" :selected="collectionFilter === collection.name">{{collection.name | truncate}}</b-dropdown-option>
+          <b-dropdown-option
+            v-for="collection in collections"
+            :key="collection.uri"
+            :value="collection.name"
+            :selected="collectionFilter === collection.name">
+            {{collection.name | truncate}}
+          </b-dropdown-option>
+
         </b-dropdown>
         <span class="dropdown" v-if="collectionFilter">
           <button class="button" slot="trigger" @click="collectionFilter = undefined;">

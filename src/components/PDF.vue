@@ -1,20 +1,15 @@
 <template>
   <div :ref="'container'"
        class="pageContainer"
-       :class="{ loading: isLoading, centered: (!spreads || zoom <= 1) }"
-       :style="{ width: `${width}px`, height: `${height ? height : viewportHeight }px` }">
-    <div class="pages" :style="{
-      width: `${viewportWidth}px`,
-      height: `${viewportHeight}px`,
-      top: `${viewportTop}px`,
-      left: `${viewportLeft}px`
-      }">
+       :class="containerClass"
+       :style="containerStyle">
+    <div class="pages" :style="pagesStyle">
       <page
         v-for="page in displayedPages"
         :key="page.pageIndex"
         :ref="'page_'+page.pageIndex"
         :page="page"
-        :width="spreads ? (width / 2) - 40 : width - 40"
+        :width="computedWidth"
         :height="height - 40"
         :scale="zoom"
         :onViewport="handleViewport"
@@ -115,6 +110,25 @@ export default {
         .catch((err) => console.error(err));
     }
   },
+  computed: {
+    containerStyle () {
+      return { width: `${this.width}px`, height: `${this.height ? this.height : this.viewportHeight}px` }
+    },
+    containerClass () {
+      return { loading: this.isLoading, centered: (!this.spreads || this.zoom <= 1) }
+    },
+    pagesStyle () {
+      return {
+        width: `${this.viewportWidth}px`,
+        height: `${this.viewportHeight}px`,
+        top: `${this.viewportTop}px`,
+        left: `${this.viewportLeft}px`
+      }
+    },
+    computedWidth () {
+      return this.spreads ? (this.width / 2) - 40 : this.width - 40;
+    }
+  },
   watch: {
     src () {
       if (this.src) {
@@ -140,7 +154,6 @@ export default {
     },
     query () {
       if (this.query === '') {
-        // this.findController.executeCommand('find', {query: this.query});
         this.clearMatches();
       }
     },
